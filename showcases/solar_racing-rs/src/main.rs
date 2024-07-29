@@ -1,6 +1,7 @@
 use gdk::Display;
-use gtk::{Application, CssProvider};
 use gtk::prelude::*;
+use gtk::{gdk, Application, CssProvider};
+
 
 mod gui;
 mod utils;

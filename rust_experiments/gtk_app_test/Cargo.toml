@@ -1,9 +1,7 @@
 [package]
-name = "solar_racing-rs"
+name = "gtk_app_test"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-glib = "0.20.0"
-gdk = "0.18.0"
 gtk = { version = "0.9.0", package = "gtk4", features = ["v4_12"] }

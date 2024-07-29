@@ -1,7 +1,7 @@
 use gtk::prelude::*;
 use gtk::{glib, Application, ApplicationWindow, Button};
 
-const APP_ID: &str = "my-gtk-app";
+const APP_ID: &str = "org.example.mygtkapp";
 
 fn main() -> glib::ExitCode {
     // Create a new application
