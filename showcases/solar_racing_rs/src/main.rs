@@ -1,12 +1,13 @@
-use gdk::Display;
 use gtk::prelude::*;
-use gtk::{gdk, Application, CssProvider};
-
+use gtk::Application;
 
 mod gui;
 mod utils;
+mod gui_main;
 
 const APP_ID: &str = "com.solar_racing";
+
+
 
 fn main() {
     // Create the application
@@ -16,7 +17,7 @@ fn main() {
 
     // Connect to activate signal
     app.connect_activate(|app| {
-        gui::gui_main::build_ui(app);
+        gui_main::build_ui(app);
     });
 
     // Run the application

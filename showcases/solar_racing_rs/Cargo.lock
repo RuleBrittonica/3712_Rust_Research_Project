@@ -579,6 +579,37 @@ dependencies = [
 ]
 
 [[package]]
+name = "libadwaita"
+version = "0.7.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2ff9c222b5c783729de45185f07b2fec2d43a7f9c63961e777d3667e20443878"
+dependencies = [
+ "gdk4",
+ "gio 0.20.0",
+ "glib 0.20.0",
+ "gtk4",
+ "libadwaita-sys",
+ "libc",
+ "pango 0.20.0",
+]
+
+[[package]]
+name = "libadwaita-sys"
+version = "0.7.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1c44d8bdbad31d6639e1f20cc9c1424f1a8e02d751fc28d44659bf743fb9eca6"
+dependencies = [
+ "gdk4-sys",
+ "gio-sys 0.20.0",
+ "glib-sys 0.20.0",
+ "gobject-sys 0.20.0",
+ "gtk4-sys",
+ "libc",
+ "pango-sys 0.20.0",
+ "system-deps 7.0.1",
+]
+
+[[package]]
 name = "libc"
 version = "0.2.155"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -796,8 +827,10 @@ name = "solar_racing-rs"
 version = "0.1.0"
 dependencies = [
  "gdk",
+ "gio 0.20.0",
  "glib 0.20.0",
  "gtk4",
+ "libadwaita",
 ]
 
 [[package]]
