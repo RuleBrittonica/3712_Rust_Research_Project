@@ -1,0 +1,21 @@
+/* style.css */
+window {
+  background-color: #F3F3F3;
+}
+
+button {
+  background-color: #0078D7;
+  color: white;
+  border-radius: 4px;
+  padding: 6px 12px;
+}
+
+button:hover {
+  background-color: #005A9E;
+}
+
+label {
+  font-family: "Segoe UI", sans-serif;
+  font-size: 12pt;
+  color: #333333;
+}
