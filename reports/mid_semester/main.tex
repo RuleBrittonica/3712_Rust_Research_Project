@@ -1,0 +1,45 @@
+\documentclass{sig-alternate-05-2015}
+
+\usepackage{graphicx}
+\usepackage{color}
+\usepackage{url}
+\usepackage{multicol}
+\usepackage{microtype}
+\usepackage{siunitx} % For SI units
+\usepackage{amsmath} % For advanced math features
+\usepackage{fixltx2e} % Fixes some LaTeX2e bugs
+
+
+\begin{document}
+
+\title{Refactoring Methods in Rust - Mid Semester Report}
+
+\author{Matthew Britton\\ ENGN3712, ANU\\ \url{matt.britton@anu.edu.au} \and
+Alex Potanin\\ SoC, ANU\\ \url{alex.potanin@anu.edu.au}}
+
+\maketitle
+
+
+% Acknowledgements and Abstract
+\input{frontmatter/acknowledgements.tex}
+\input{frontmatter/abstract.tex}
+
+% Lists and Tables
+\tableofcontents
+\newpage
+\listoffigures
+\newpage
+\listoftables
+\newpage
+
+% Main Report Body
+\input{chapters/introduction.tex}
+\input{chapters/background_info.tex}
+\input{chapters/project_methods.tex}
+
+\newpage
+
+\bibliographystyle{plan}
+\bibliography{references}
+
+\end{document}

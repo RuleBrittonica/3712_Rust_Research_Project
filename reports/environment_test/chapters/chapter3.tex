@@ -1,0 +1,70 @@
+\section{Question 3}
+\subsection{Part a}
+Convection and Radiation will carry heat away from the wall (and into the environment), whilst Conduction will bring heat from the inside of the wall to the outside. Thus we arrive at the following equation: $Q_x = Q_e + Q_c$
+\begin{equation*}
+    \begin{split}
+        k \cdot A \cdot \left(\frac{T_2 - T_1}{L}\right) & = \epsilon \cdot \sigma \cdot A \cdot (T_B^4 - T_s^4) + h \cdot A \cdot (T_B - T_F) \\
+        k \cdot \left(\frac{T_2 - T_1}{L}\right) & = \epsilon \cdot \sigma \cdot  (T_B^4 - T_s^4) + h \cdot (T_B - T_F) \\
+        0.3 \cdot \left(\frac{308 - T_s}{0.003}\right) & = 0.95 \cdot 5.67\text{x}10^{-8} \cdot (T_s^4 - 297^4) + 2 \cdot (T_s - 297)
+    \end{split}
+\end{equation*}
+\subsection{Part b}
+\begin{equation*}
+    \begin{split}
+        0.3 \cdot \left(\frac{308 - T_s}{0.003}\right) & = 0.95 \cdot 5.67\text{x}10^{-8} \cdot (T_s^4 - 297^4) + 2 \cdot (T_s - 297) \\
+    \end{split}
+\end{equation*}
+Plugging the above equation into Wolfram gives: $T_s = 307$ (and $T_s = -1327$, which we can safely ignore.) \\
+$T_s = 307$K = $34^\circ$C
+\section{Question 4}
+\subsection{Part a}
+\begin{equation*}
+    \begin{split}
+        \gamma & = 2.5 = \frac{Q_{out}}{W_{cycle}} \\
+        & = \frac{80000}{W_{cycle}} \\
+        W_{cycle} & = \frac{80000}{2.5} \\
+        & = 32000 \text{kJh}^{-1} \\
+        & = 8.89 \text{kW}
+w    \end{split}
+\end{equation*}
+\subsection{Part b}
+\begin{equation*}
+    \begin{split}
+        W_{cycle} & = Q_{out} - Q_{in} \\
+        Q_{in} & = Q_{out} - W_{cycle} \\
+        & = 80000 - 32000 \\
+        & = 48000 \text{kJh}^{-1} \\
+        & = 13.33 \text{kW}
+    \end{split}
+\end{equation*}
+
+\section{Question 5}
+\subsection{Part a}
+State 1: \\
+From table A-1, at water's critical point, $T_c = 647.3K, P_c = 220.9bar$. \\
+From table A-2, when we consider T = $374.14^\circ$C and P = 220.9 bar. \\
+We know that $v_1 = v_2 = 0.00315\text{Jm}^3 \cdot kg^{-1}$. \\
+State 2: \\
+Additionally, from Table A-3, at P = 30 bar: \\
+\begin{equation*}
+    \begin{split}
+        v_f & = 1.2165\text{x}10^{-3}\text{m}^3\cdot kg^{-1} \\
+        v & = v_f + x(v_g - v_f) \\
+        x_2 & = \frac{v_2 - v_f}{v_g - v_f} \\
+        & = \frac{0.003155 - (1.2165\text{x}10^{-3})}{0.06668 = (1.2165\text{x}10^{-3})} \\
+        x_2 & = 0.0296
+    \end{split}
+\end{equation*}
+\subsection{Part b}
+We know: $T_1 = T_2 = T_c = 647.3K = 374.3^\circ C$. \\
+From Table A-4, at P\textsubscript{2} = 30 bar: \\
+\begin{enumerate}
+    \item T = $360^\circ$C, $v = 0.0923$.
+    \item T = $400^\circ$C, $v = 0.0994$.
+\end{enumerate}
+Interpolating for T\textsubscript{2} = $374.3^\circ$C, $\frac{v_{400}-v_{360}}{400-360} = \frac{v_2 - v_{360}}{374.3-360}$. \\
+From there we get: $$\frac{0.0944 - 0.0923}{400-360} = \frac{v_2 - 0.0923}{374.3 - 360}$$
+Hence:
+$$
+v_2 = 0.0948\text{m}^3 \cdot \text{kg}^{-1}
+$$
