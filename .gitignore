@@ -1,6 +1,7 @@
 # Ignore all target directories
 **/target/
 
+**/.aux/
 
 ## Manually specified
 
