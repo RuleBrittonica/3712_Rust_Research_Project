@@ -26,7 +26,7 @@ pub struct Car {
     lift_force: f64, // N
     side_force: f64, // N
     roll_moment: f64, // Nm
-    yaw_moment: f64, // Nm
+    yaw_moment: f64, // Nmp
     pitch_moment: f64, // Nm
 
     // Magic Numbers
