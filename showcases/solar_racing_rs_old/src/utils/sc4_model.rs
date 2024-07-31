@@ -195,4 +195,7 @@ impl fmt::Display for OffsetCat {
                self.roll_coefficient, self.yaw_coefficient, self.pitch_coefficient,
                self.drag_force, self.lift_force, self.side_force,
                self.roll_moment, self.yaw_moment, self.pitch_moment,
-               self.B,
+               self.B, self.C, self.D, self.E,
+               self.cog_f_prop, self.cog_m_prop, self.cog_r_prop)
+    }
+}
