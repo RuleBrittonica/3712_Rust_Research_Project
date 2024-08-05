@@ -1,5 +1,7 @@
 # Ignore all target directories
+***/target/
 **/target/
+*/target/
 
 **/.aux/
 

@@ -415,8 +415,7 @@ checksum = "7a66a03ae7c801facd77a29370b4faec201768915ac14a721ba36f20bc9c209b"
 [[package]]
 name = "rem-borrower"
 version = "0.1.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d04731176befc6e09bb736b24748bd33288ead9bd479522ab62dc118e7e4529d"
+source = "git+https://github.com/RuleBrittonica/rem-borrower.git?branch=master#07f48f304605a87567ad48c7d758ba31c32f78f1"
 dependencies = [
  "clap",
  "colored",
@@ -433,9 +432,8 @@ dependencies = [
 
 [[package]]
 name = "rem-constraint"
-version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9217f04b1bd927e30ba667512a93ed731826128e1d960a34f22921b5cbb161dd"
+version = "0.1.1"
+source = "git+https://github.com/RuleBrittonica/rem-constraint.git?branch=master#9591982174025725dbdd4233e71df087a668ba76"
 dependencies = [
  "env_logger",
  "itertools",
@@ -451,8 +449,7 @@ dependencies = [
 [[package]]
 name = "rem-controller"
 version = "0.1.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "46c926f9c38ed8d4ce590e711677ce55f5767c4ff0541f621a96bbf8fa9772c5"
+source = "git+https://github.com/RuleBrittonica/rem-controller.git?branch=master#acbb9cd8acdd5c5196d22aaf8c75edb51fbdd127"
 dependencies = [
  "clap",
  "colored",
@@ -468,8 +465,7 @@ dependencies = [
 [[package]]
 name = "rem-repairer"
 version = "0.1.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9445cf6c34ecf2620d8a97ce2600773ff026e3669f981c5604bfae8367f14f4b"
+source = "git+https://github.com/RuleBrittonica/rem-repairer.git?branch=master#81458c3410e26ac8ed985fdc9f64ce198d3ea527"
 dependencies = [
  "clap",
  "colored",
@@ -488,8 +484,7 @@ dependencies = [
 [[package]]
 name = "rem-utils"
 version = "0.1.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2597a9dca78191ebc8cadcb4b6855b4b7bc325e3150aff7f1d7f97161158dd68"
+source = "git+https://github.com/RuleBrittonica/rem-utils.git?branch=master#3ec2714a86f311d6c810502d5edd2a7d7a0769b2"
 dependencies = [
  "ena",
  "home",
