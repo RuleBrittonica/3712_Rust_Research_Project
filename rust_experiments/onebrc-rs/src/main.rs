@@ -22,7 +22,7 @@ impl Default for State {
 impl Display for State {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let avg = self.sum / (self.count as f64);
-        write!(f, "{:.1}/{avg:.1}/{:.1}", self.min, self.max)
+        write!(f, "{:.1}/{:.1}/{:.1}", self.min, avg, self.max)
     }
 }
 
