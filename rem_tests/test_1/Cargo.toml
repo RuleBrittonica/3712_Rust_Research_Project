@@ -1,0 +1,18 @@
+[package]
+name = "test_1"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+
+[dependencies.rem-borrower]
+git = "https://github.com/RuleBrittonica/rem/tree/main/src/rem-borrower"
+rev = "891a6f1de2a85b5ab534bff4c4cff9b27803e305"
+
+[dependencies.rem-controller]
+git = "https://github.com/RuleBrittonica/rem/tree/main/src/rem-controller"
+rev = "891a6f1de2a85b5ab534bff4c4cff9b27803e305"
+
+[dependencies.rem-repairer]
+git = "https://github.com/RuleBrittonica/rem/tree/main/src/rem-repairer"
+rev = "891a6f1de2a85b5ab534bff4c4cff9b27803e305"
