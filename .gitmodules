@@ -1,0 +1,3 @@
+[submodule "rem-vscode"]
+	path = rem-vscode
+	url = https://github.com/RuleBrittonica/rem-vscode.git
