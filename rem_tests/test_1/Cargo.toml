@@ -1,0 +1,18 @@
+[package]
+name = "test_1"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+
+[dependencies.rem-borrower]
+git = "https://github.com/RuleBrittonica/rem-borrower.git"
+branch = "master"
+
+[dependencies.rem-controller]
+git = "https://github.com/RuleBrittonica/rem-controller.git"
+branch = "master"
+
+[dependencies.rem-repairer]
+git = "https://github.com/RuleBrittonica/rem-repairer.git"
+branch = "master"
