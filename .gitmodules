@@ -7,3 +7,6 @@
 [submodule "rem-matt/rem-borrower"]
 	path = rem-matt/rem-borrower
 	url = https://github.com/RuleBrittonica/rem-borrower.git
+[submodule "rem-matt/rem-controller"]
+	path = rem-matt/rem-controller
+	url = https://github.com/RuleBrittonica/rem-controller
