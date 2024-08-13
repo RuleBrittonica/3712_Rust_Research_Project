@@ -10,3 +10,6 @@
 [submodule "rem-matt/rem-controller"]
 	path = rem-matt/rem-controller
 	url = https://github.com/RuleBrittonica/rem-controller
+[submodule "rem-matt/rem-repairer"]
+	path = rem-matt/rem-repairer
+	url = https://github.com/RuleBrittonica/rem-repairer
