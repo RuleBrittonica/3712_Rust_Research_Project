@@ -4,3 +4,6 @@
 [submodule "rem-matt/rem-utils"]
 	path = rem-matt/rem-utils
 	url = https://github.com/RuleBrittonica/rem-utils.git
+[submodule "rem-matt/rem-borrower"]
+	path = rem-matt/rem-borrower
+	url = https://github.com/RuleBrittonica/rem-borrower.git
