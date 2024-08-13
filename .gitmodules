@@ -16,3 +16,9 @@
 [submodule "rem-matt/rem-constraint"]
 	path = rem-matt/rem-constraint
 	url = https://github.com/RuleBrittonica/rem-constraint.git
+[submodule "rem-matt/rem-mat"]
+	path = rem-matt/rem-mat
+	url = https://github.com/RuleBrittonica/rem-cli
+[submodule "rem-matt/rem-cli"]
+	path = rem-matt/rem-cli
+	url = https://github.com/RuleBrittonica/rem-cli
