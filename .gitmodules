@@ -13,3 +13,6 @@
 [submodule "rem-matt/rem-repairer"]
 	path = rem-matt/rem-repairer
 	url = https://github.com/RuleBrittonica/rem-repairer
+[submodule "rem-matt/rem-constraint"]
+	path = rem-matt/rem-constraint
+	url = https://github.com/RuleBrittonica/rem-constraint.git
