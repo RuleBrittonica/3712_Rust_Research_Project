@@ -1,4 +1,4 @@
-[submodule "rem-vscode"]
+[submodule "rem-matt/rem-vscode"]
 	path = rem-vscode
 	url = https://github.com/RuleBrittonica/rem-vscode.git
 [submodule "rem-matt/rem-utils"]
