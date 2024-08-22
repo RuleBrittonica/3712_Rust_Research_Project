@@ -1,9 +1,9 @@
 [submodule "rem-matt/rem-utils"]
 	path = rem-matt/rem-utils
-	url = https://github.com/RuleBrittonica/rem-utils.git
+	url = https://github.com/RuleBrittonica/rem-utils
 [submodule "rem-matt/rem-borrower"]
 	path = rem-matt/rem-borrower
-	url = https://github.com/RuleBrittonica/rem-borrower.git
+	url = https://github.com/RuleBrittonica/rem-borrower
 [submodule "rem-matt/rem-controller"]
 	path = rem-matt/rem-controller
 	url = https://github.com/RuleBrittonica/rem-controller
@@ -12,10 +12,10 @@
 	url = https://github.com/RuleBrittonica/rem-repairer
 [submodule "rem-matt/rem-constraint"]
 	path = rem-matt/rem-constraint
-	url = https://github.com/RuleBrittonica/rem-constraint.git
+	url = https://github.com/RuleBrittonica/rem-constraint
 [submodule "rem-matt/rem-cli"]
 	path = rem-matt/rem-cli
 	url = https://github.com/RuleBrittonica/rem-cli
 [submodule "rem-matt/rem-vscode"]
 	path = rem-matt/rem-vscode
-	url = https://github.com/RuleBrittonica/rem-vscode.git
+	url = https://github.com/RuleBrittonica/rem-vscode
