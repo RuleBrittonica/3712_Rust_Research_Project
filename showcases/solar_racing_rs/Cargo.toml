@@ -1,9 +1,0 @@
-[workspace]
-
-members = [
-    "frontend",
-    "solar_array",
-    "vehicle_stability",
-]
-
-resolver = "2"
