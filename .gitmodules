@@ -25,3 +25,6 @@
 [submodule "rem/rem-vscode"]
 	path = rem/rem-vscode
 	url = https://github.com/RuleBrittonica/rem-vscode.git
+[submodule "experiments/rust-lsp-test"]
+	path = experiments/rust-lsp-test
+	url = https://github.com/RuleBrittonica/rust-lsp-test
