@@ -1,45 +1,115 @@
-\documentclass{sig-alternate-05-2015}
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+
+\documentclass[fleqn,10pt]{SelfArx} % Document font size and equations flushed left
+
+\usepackage[english]{babel}
+
+\usepackage{lipsum}
 
 \usepackage{graphicx}
-\usepackage{color}
-\usepackage{url}
-\usepackage{multicol}
-\usepackage{microtype}
-\usepackage{siunitx} % For SI units
-\usepackage{amsmath} % For advanced math features
-\usepackage{fixltx2e} % Fixes some LaTeX2e bugs
 
+%----------------------------------------------------------------------------------------
+%	COLUMNS
+%----------------------------------------------------------------------------------------
+
+\setlength{\columnsep}{0.55cm} % Distance between the two columns of text
+\setlength{\fboxrule}{0.75pt} % Width of the border around the abstract
+
+%----------------------------------------------------------------------------------------
+%	COLORS
+%----------------------------------------------------------------------------------------
+
+\definecolor{color1}{RGB}{0,0,90} % Color of the article title and sections
+\definecolor{color2}{RGB}{0,20,20} % Color of the boxes behind the abstract and headings
+
+%----------------------------------------------------------------------------------------
+%	HYPERLINKS
+%----------------------------------------------------------------------------------------
+
+\usepackage{hyperref}
+
+\hypersetup{
+	hidelinks,
+	colorlinks,
+	breaklinks=true,
+	urlcolor=color2,
+	citecolor=color1,
+	linkcolor=color1,
+	bookmarksopen=false,
+	pdftitle={Title},
+	pdfauthor={Author},
+}
+
+%----------------------------------------------------------------------------------------
+%	ARTICLE INFORMATION
+%----------------------------------------------------------------------------------------
+
+\JournalInfo{ENGN3712: Major Research Project}
+\Archive{Mid Project Report}
+
+\PaperTitle{Bringing Extract Method Refactoring to the Rust Programming Language:
+Experiments with REM}
+
+\Authors{Matthew Britton\textsuperscript{1}, Supervisor: Alex Potanin\textsuperscript{2}}
+\affiliation{\textsuperscript{1}\textit{School of Engineering, The Australian
+National University. | matt.britton@anu.edu.au}}
+\affiliation{\textsuperscript{2}\textit{School of Computing, The Australian
+National University. | alex.potanin@anu.edu.au}}
+
+\Keywords{Rust}
+\newcommand{\keywordname}{Keywords}
+
+%----------------------------------------------------------------------------------------
+%	ABSTRACT
+%----------------------------------------------------------------------------------------
+
+\input{frontmatter/abstract.tex}
+
+%----------------------------------------------------------------------------------------
 
 \begin{document}
 
-\title{Refactoring Methods in Rust - Mid Semester Report}
-
-\author{Matthew Britton\\ ENGN3712, ANU\\ \url{matt.britton@anu.edu.au} \and
-Alex Potanin\\ SoC, ANU\\ \url{alex.potanin@anu.edu.au}}
-
 \maketitle
 
-
-% Acknowledgements and Abstract
-\input{frontmatter/acknowledgements.tex}
-\input{frontmatter/abstract.tex}
-
-% Lists and Tables
 \tableofcontents
-\newpage
-\listoffigures
-\newpage
-\listoftables
-\newpage
 
-% Main Report Body
+
+%----------------------------------------------------------------------------------------
+%	ARTICLE CONTENTS
+%----------------------------------------------------------------------------------------
+
 \input{chapters/introduction.tex}
-\input{chapters/background_info.tex}
+
+\input{chapters/theory_background.tex}
+
+\input{chapters/lit_review.tex}
+
 \input{chapters/project_methods.tex}
 
-\newpage
+\input{chapters/initial_results.tex}
 
-\bibliographystyle{plan}
-\bibliography{references}
+\input{chapters/future_work.tex}
+
+\input{chapters/project_issues.tex}
+
+
+%------------------------------------------------
+
+\input{frontmatter/acknowledgements.tex}
+\addcontentsline{toc}{section}{Acknowledgments}
+
+So long and thanks for all the fish \cite{Figueredo:2009dg, Smith:2012qr}.
+
+%----------------------------------------------------------------------------------------
+%	REFERENCE LIST
+%----------------------------------------------------------------------------------------
+
+\phantomsection
+\bibliographystyle{unsrt}
+\bibliography{ref.bib}
+
+%----------------------------------------------------------------------------------------
 
 \end{document}
