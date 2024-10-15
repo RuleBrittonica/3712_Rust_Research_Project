@@ -14,13 +14,13 @@ contribution focused on the theoretical apects of the problem
 implementation, \cite{BorrowingWithoutSorrowing}, with a pure Rust algorithm and
 a heavy reliance on Intellij IDEA's type inference and static code analysis
 tools. Their approach was dubbed ``Rusty Extraction Maestro'' (REM). Figure
-\ref{fig:rem-overview} \cite{AdventureOfALifetime} gives a high-level overview
+\ref{fig:rem-overview} gives a high-level overview
 of the REM algorithm.
 
 \begin{figure}[h]
     \centering
     \includegraphics[width=\columnwidth]{Figures/rem-overview.png}
-    \caption{The REM Algorithm}
+    \caption{An overview of the REM Algorithm, from \cite{AdventureOfALifetime}}
     \label{fig:rem-overview}
 \end{figure}
 
@@ -65,3 +65,38 @@ impossible as it would a model of the formal semantics of (safe) Rust, which
 doesn't exists \cite{AdventureOfALifetime}. Instead, the toolchain relies on
 extensive testing, the rust compiler, and a fail-early approach to ensure that
 the user is never presented with ``incorrect'' code.
+
+\subsection*{Aims}
+
+This project aims to improve and extend on the REM tool by addressing key
+limitations and researching (and subsequently implementing) new approaches to
+refactoring.
+\begin{enumerate}
+    \item \textbf{Fixing REM's Issues:} Remove the dependency on (\textit{i})
+    \verb|rustc| and (\textit{ii}) Intellij IDEA to make REM a standalone tool.
+    Additionally, reduce file I/O overhead by optimising the tools internal data
+    handling
+    \item \textbf{Platform-Agnostic Code Extraction:} Build a complete,
+    end-to-endsolution for method extraction using \textit{Rust Analyzer} (RA)
+    for the code extraction, wrapped in a single, user-friendly CLI tool written
+    entirely in Rust.
+    \item \textbf{VSCode Extension Proof of Concept:} Develop a VSCode extension
+    to showcase how REM can be easily integrated into editors, with potential
+    for extending to other environments.
+    \item \textbf{Exploring New Refactorings:} The big ticket item for this
+    research project where the bulk of my time will be spent, investigating
+    extract method refactoring for the far more advanced areas of
+    \textit{Generics, Ansynchronous Code, Macros, Closures, and Const
+    Functions}. \textit{Generics} and \textit{Asynchronous Code} present special
+    challenges due to (a) the complex lifetimes and (b) the uncertainty of the
+    code at compile time, and are what the majority of the research will focus
+    on.
+    \item \textbf{Final Aim: Merging REM with RA:} An ultimate, ambitious goal
+    for this project is to merge the REM toolchain with RA, Rust's official
+    language server protocol (LSP) implementation
+    \footnote{https://rust-analyzer.github.io/}. This would require proving
+    substantially more of the correctness of REM (although as previously noted,
+    a full correctness proof is impossible), allowing its functionality to be
+    available across any Rust-supported editor. If that is not feasible, then a
+    well featured VSCode extension is a suitable alternative.
+\end{enumerate}

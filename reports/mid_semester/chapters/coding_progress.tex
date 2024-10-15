@@ -8,7 +8,8 @@ compiler. It relied compiler specific representations of files and their syntax
 trees. Because of this dependency, REM required a very specific buildchain, and
 could not be used outside of this build context. Additionally, when I took over
 the project, changes to external libraries meant that the toolchain was
-completely non-functional. \\
+completely non-functional. Some work is still required to bring the toolchain
+off of nightly rust onto stable rust.\\
 Another small modification has been changing the way REM handles data.
 Previously, the three main components of REM (controller, borrower and repairer)
 worked by each reading and writing to a file, and then passing the file to the
@@ -16,7 +17,26 @@ next stage of the toolchain. By changing the way data is passed between the (now
 5) modules of REM, a roughly 10-20\% speedup has been achieved.
 
 \subsection*{REM-Extract: Performing inital function extraction in Rust}
+% Mention HIR here, how Rust performs its type inference (and what type
+% inference is in general) - \cite{DUGGAN199637}
+% Also mention the extract method literature review here \cite{ExtractMethodLitReview}
 
 \subsection*{REM-CLI: A comprehensive command line interface for REM}
 
+The REM-CLI provides a unified interface for developers to interact with the
+5 separate modules of REM. It streamlines the process of performing method
+extraction by offering an intuitive command-line interface that handles
+everything from code analysis to extraction. By consolidating the toolchain into
+a single, easy-to-use CLI, REM removes the need for users to manually manage
+multiple stages of the extraction process. It is also needed to itegrate the
+functionality into a code editor.
+
 \subsection*{REM-VSCode: A Visual Studio Code extension for REM}
+
+The REM-VSCode extension is a proof of concept that demonstrates how the REM
+tool can be easily integrated into any code editor. It provides a user-friendly interface
+within the far more popular Visual Studio Code editor. Because the entire
+backend of REM is now written in Rust, the extension is able to be independent
+of a specific platform, and thanks the the previous work on decoupling the tool
+from rustc, it no longer requires a very specific environment / buildchain to
+run. It is available on the \href{https://marketplace.visualstudio.com/items?itemName=MatthewBritton.remvscode&ssr=false#overview}{VSCode Marketplace}.
