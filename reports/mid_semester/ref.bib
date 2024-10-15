@@ -1,0 +1,81 @@
+@article{AdventureOfALifetime,
+    author = {Thy, Sewen and Costea, Andreea and Gopinathan, Kiran and Sergey, Ilya},
+    title = {Adventure of a Lifetime: Extract Method Refactoring for Rust},
+    year = {2023},
+    issue_date = {October 2023},
+    publisher = {Association for Computing Machinery},
+    address = {New York, NY, USA},
+    volume = {7},
+    number = {OOPSLA2},
+    url = {https://doi.org/10.1145/3622821},
+    doi = {10.1145/3622821},
+    abstract = {We present a design and implementation of the automated "Extract Method" refactoring for Rust programs. Even though Extract Method is one of the most well-studied and widely used in practice automated refactorings, featured in all major IDEs for all popular programming languages, implementing it soundly for Rust is surprisingly non-trivial due to the restrictions of the Rust's ownership and lifetime-based type system.
+
+    In this work, we provide a systematic decomposition of the Extract Method refactoring for Rust programs into a series of program transformations, each concerned with satisfying a particular aspect of Rust type safety, eventually producing a well-typed Rust program. Our key discovery is the formulation of Extract Method as a composition of naive function hoisting and a series of automated program repair procedures that progressively make the resulting program "more well-typed" by relying on the corresponding repair oracles. Those oracles include a novel static intra-procedural ownership analysis that infers correct sharing annotations for the extracted function's parameters, and the lifetime checker of rustc, Rust's reference compiler.
+
+    We implemented our approach in a tool called REM---an automated Extract Method refactoring built on top of IntelliJ IDEA plugin for Rust. Our extensive evaluation on a corpus of changes in five popular Rust projects shows that REM (a) can extract a larger class of feature-rich code fragments into semantically correct functions than other existing refactoring tools, (b) can reproduce method extractions performed manually by human developers in the past, and (c) is efficient enough to be used in interactive development.},
+    journal = {Proc. ACM Program. Lang.},
+    month = oct,
+    articleno = {245},
+    numpages = {28},
+    keywords = {program repair, automated code refactoring, Rust}
+}
+
+@article{BorrowingWithoutSorrowing,
+  author = {Sewen Thy},
+  title = {Borrowing without Sorrowing: Implementing Extract Method Refactoring for Rust},
+  year = {2023},
+  url= {https://verse-lab.github.io/papers/Sewen-Thy-Capstone.pdf}
+}
+
+@article{rbooka,
+  author = {Matsakis, Nicholas Turon, Aaron},
+  title = {The Rust RFC Book: Statements and Expressions},
+  url = {https://doc.rust-lang.org/reference/statements-and-expressions.html},
+  year = {2020}
+}
+
+@article{rbookb,
+  author = {Matsakis, Nicholas Turon, Aaron},
+  title = {The Rust RFC Book: Lifetime Elision},
+  url = {https://doc.rust-lang.org/nomicon/lifetime-elision.html},
+  year = {2020}
+}
+
+@inproceedings{10.1145/781131.781156,
+author = {Lerner, Sorin and Millstein, Todd and Chambers, Craig},
+title = {Automatically proving the correctness of compiler optimizations},
+year = {2003},
+isbn = {1581136625},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/781131.781156},
+doi = {10.1145/781131.781156},
+abstract = {We describe a technique for automatically proving compiler optimizations sound, meaning that their transformations are always semantics-preserving. We first present a domain-specific language, called Cobalt, for implementing optimizations as guarded rewrite rules. Cobalt optimizations operate over a C-like intermediate representation including unstructured control flow, pointers to local variables and dynamically allocated memory, and recursive procedures. Then we describe a technique for automatically proving the soundness of Cobalt optimizations. Our technique requires an automatic theorem prover to discharge a small set of simple, optimization-specific proof obligations for each optimization. We have written a variety of forward and backward intraprocedural dataflow optimizations in Cobalt, including constant propagation and folding, branch folding, full and partial redundancy elimination, full and partial dead assignment elimination, and simple forms of points-to analysis. We implemented our soundness-checking strategy using the Simplify automatic theorem prover, and we have used this implementation to automatically prove our optimizations correct. Our checker found many subtle bugs during the course of developing our optimizations. We also implemented an execution engine for Cobalt optimizations as part of the Whirlwind compiler infrastructure.},
+booktitle = {Proceedings of the ACM SIGPLAN 2003 Conference on Programming Language Design and Implementation},
+pages = {220–231},
+numpages = {12},
+keywords = {automated correctness proofs, compiler optimization},
+location = {San Diego, California, USA},
+series = {PLDI '03}
+}
+
+@article{ProvingCompilerOptimisations,
+  author = {Lerner, Sorin and Millstein, Todd and Chambers, Craig},
+  title = {Automatically proving the correctness of compiler optimizations},
+  year = {2003},
+  issue_date = {May 2003},
+  publisher = {Association for Computing Machinery},
+  address = {New York, NY, USA},
+  volume = {38},
+  number = {5},
+  issn = {0362-1340},
+  url = {https://doi.org/10.1145/780822.781156},
+  doi = {10.1145/780822.781156},
+  abstract = {We describe a technique for automatically proving compiler optimizations sound, meaning that their transformations are always semantics-preserving. We first present a domain-specific language, called Cobalt, for implementing optimizations as guarded rewrite rules. Cobalt optimizations operate over a C-like intermediate representation including unstructured control flow, pointers to local variables and dynamically allocated memory, and recursive procedures. Then we describe a technique for automatically proving the soundness of Cobalt optimizations. Our technique requires an automatic theorem prover to discharge a small set of simple, optimization-specific proof obligations for each optimization. We have written a variety of forward and backward intraprocedural dataflow optimizations in Cobalt, including constant propagation and folding, branch folding, full and partial redundancy elimination, full and partial dead assignment elimination, and simple forms of points-to analysis. We implemented our soundness-checking strategy using the Simplify automatic theorem prover, and we have used this implementation to automatically prove our optimizations correct. Our checker found many subtle bugs during the course of developing our optimizations. We also implemented an execution engine for Cobalt optimizations as part of the Whirlwind compiler infrastructure.},
+  journal = {SIGPLAN Not.},
+  month = may,
+  pages = {220–231},
+  numpages = {12},
+  keywords = {automated correctness proofs, compiler optimization}
+}

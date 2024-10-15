@@ -1,0 +1,91 @@
+\section{Ownership and Borrowing Repair \cite{AdventureOfALifetime}}
+\label{app:ownership_and_borrowing_repair}
+
+% \begin{algorithm}[H]
+%     \caption{FixOwnershipAndBorrowing}
+%     \textbf{Input}: the extracted function EF, the expression $E$ of the call to EF, original function F \\
+%     \textbf{Output}: a set of patches PS
+%     \begin{algorithmic}[1]
+%         \State Aliases $\gets$ alias analysis on F
+%         \State Mut $\gets CollectMutabilityConstraints(EF, Aliases)$
+%         \State Own $\gets CollectOwnershipConstraints(EF, Aliases, F)$
+%         \State $PS \gets []$
+%         \For{ $param \in EF.params$ }
+%             \State $(v, \tau, l) \gets param.var, param.type, param.loc$
+%             \If{$UNSAT(Mut \cup Own, v)$}
+%                 \State raise RefactorError
+%             \EndIf
+%             \If{$LUB(Mut \cup Own, v) = \{mut, ref\}$}
+%                 \State $PS \gets (l, v: \tau \rightsquigarrow v: \&mut \tau) :: PS$
+%             \EndIf
+%             \If{$LUB(Mut \cup Own, v) = \{imm, ref\}$}
+%                 \State $PS \gets (l, v: \tau \rightsquigarrow v: \&\tau) :: PS$
+%             \EndIf
+%         \EndFor
+%         \For{ $param \in EF.params$ }
+%             \If{$LUB(Mut \cup Own, param.var) = \{\_, ref\}$}
+%                 \State Exps $\gets$ collect from EF.body all the occurrences of $param.var$
+%                 \For{ $e \in Exps$ }
+%                     \State $PS \gets (e.loc, e \rightsquigarrow \&e) :: PS$
+%                 \EndFor
+%             \EndIf
+%         \EndFor
+%         \For{ $arg \in E.args$ }
+%             \If{$LUB(Mut \cup Own, v) = \{mut, ref\}$}
+%                 \State $PS \gets (l, e \rightsquigarrow \&mut e) :: PS$
+%             \EndIf
+%             \If{$LUB(Mut \cup Own, v) = \{imm, ref\}$}
+%                 \State $PS \gets (l, e \rightsquigarrow \&e) :: PS$
+%             \EndIf
+%         \EndFor
+%         \State \textbf{return} PS
+%     \end{algorithmic}
+% \end{algorithm}
+
+% \begin{algorithm}[H]
+%     \caption{CollectMutabilityConstraints}
+%     \textbf{Input}: extracted function EF, an alias map Aliases \\
+%     \textbf{Output}: a set Mut of mutability constraints
+%     \begin{algorithmic}[1]
+%         \State $MV \gets$ collect all the variables in EF that are part of an lvalue expression
+%         \State add to $MV$ all the variables in the body of EF that are function call arguments with mutable requirements
+%         \State add to $MV$ all the variables in EF that are mutably borrowed
+%         \State $Mut \gets \{imm \leftarrow p.var \mid p \in EF.params \land \forall v' \in Aliases(p.var) : v' \notin MV\} \cup$
+%         \State \quad \{$mut \leftarrow p.var \mid p \in EF.params \land \exists v' \in Aliases(p.var): v' \in MV$\}
+%         \State \textbf{return} Mut
+%     \end{algorithmic}
+% \end{algorithm}
+
+% \begin{algorithm}[H]
+%     \caption{CollectOwnershipConstraints}
+%     \textbf{Input}: extracted function EF, an alias map Aliases, original caller function F \\
+%     \textbf{Output}: a set Ownership of ownership constraints
+%     \begin{algorithmic}[1]
+%         \State $FV \gets$ free variables in F in the code snippet after the call to EF
+%         \State $PBV \gets$ collect all vars in EF.params declared as pass-by-value
+%         \State $Borrows \gets PBV \cap \{p.var \mid p \in EF.params \land \exists v' \in Aliases(p.var) : v' \in FV\}$
+%         \State $Ownership \gets \{v \leftarrow ref \mid v \in Borrows\} \cup \{own \leftarrow v \mid v \in Own\}$
+%         \State \textbf{return} Ownership
+%     \end{algorithmic}
+% \end{algorithm}
+
+\begin{figure*}[h!]
+    \centering
+    \includegraphics[width=\textwidth]{figures/algo_2.png}
+    % \caption{Ownership and Borrowing Repair}
+    \label{fig:algo_2}
+\end{figure*}
+
+\begin{figure*}[h!]
+    \centering
+    \includegraphics[width=\textwidth]{figures/algo_3.png}
+    % \caption{Ownership and Borrowing Repair}
+    \label{fig:algo_3}
+\end{figure*}
+
+\begin{figure*}[h!]
+    \centering
+    \includegraphics[width=\textwidth]{figures/algo_4.png}
+    % \caption{Ownership and Borrowing Repair}
+    \label{fig:algo_4}
+\end{figure*}

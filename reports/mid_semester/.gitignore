@@ -1,1 +1,7 @@
 references/*
+
+**.aux
+*.aux
+*.out
+*.bbl
+*.toc

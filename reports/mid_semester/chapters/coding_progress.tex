@@ -1,9 +1,22 @@
 \section{Coding Progress}
 
-\subsection{Modifications to REM}
+\subsection*{Modifications to REM}
 
-\subsection{REM-Extract: Performing inital function extraction in Rust}
+The most important modification to the original toolchain has been decoupling it
+from the rust compiler. Previously, REM was heavily tied to rustc, the rust
+compiler. It relied compiler specific representations of files and their syntax
+trees. Because of this dependency, REM required a very specific buildchain, and
+could not be used outside of this build context. Additionally, when I took over
+the project, changes to external libraries meant that the toolchain was
+completely non-functional. \\
+Another small modification has been changing the way REM handles data.
+Previously, the three main components of REM (controller, borrower and repairer)
+worked by each reading and writing to a file, and then passing the file to the
+next stage of the toolchain. By changing the way data is passed between the (now
+5) modules of REM, a roughly 10-20\% speedup has been achieved.
 
-\subsection{REM-CLI: A comprehensive command line interface for REM}
+\subsection*{REM-Extract: Performing inital function extraction in Rust}
 
-\subsection{Rem-VSCode: A Visual Studio Code extension for REM}
+\subsection*{REM-CLI: A comprehensive command line interface for REM}
+
+\subsection*{REM-VSCode: A Visual Studio Code extension for REM}
