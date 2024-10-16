@@ -62,7 +62,9 @@ ensuring the correctness of the output. A refactor is ``correct'' if the orginal
 behaviour of the program is preserved \cite{ProvingCompilerOptimisations}.
 Unfortunately, for the REM algorithm, formal verification of the correctness is
 impossible as it would a model of the formal semantics of (safe) Rust, which
-doesn't exists \cite{AdventureOfALifetime}. Instead, the toolchain relies on
+doesn't exist \footnote{Formal correctness proofs for refactorings are very
+rare, even for languages with fully formalised semantics
+\cite{AdventureOfALifetime}}. Instead, the toolchain relies on a combination of
 extensive testing, the rust compiler, and a fail-early approach to ensure that
 the user is never presented with ``incorrect'' code.
 

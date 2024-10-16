@@ -42,24 +42,6 @@
   year = {2020}
 }
 
-@inproceedings{10.1145/781131.781156,
-author = {Lerner, Sorin and Millstein, Todd and Chambers, Craig},
-title = {Automatically proving the correctness of compiler optimizations},
-year = {2003},
-isbn = {1581136625},
-publisher = {Association for Computing Machinery},
-address = {New York, NY, USA},
-url = {https://doi.org/10.1145/781131.781156},
-doi = {10.1145/781131.781156},
-abstract = {We describe a technique for automatically proving compiler optimizations sound, meaning that their transformations are always semantics-preserving. We first present a domain-specific language, called Cobalt, for implementing optimizations as guarded rewrite rules. Cobalt optimizations operate over a C-like intermediate representation including unstructured control flow, pointers to local variables and dynamically allocated memory, and recursive procedures. Then we describe a technique for automatically proving the soundness of Cobalt optimizations. Our technique requires an automatic theorem prover to discharge a small set of simple, optimization-specific proof obligations for each optimization. We have written a variety of forward and backward intraprocedural dataflow optimizations in Cobalt, including constant propagation and folding, branch folding, full and partial redundancy elimination, full and partial dead assignment elimination, and simple forms of points-to analysis. We implemented our soundness-checking strategy using the Simplify automatic theorem prover, and we have used this implementation to automatically prove our optimizations correct. Our checker found many subtle bugs during the course of developing our optimizations. We also implemented an execution engine for Cobalt optimizations as part of the Whirlwind compiler infrastructure.},
-booktitle = {Proceedings of the ACM SIGPLAN 2003 Conference on Programming Language Design and Implementation},
-pages = {220–231},
-numpages = {12},
-keywords = {automated correctness proofs, compiler optimization},
-location = {San Diego, California, USA},
-series = {PLDI '03}
-}
-
 @article{ProvingCompilerOptimisations,
   author = {Lerner, Sorin and Millstein, Todd and Chambers, Craig},
   title = {Automatically proving the correctness of compiler optimizations},
