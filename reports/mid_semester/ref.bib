@@ -9,11 +9,6 @@
     number = {OOPSLA2},
     url = {https://doi.org/10.1145/3622821},
     doi = {10.1145/3622821},
-    abstract = {We present a design and implementation of the automated "Extract Method" refactoring for Rust programs. Even though Extract Method is one of the most well-studied and widely used in practice automated refactorings, featured in all major IDEs for all popular programming languages, implementing it soundly for Rust is surprisingly non-trivial due to the restrictions of the Rust's ownership and lifetime-based type system.
-
-    In this work, we provide a systematic decomposition of the Extract Method refactoring for Rust programs into a series of program transformations, each concerned with satisfying a particular aspect of Rust type safety, eventually producing a well-typed Rust program. Our key discovery is the formulation of Extract Method as a composition of naive function hoisting and a series of automated program repair procedures that progressively make the resulting program "more well-typed" by relying on the corresponding repair oracles. Those oracles include a novel static intra-procedural ownership analysis that infers correct sharing annotations for the extracted function's parameters, and the lifetime checker of rustc, Rust's reference compiler.
-
-    We implemented our approach in a tool called REM---an automated Extract Method refactoring built on top of IntelliJ IDEA plugin for Rust. Our extensive evaluation on a corpus of changes in five popular Rust projects shows that REM (a) can extract a larger class of feature-rich code fragments into semantically correct functions than other existing refactoring tools, (b) can reproduce method extractions performed manually by human developers in the past, and (c) is efficient enough to be used in interactive development.},
     journal = {Proc. ACM Program. Lang.},
     month = oct,
     articleno = {245},
@@ -77,12 +72,50 @@
 }
 
 @article{ExtractMethodLitReview,
-author = {Alomar, Eman and Mkaouer, Mohamed Wiem and Ouni, Ali},
-year = {2023},
-month = {12},
-pages = {},
-title = {Behind the Intent of Extract Method Refactoring A Systematic Literature Review},
-volume = {PP},
-journal = {IEEE Transactions on Software Engineering},
-doi = {10.1109/TSE.2023.3345800}
+  author = {Alomar, Eman and Mkaouer, Mohamed Wiem and Ouni, Ali},
+  year = {2023},
+  month = {12},
+  pages = {},
+  title = {Behind the Intent of Extract Method Refactoring A Systematic Literature Review},
+  volume = {PP},
+  journal = {IEEE Transactions on Software Engineering},
+  doi = {10.1109/TSE.2023.3345800}
+}
+
+@article{GenericRefactoringJAVA,
+  author={Marticorena, Raul and López, Carlos and Crespo, Yania and Pérez, F. Javier},
+  booktitle={2010 14th European Conference on Software Maintenance and Reengineering},
+  title={Refactoring Generics in JAVA: A Case Study on Extract Method},
+  year={2010},
+  volume={},
+  number={},
+  pages={212-221},
+  keywords={Java;Software;Input variables;Arrays;Indexes;Feature extraction;generics;generic programming;refactoring;extract method;test cases},
+  doi={10.1109/CSMR.2010.38}
+}
+
+@article{AutomaticRefactoringAsyncJAVA,
+  AUTHOR = {Zhang, Yang and Xie, Zhaoyang and Yue, Yanxia and Qi, Lin},
+  TITLE = {Automatic Refactoring Approach for Asynchronous Mechanisms with CompletableFuture},
+  JOURNAL = {Applied Sciences},
+  VOLUME = {14},
+  YEAR = {2024},
+  NUMBER = {19},
+  ARTICLE-NUMBER = {8866},
+  URL = {https://www.mdpi.com/2076-3417/14/19/8866},
+  ISSN = {2076-3417},
+  ABSTRACT = {To address the inherent limitations of Future in asynchronous programming frameworks, JDK 1.8 introduced the CompletableFuture class, which features approximately 50 different methods for composing and executing asynchronous computations and handling exceptions. This paper proposes an automatic refactoring method that integrates multiple static analysis techniques, including visitor pattern analysis, alias analysis, and executor inheritance structure analysis, to conduct precondition checks. Distinct from existing Future refactoring methods, this approach considers custom executor types, thereby extending its applicability. Using this method, the ReFuture automatic refactoring plugin was implemented within the Eclipse JDT framework. The method was evaluated in terms of the number of refactorings, refactoring time, and error introduction, alongside a side-by-side comparison with the existing method. The refactoring outcomes for nine large applications, including ActiveMQ, Hadoop, and Elasticsearch, show that ReFuture successfully refactored 639 out of 813 potential code structures, achieving a refactoring success rate of 64.70% without introducing errors. This tool effectively facilitates the refactoring to CompletableFuture and enhances refactoring efficiency compared to manual methods.},
+  DOI = {10.3390/app14198866}
+}
+
+@article{AndroidAsncRefactoring,
+  author={Lin, Yu and Okur, Semih and Dig, Danny},
+  booktitle={2015 30th IEEE/ACM International Conference on Automated Software Engineering (ASE)},
+  title={Study and Refactoring of Android Asynchronous Programming (T)},
+  year={2015},
+  volume={},
+  number={},
+  pages={224-235},
+  keywords={Androids;Humanoid robots;Graphical user interfaces;Receivers;Programming;Registers;Transforms;Refactoring;Android;Asynchronous},
+  doi={10.1109/ASE.2015.50}
 }

@@ -6,7 +6,9 @@ This project starts an extension of work done in a previous project by Sewen Thy
 Ilya Sergey, in which they theorised and then implemented the beginnings of an
 automated ``Extract Method'' refactoring tool for the Rust programming language.
 Extract Method refactorings are a well known and widely used refactoring
-approach, however, due to Rust's unique approach to memory safety of of
+approach, although it is also one of the most complicated to implement in practice
+as it relies on very low-level code changes \cite{ExtractMethodLitReview}.
+Additionally, due to Rust's unique approach to memory safety of
 ownership and borrowing, and the lifetime system that enforces these rules, it
 is far more difficult to implement than in other languages. Ilya Sergey et al's
 contribution focused on the theoretical apects of the problem
@@ -29,7 +31,7 @@ performed an initial code extraction and type inference. If REM fails (i.e. an
 extraction isn't possible), then the code is returned to its original condition.
 The stages are:
 
-\begin{enumerate}
+\begin{enumerate}[itemsep=0pt]
     \item \textbf{Controller:} handles any non local control flow. This includes
     \textcolor{blue}{return}, \textcolor{blue}{break} and
     \textcolor{blue}{continue}. As rust is an expressions based language
@@ -39,7 +41,10 @@ The stages are:
     \item \textbf{Borrower:} infers any ownership annotations. In Rust,
     variables can be either immutable (imm) or mutable (mut). Additionally, they
     are either owned by the current scope, or borrowed from another scope.
-    \inputminted[linenos, tabsize=2]{rust}{snippets/borrow.rs}
+
+    {\small
+    \inputminted[linenos, tabsize=2]{rust}{snippets/borrow.rs}}
+
     The borrower is at its core, a dataflow analysis algorithm that infers the ownership of each
     variable, and adds the correct information to the function body and scope.
     The algorithms are included in appendix \ref{app:ownership_and_borrowing_repair}.
@@ -49,10 +54,16 @@ The stages are:
     references remain valid. The repairer first explicitly annotates all
     lifetimes, using the rust compiler (rustc) to check for errors: \verb|'a|
     represents the lifetime of \verb|x| \footnote{See
-    \href{https://doc.rust-lang.org/nomicon/lifetimes.html}{Rust Book - Lifetimes} for more information}.
-    \inputminted[]{rust}{snippets/lifetime.rs}
-    It then applies the lifetime elision rules \cite{rbookb} to remove any
-    lifetimes the compiler can infer to bring the code back to a human readable
+    \href{https://doc.rust-lang.org/nomicon/lifetimes.html}{Rust Book -
+    Lifetimes} for more information}.
+
+    {\small
+    \inputminted[]{rust}{snippets/lifetime.rs}}
+
+    All functions are converted into an intermediate representation (IR), that
+    are the machine equivalent of the above snippet. It then applies
+    the lifetime elision rules \cite{rbookb} to remove any lifetimes the
+    compiler can infer to bring the code back to a human readable
     state.
     The algorithm is included in appendix \ref{app:lifetime_repair}
 \end{enumerate}
@@ -73,11 +84,11 @@ the user is never presented with ``incorrect'' code.
 This project aims to improve and extend on the REM tool by addressing key
 limitations and researching (and subsequently implementing) new approaches to
 refactoring.
-\begin{enumerate}
+\begin{enumerate}[itemsep=0pt]
     \item \textbf{Fixing REM's Issues:} Remove the dependency on (\textit{i})
     \verb|rustc| and (\textit{ii}) Intellij IDEA to make REM a standalone tool.
-    Additionally, reduce file I/O overhead by optimising the tools internal data
-    handling
+    Additionally, reduce file I/O overhead (and other unnescessary overhead) by
+    optimising the tools internal data handling.
     \item \textbf{Platform-Agnostic Code Extraction:} Build a complete,
     end-to-endsolution for method extraction using \textit{Rust Analyzer} (RA)
     for the code extraction, wrapped in a single, user-friendly CLI tool written
@@ -88,11 +99,12 @@ refactoring.
     \item \textbf{Exploring New Refactorings:} The big ticket item for this
     research project where the bulk of my time will be spent, investigating
     extract method refactoring for the far more advanced areas of
-    \textit{Generics, Ansynchronous Code, Macros, Closures, and Const
-    Functions}. \textit{Generics} and \textit{Asynchronous Code} present special
-    challenges due to (a) the complex lifetimes and (b) the uncertainty of the
-    code at compile time, and are what the majority of the research will focus
-    on.
+    \textit{Generics} and \textit{Ansynchronous Code}, with the potential to
+    expand into, \textit{Macros, Closures, and Const Functions}, time
+    permitting. \textit{Generics} and \textit{Asynchronous Code} present special
+    challenges due to (a) the complex lifetimes and (b) the lack of information
+    available at compile time. The starting point for this is \textit{Generics},
+    as Adventure of A Lifetime \cite{AdventureOfALifetime} touches on the topic.
     \item \textbf{Final Aim: Merging REM with RA:} An ultimate, ambitious goal
     for this project is to merge the REM toolchain with RA, Rust's official
     language server protocol (LSP) implementation

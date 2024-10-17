@@ -18,11 +18,27 @@ readability and clarity of the resulting code can vary.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\columnwidth]{Figures/issue_1.png}
-    \caption{An example of the non-deterministic nature of the extraction
-    algorithm. \textcolor{red}{Red is expected output}, \textcolor{green}{green is the
-    returned code}}
-    \label{fig:issue1}
+    \sbox\mysavebox{\includegraphics[width=0.9\columnwidth]{Figures/issue_1.png}}
+    \usebox\mysavebox
+    \par
+    \begin{minipage}{\wd\mysavebox}
+        \caption{An example of the non-deterministic nature of the extraction
+        algorithm. \textcolor{red}{Red is expected output}, \textcolor{green}{green is the
+        returned code} \label{fig:issue1}.}
+    \end{minipage}
 \end{figure}
 
-\subsection*{Come up with something else to go here}
+
+\subsection*{Performance Bottlenecks in Large Codebases}
+
+The extraction tool's performance is a notable limitation in its current form.
+Since it is designed to be modular and not tied to any specific codebase, it
+must build a representation of the entire project to perform code extraction.
+While this approach works well for small, isolated test cases, it becomes
+inefficient when applied to larger, project-scale codebases. In such cases, the
+tool faces significant performance bottlenecks. \\
+To address this, the tool will need to either (a) operate on a targeted subset
+of the codebase, focusing only on the relevant files and functions, or (b)
+efficiently cache and reuse results from RA's existing analysis
+to avoid redundant computations. Both approaches present technical challenges
+that require careful consideration.

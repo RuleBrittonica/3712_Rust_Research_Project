@@ -1,5 +1,43 @@
-\section{Work Completed to Date}
+\section{Theory Work Completed to Date}
 
 \subsection*{Literature Review Progress}
 
+A literature review is in the process of being written, and is around 60-75\%
+complete. A draft will be completed by the Christmas break, and it will be
+finished by the end of the summer break (although it will still be subject to
+review and future revisions). It (broadly) covers the following topics, with
+topics marked with * potentially being added:
+\begin{itemize}[itemsep=0pt]
+    \item An Overview of Extract Method Refactoring.
+    \item Rust's Memory Management Model (Ownership and Borrowing), and how its'
+    type system both helps and hinders refactoring tools.
+    \item * Evolving Standards and Best Practices in the Rust Ecosystem.
+    \item Existing Refactoring Tools and Their Limitations.
+    \item Previous Work on the REM Tool by Ilya Sergey et al and Sewen Thy.
+    \item Advanced Refactoring Techniques in Other Languages.
+    \item Testing and Validation Strategies for Refactoring Tools
+    \item * Comparative Analysis with Other Programming Languages.
+    \item * Integration with Developer Tools.
+\end{itemize}
+
 \subsection*{Research into Advanced Refactoring Methods}
+
+Recent research on advanced refactoring methods, primarily focused on Java,
+highlights the importance of enhancing tools to handle the complexities of
+asynchronous programming and generics. Lin et al. developed ASYNCDROID \cite{AndroidAsncRefactoring}, a tool
+that refactors improperly used Android async constructs, transforming them into
+more efficient forms like \verb|IntentService|. This approach
+addresses memory leaks and lost results, by automating these complex refactorings. \\
+Similarly, Zhang et al. proposed ReFuture \cite{AutomaticRefactoringAsyncJAVA}, a tool for automating refactoring in
+Java projects using CompletableFuture, improving asynchronous code efficiency
+through static analysis techniques like visitor pattern and alias
+analysis. This tool demonstrated high effectiveness in large
+codebases, emphasizing the need for advanced analysis to manage dependencies and
+optimize task scheduling. \\
+Additionally, Marticorena et al. explored the impact of generics on method
+extraction refactorings in Java, noting the necessity for refactoring tools to
+evolve as programming languages incorporate more sophisticated type
+systems \cite{GenericRefactoringJAVA}. \\
+These studies, while centered on Java, underscore the broader need for
+developing refactoring methods for modern language features, particularly in
+environments with strict memory and type constraints.
