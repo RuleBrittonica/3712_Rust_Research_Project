@@ -1,0 +1,120 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+\begin{document}
+
+\section{Algorithm 1: FixNonLocalControl}
+
+\textbf{Input:} an extracted function $EF$, an introduced function call
+expression $E$ (i.e., $EF(\dots)$) in the caller \\
+\textbf{Output:} a list of patches $PS$ to apply to the refactored file
+
+\begin{enumerate}
+    \item $PS \leftarrow []$
+    \item $R \leftarrow$ collect \textbf{return} statements in $EF$
+    \item $B, C \leftarrow$ collect top-level \textbf{break} and \textbf{continue} statements in $EF$
+    \item \textbf{if} $R \cup B \cup C \neq \emptyset$ \textbf{then}
+    \begin{enumerate}
+        \item $RTY \leftarrow$ \texttt{BuildReturnType}$(R, B, C)$
+        \item $PS \leftarrow$ \texttt{UpdateReturnType}$(EF, RTY)$ :: $PS$
+        \item \textbf{for} $l_r \in R$ \textbf{do} $PS \leftarrow (l_r, \text{return } e  \leadsto \text{return } \texttt{Ret}(e))$ :: $PS$
+        \item \textbf{for} $l_b \in B$ \textbf{do} $PS \leftarrow (l_b, \text{break } \leadsto \text{return } \texttt{Break})$ :: $PS$
+        \item \textbf{for} $l_c \in C$ \textbf{do} $PS \leftarrow (l_c, \text{continue } \leadsto \text{return } \texttt{Continue})$ :: $PS$
+        \item $l_E \leftarrow$ find location of the final expression of $EF$
+        \item $PS \leftarrow (l_E, E \leadsto \texttt{Ok}(E))$ :: $PS$
+        \item $\overline{CS} \leftarrow$ \texttt{BuildCasesForReturnType}$(RTY)$
+        \item $l_\text{caller} \leftarrow$ location of $E$
+        \item $PS \leftarrow (l_\text{caller}, E \leadsto \text{match } E \text{ with } \overline{CS})$ :: $PS$
+    \end{enumerate}
+    \item \textbf{return} $PS$
+\end{enumerate}
+
+\newpage
+
+\section{Algorithm 2: FixOwnershipAndBorrowing}
+\textbf{Input:} the extracted function $EF$, the expression $E$ of the call to
+$EF$, orginal function $F$ \\
+\textbf{Output:} a set of patches $PS$ (to apply to the refactored file)
+
+\begin{enumerate}
+    \item \textit{Aliases} $\leftarrow$ alias analysis on $F$
+    \item \textit{Mut} $\leftarrow$ \texttt{CollectMutabilityConstraints}$(EF, \texttt{Aliases})$
+    \item \textit{Own} $\leftarrow$ \texttt{CollectOwnershipConstraints}$(EF, \texttt{Aliases}, F)$
+    \item $PS \leftarrow []$
+
+    \item \textbf{for} $param \in EF.\texttt{params}$ \textbf{do}
+    \begin{enumerate}
+        \item $v, \tau, l \leftarrow param.\texttt{var}, param.\texttt{type}, param.\texttt{loc}$
+        \item \textbf{if} $\texttt{UNSAT}(\texttt{Mut} \cup \texttt{Own}, v)$ \textbf{then} raise \texttt{RefactorError}
+        \item \textbf{if} $\texttt{LUB}(\texttt{Mut} \cup \texttt{Own}, v) = \langle \texttt{mut, ref} \rangle$ \textbf{then} $PS \leftarrow (l, v\!:\!\tau \leadsto v\!:\!\&\texttt{mut} \, \tau)$ :: $PS$
+        \item \textbf{if} $\texttt{LUB}(\texttt{Mut} \cup \texttt{Own}, v) = \langle \texttt{imm, ref} \rangle$ \textbf{then} $PS \leftarrow (l, v\!:\!\tau \leadsto v\!:\!\&\tau)$ :: $PS$
+    \end{enumerate}
+
+    \item \textbf{for} $param \in EF.\texttt{params}$ \textbf{do}
+    \begin{enumerate}
+        \item \textbf{if} $\texttt{LUB}(\texttt{Mut} \cup \texttt{Own}, param.\texttt{var}) = \langle \_, \texttt{ref} \rangle$ \textbf{then}
+        \item \quad \texttt{Exps} $\leftarrow$ collect from $EF.\texttt{body}$ all the occurrences of $param.\texttt{var}$
+        \item \quad \textbf{for} $e \in \texttt{Exps}$ \textbf{do} $PS \leftarrow (e.\texttt{loc}, e \leadsto (*e))$ :: $PS$
+    \end{enumerate}
+
+    \item \textbf{for} $arg \in E.\texttt{args}$ \textbf{do}
+    \begin{enumerate}
+        \item $v, e, l \leftarrow arg.\texttt{var}, arg.\texttt{exp}, arg.\texttt{loc}$
+        \item \textbf{if} $\texttt{LUB}(\texttt{Mut} \cup \texttt{Own}, v) = \langle \texttt{mut, ref} \rangle$ \textbf{then} $PS \leftarrow (l, e \leadsto \&\texttt{mut} \, e)$ :: $PS$
+        \item \textbf{if} $\texttt{LUB}(\texttt{Mut} \cup \texttt{Own}, v) = \langle \texttt{imm, ref} \rangle$ \textbf{then} $PS \leftarrow (l, e \leadsto \&e)$ :: $PS$
+    \end{enumerate}
+\end{enumerate}
+
+\newpage
+
+\section{Algorithm 3: CollectMutabilityConstraints}
+\textbf{Input:} extracted function $EF$, an alias map \texttt{Aliases} \\
+\textbf{Output:} a set \texttt{Mut} of mutability constraints
+
+\begin{enumerate}
+    \item $MV \leftarrow$ collect all the variables in $EF$ that are part of an \texttt{lvalue} expression
+    \item $MV \leftarrow MV$ + all variables in the body of $EF$ that are function call arguments with mutable requirements
+    \item $MV \leftarrow MV$ + all variables in $EF$ that are mutably borrowed
+    \item \texttt{Mut} $\leftarrow \{ \texttt{imm} \leq p.\texttt{var} \mid p \in EF.\texttt{params} \land \forall v' \in \texttt{Aliases}(p.\texttt{var}) : v' \notin MV \} \cup$
+    \item \quad $\{ \texttt{mut} \leq p.\texttt{var} \mid p \in EF.\texttt{params} \land \exists v' \in \texttt{Aliases}(p.\texttt{var}) : v' \in MV \}$
+\end{enumerate}
+
+\newpage
+
+\section{Algorithm 4: CollectOwnershipConstraints}
+\textbf{Input:} extracted function $EF$, an alias map \texttt{Aliases}, original caller function $F$ \\
+\textbf{Output:} a set \texttt{Ownership} of ownership constraints
+
+\begin{enumerate}
+    \item $FV \leftarrow$ free variables in $F$ in the code snippet after the call to $EF$
+    \item $PBV \leftarrow$ collect all variables in $EF.\texttt{params}$ declared as pass-by-value
+    \item \texttt{Borrows} $\leftarrow PBV \cap \{ p.\texttt{var} \mid p \in EF.\texttt{params} \land \exists v' \in \texttt{Aliases}(p.\texttt{var}) : v' \in FV \}$
+    \item \texttt{Own} $\leftarrow$ collect all the variables in $EF$ which are moved into or out of
+    \item \texttt{Ownership} $\leftarrow \{ v \leq \texttt{ref} \mid v \in \texttt{Borrows} \} \cup \{ \texttt{own} \leq v \mid v \in \texttt{Own} \}$
+\end{enumerate}
+
+\newpage
+
+\section{Algorithm 5: FixLifetimes}
+\textbf{Input:} a cargo manifest file \texttt{CARGO\_MANIFEST} for the whole project, extracted function $EF$ \\
+\textbf{Output:} patched extracted function $EF'$
+
+\begin{enumerate}
+    \item $EF' \leftarrow$ clone $EF$
+    \item $EF' \leftarrow$ update $EF'$ by annotating each borrow in $EF'.\texttt{params}$ and $EF'.\texttt{ret}$ with a fresh lifetime where none exists
+    \item $EF' \leftarrow$ update $EF'$ by adding the freshly introduced lifetimes to the list of lifetime parameters in $EF'.\texttt{sig}$
+    \item \textbf{Loop}
+    \begin{enumerate}
+        \item $err \leftarrow (\texttt{cargo check CARGO\_MANIFEST}).\texttt{errors}$
+        \item \textbf{if} $err = \emptyset$ \textbf{then} \textbf{break}
+        \item \texttt{suggestions} $\leftarrow$ collect lifetime bounds suggestions from $err$
+        \item \textbf{if} \texttt{suggestions} = $\emptyset$ \textbf{then} raise \texttt{RefactorError}
+        \item $EF' \leftarrow$ apply \texttt{suggestions} to $EF'$
+    \end{enumerate}
+    \item // readability optimizations:
+    \item $EF' \leftarrow$ collapse the cycles in the \texttt{where} clause of $EF'.\texttt{sig}$
+    \item $EF' \leftarrow$ apply elision rules
+\end{enumerate}
+
+\end{document}
