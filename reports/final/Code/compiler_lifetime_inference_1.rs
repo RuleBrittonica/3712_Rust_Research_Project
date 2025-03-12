@@ -1,0 +1,1 @@
+fn echo<'a>(message: &'a str) -> &'a str { message }

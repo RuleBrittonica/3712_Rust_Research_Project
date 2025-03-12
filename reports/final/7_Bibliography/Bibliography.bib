@@ -1,0 +1,184 @@
+@article{AENEAS,
+author = {Ho, Son and Protzenko, Jonathan},
+title = {Aeneas: Rust verification by functional translation},
+year = {2022},
+issue_date = {August 2022},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+volume = {6},
+number = {ICFP},
+url = {https://doi.org/10.1145/3547647},
+doi = {10.1145/3547647},
+abstract = {We present Aeneas, a new verification toolchain for Rust programs based on a lightweight functional translation. We leverage Rust’s rich region-based type system to eliminate memory reasoning for a large class of Rust programs, as long as they do not rely on interior mutability or unsafe code. Doing so, we relieve the proof engineer of the burden of memory-based reasoning, allowing them to instead focus on functional properties of their code.
+
+The first contribution of Aeneas is a new approach to borrows and controlled aliasing. We propose a pure, functional semantics for LLBC, a Low-Level Borrow Calculus that captures a large subset of Rust programs. Our semantics is value-based, meaning there is no notion of memory, addresses or pointer arithmetic. Our semantics is also ownership-centric, meaning that we enforce soundness of borrows via a semantic criterion based on loans rather than through a syntactic type-based lifetime discipline. We claim that our semantics captures the essence of the borrow mechanism rather than its current implementation in the Rust compiler.
+
+The second contribution of Aeneas is a translation from LLBC to a pure lambda-calculus. This allows the user to reason about the original Rust program through the theorem prover of their choice, and fulfills our promise of enabling lightweight verification of Rust programs. To deal with the well-known technical difficulty of terminating a borrow, we rely on a novel approach, in which we approximate the borrow graph in the presence of function calls. This in turn allows us to perform the translation using a new technical device called backward functions.
+
+We implement our toolchain in a mixture of Rust and OCaml; our chief case study is a low-level, resizing hash table, for which we prove functional correctness, the first such result in Rust. Our evaluation shows significant gains of verification productivity for the programmer. This paper therefore establishes a new point in the design space of Rust verification toolchains, one that aims to verify Rust programs simply, and at scale.
+
+Rust goes to great lengths to enforce static control of aliasing; the proof engineer should not waste any time on memory reasoning when so much already comes “for free”!},
+journal = {Proc. ACM Program. Lang.},
+month = aug,
+articleno = {116},
+numpages = {31},
+keywords = {verification, functional translation, Rust}
+}
+@article{AENEAS_PART_2,
+author = {Ho, Son and Fromherz, Aymeric and Protzenko, Jonathan},
+title = {Sound Borrow-Checking for Rust via Symbolic Semantics},
+year = {2024},
+issue_date = {August 2024},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+volume = {8},
+number = {ICFP},
+url = {https://doi.org/10.1145/3674640},
+doi = {10.1145/3674640},
+abstract = {The Rust programming language continues to rise in popularity, and as such,                                                                warrants the close attention of the programming languages community. In this                                                                work, we present a new foundational contribution towards the theoretical                                                                understanding of Rust’s semantics. We prove that LLBC, a high-level, borrow-centric model                                                                previously proposed for Rust’s semantics and execution, is sound with regards to a low-level                                                                pointer-based language \`{a} la CompCert. Specifically, we prove the                                                                following: that LLBC is a correct view over a traditional model of execution;                                                                that LLBC’s symbolic semantics are a correct abstraction of LLBC programs;                                                                and that LLBC’s symbolic semantics act as a borrow-checker for LLBC, i.e. that                                                                symbolically-checked LLBC programs do not get stuck when executed on a                                                                heap-and-addresses model of execution.                                                                                                                                To prove these results, we introduce a new proof style that considerably                                                                simplifies our proofs of simulation, which relies on a notion of hybrid                                                                states. Equipped with this reasoning framework, we show that a new addition to                                                                LLBC’s symbolic semantics, namely a join operation, preserves the abstraction                                                                and borrow-checking properties. This in turn allows us to add support for                                                                loops to the Aeneas framework; we show, using a series of examples and case                                                                studies, that this unlocks new expressive power for Aeneas.},
+journal = {Proc. ACM Program. Lang.},
+month = aug,
+articleno = {251},
+numpages = {29},
+keywords = {Rust, Semantics, Verification}
+}
+
+@article{AdventureOfALifetime,
+    author = {Thy, Sewen and Costea, Andreea and Gopinathan, Kiran and Sergey, Ilya},
+    title = {Adventure of a Lifetime: Extract Method Refactoring for Rust},
+    year = {2023},
+    issue_date = {October 2023},
+    publisher = {Association for Computing Machinery},
+    address = {New York, NY, USA},
+    volume = {7},
+    number = {OOPSLA2},
+    url = {https://doi.org/10.1145/3622821},
+    doi = {10.1145/3622821},
+    journal = {Proc. ACM Program. Lang.},
+    month = oct,
+    articleno = {245},
+    numpages = {28},
+    keywords = {program repair, automated code refactoring, Rust}
+}
+
+@article{BorrowingWithoutSorrowing,
+  author = {Sewen Thy},
+  title = {Borrowing without Sorrowing: Implementing Extract Method Refactoring for Rust},
+  year = {2023},
+  url= {https://verse-lab.github.io/papers/Sewen-Thy-Capstone.pdf}
+}
+
+@article{rbooka,
+  author = {Matsakis, Nicholas Turon, Aaron},
+  title = {The Rust RFC Book: Statements and Expressions},
+  url = {https://doc.rust-lang.org/reference/statements-and-expressions.html},
+  year = {2020}
+}
+
+@article{rbookb,
+  author = {Matsakis, Nicholas Turon, Aaron},
+  title = {The Rust RFC Book: Lifetime Elision},
+  url = {https://doc.rust-lang.org/nomicon/lifetime-elision.html},
+  year = {2020}
+}
+
+@article{ProvingCompilerOptimisations,
+  author = {Lerner, Sorin and Millstein, Todd and Chambers, Craig},
+  title = {Automatically proving the correctness of compiler optimizations},
+  year = {2003},
+  issue_date = {May 2003},
+  publisher = {Association for Computing Machinery},
+  address = {New York, NY, USA},
+  volume = {38},
+  number = {5},
+  issn = {0362-1340},
+  url = {https://doi.org/10.1145/780822.781156},
+  doi = {10.1145/780822.781156},
+  abstract = {We describe a technique for automatically proving compiler optimizations sound, meaning that their transformations are always semantics-preserving. We first present a domain-specific language, called Cobalt, for implementing optimizations as guarded rewrite rules. Cobalt optimizations operate over a C-like intermediate representation including unstructured control flow, pointers to local variables and dynamically allocated memory, and recursive procedures. Then we describe a technique for automatically proving the soundness of Cobalt optimizations. Our technique requires an automatic theorem prover to discharge a small set of simple, optimization-specific proof obligations for each optimization. We have written a variety of forward and backward intraprocedural dataflow optimizations in Cobalt, including constant propagation and folding, branch folding, full and partial redundancy elimination, full and partial dead assignment elimination, and simple forms of points-to analysis. We implemented our soundness-checking strategy using the Simplify automatic theorem prover, and we have used this implementation to automatically prove our optimizations correct. Our checker found many subtle bugs during the course of developing our optimizations. We also implemented an execution engine for Cobalt optimizations as part of the Whirlwind compiler infrastructure.},
+  journal = {SIGPLAN Not.},
+  month = may,
+  pages = {220–231},
+  numpages = {12},
+  keywords = {automated correctness proofs, compiler optimization}
+}
+
+@article{DUGGAN199637,
+  title = {Explaining type inference},
+  journal = {Science of Computer Programming},
+  volume = {27},
+  number = {1},
+  pages = {37-83},
+  year = {1996},
+  issn = {0167-6423},
+  doi = {https://doi.org/10.1016/0167-6423(95)00007-0},
+  url = {https://www.sciencedirect.com/science/article/pii/0167642395000070},
+  author = {Dominic Duggan and Frederick Bent},
+  abstract = {Type inference is the compile-time process of reconstructing missing type information in a program based on the usage of its variables. ML and Haskell are two languages where this aspect of compilation has enjoyed some popularity, allowing type information to be omitted while static type checking is still performed. Type inference may be expected to have some application in the prototyping and scripting languages which are becoming increasingly popular. A difficulty with type inference is the confusing and sometimes counter-intuitive diagnostics produced by the type checker as a result of type errors. A modification of the unification algorithm used in Hindley-Milner type inference is presented, which allows the specific reasoning which led to a program variable having a particular type to be recorded for type explanation. This approach is close to the intuitive process used in practice for debugging type errors. The algorithm is practical, and has been implemented in the Standard ML of New Jersey compiler. The modified unification algorithm also appears useful in other domains, including logic program debuggers and semantics-based programming environments.}
+}
+
+@article{ExtractMethodLitReview,
+  author = {Alomar, Eman and Mkaouer, Mohamed Wiem and Ouni, Ali},
+  year = {2023},
+  month = {12},
+  pages = {},
+  title = {Behind the Intent of Extract Method Refactoring A Systematic Literature Review},
+  volume = {PP},
+  journal = {IEEE Transactions on Software Engineering},
+  doi = {10.1109/TSE.2023.3345800}
+}
+
+@article{GenericRefactoringJAVA,
+  author={Marticorena, Raul and López, Carlos and Crespo, Yania and Pérez, F. Javier},
+  booktitle={2010 14th European Conference on Software Maintenance and Reengineering},
+  title={Refactoring Generics in JAVA: A Case Study on Extract Method},
+  year={2010},
+  volume={},
+  number={},
+  pages={212-221},
+  keywords={Java;Software;Input variables;Arrays;Indexes;Feature extraction;generics;generic programming;refactoring;extract method;test cases},
+  doi={10.1109/CSMR.2010.38}
+}
+
+@article{AutomaticRefactoringAsyncJAVA,
+  AUTHOR = {Zhang, Yang and Xie, Zhaoyang and Yue, Yanxia and Qi, Lin},
+  TITLE = {Automatic Refactoring Approach for Asynchronous Mechanisms with CompletableFuture},
+  JOURNAL = {Applied Sciences},
+  VOLUME = {14},
+  YEAR = {2024},
+  NUMBER = {19},
+  ARTICLE-NUMBER = {8866},
+  URL = {https://www.mdpi.com/2076-3417/14/19/8866},
+  ISSN = {2076-3417},
+  ABSTRACT = {To address the inherent limitations of Future in asynchronous programming frameworks, JDK 1.8 introduced the CompletableFuture class, which features approximately 50 different methods for composing and executing asynchronous computations and handling exceptions. This paper proposes an automatic refactoring method that integrates multiple static analysis techniques, including visitor pattern analysis, alias analysis, and executor inheritance structure analysis, to conduct precondition checks. Distinct from existing Future refactoring methods, this approach considers custom executor types, thereby extending its applicability. Using this method, the ReFuture automatic refactoring plugin was implemented within the Eclipse JDT framework. The method was evaluated in terms of the number of refactorings, refactoring time, and error introduction, alongside a side-by-side comparison with the existing method. The refactoring outcomes for nine large applications, including ActiveMQ, Hadoop, and Elasticsearch, show that ReFuture successfully refactored 639 out of 813 potential code structures, achieving a refactoring success rate of 64.70% without introducing errors. This tool effectively facilitates the refactoring to CompletableFuture and enhances refactoring efficiency compared to manual methods.},
+  DOI = {10.3390/app14198866}
+}
+
+@article{AndroidAsncRefactoring,
+  author={Lin, Yu and Okur, Semih and Dig, Danny},
+  booktitle={2015 30th IEEE/ACM International Conference on Automated Software Engineering (ASE)},
+  title={Study and Refactoring of Android Asynchronous Programming (T)},
+  year={2015},
+  volume={},
+  number={},
+  pages={224-235},
+  keywords={Androids;Humanoid robots;Graphical user interfaces;Receivers;Programming;Registers;Transforms;Refactoring;Android;Asynchronous},
+  doi={10.1109/ASE.2015.50}
+}
+
+@inproceedings{OneThousandOneStories-SoftwareRefactoring,
+author = {Golubev, Yaroslav and Kurbatova, Zarina and AlOmar, Eman Abdullah and Bryksin, Timofey and Mkaouer, Mohamed Wiem},
+title = {One thousand and one stories: a large-scale survey of software refactoring},
+year = {2021},
+isbn = {9781450385626},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/3468264.3473924},
+doi = {10.1145/3468264.3473924},
+abstract = {Despite the availability of refactoring as a feature in popular IDEs, recent studies revealed that developers are reluctant to use them, and still prefer the manual refactoring of their code. At JetBrains, our goal is to fully support refactoring features in IntelliJ-based IDEs and improve their adoption in practice. Therefore, we start by raising the following main questions. How exactly do people refactor code? What refactorings are the most popular? Why do some developers tend not to use convenient IDE refactoring tools?  In this paper, we investigate the raised questions through the design and implementation of a survey targeting 1,183 users of IntelliJ-based IDEs. Our quantitative and qualitative analysis of the survey results shows that almost two-thirds of developers spend more than one hour in a single session refactoring their code; that refactoring types vary greatly in popularity; and that a lot of developers would like to know more about IDE refactoring features but lack the means to do so. These results serve us internally to support the next generation of refactoring features, as well as can help our research community to establish new directions in the refactoring usability research.},
+booktitle = {Proceedings of the 29th ACM Joint Meeting on European Software Engineering Conference and Symposium on the Foundations of Software Engineering},
+pages = {1303–1313},
+numpages = {11},
+keywords = {Software Maintenance, Refactorings, IDE Refactoring Features},
+location = {Athens, Greece},
+series = {ESEC/FSE 2021}
+}

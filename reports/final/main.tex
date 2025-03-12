@@ -1,125 +1,269 @@
-%----------------------------------------------------------------------------------------
-%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
-%----------------------------------------------------------------------------------------
-
-\documentclass[fleqn,10pt]{SelfArx} % Document font size and equations flushed left
-
-\usepackage[english]{babel}
-
-\usepackage{lipsum}
-
+\documentclass[oneside,onecolumn,12pt,a4paper,openany]{book}
+\usepackage{anuthesis}
+\usepackage{fancyhdr}
 \usepackage{graphicx}
+\usepackage{multirow}
+\usepackage{amsmath}	% Advanced maths commands
+\usepackage{amssymb}	% Extra maths symbols
+\usepackage{amscd}
+\usepackage{physics}
+\usepackage{rotating} % Rotating table
+\usepackage[toc,page]{appendix}
+\usepackage[parfill]{parskip}
+\usepackage{textcomp} % for names like O{\textquotesingle}Shea in .bbl file
+%\usepackage{footnote}
+\usepackage{changepage} % to adjust page width for fat tables
+%\usepackage{titlepic}
+\usepackage{setspace}
+\usepackage[colorlinks=true,
+linkcolor=black,
+urlcolor=black,
+citecolor=black, breaklinks=true]{hyperref}
+\usepackage{rotating}
+\usepackage{longtable}
+\usepackage{natbib}
+\bibpunct{(}{)}{;}{a}{}{,} % to follow A&A style
+\usepackage[flushleft]{threeparttable}
+\usepackage{threeparttablex}
+\usepackage{multirow}
+\usepackage{bbding}
 
-\usepackage{appendix}
+\usepackage{cleveref}
+\crefformat{footnote}{#2\footnotemark[#1]#3}
+\usepackage{sidecap}
+ \renewcommand{\bottomfraction}{0.7}
 
-\usepackage{amsmath}
+\newcommand{\thesistitle}{Refactoring and Verification in Rust}
+\newcommand{\thesistitletwo}{Expanding the REM toolchain }
+\newcommand{\thesistitlethree}{And providing a novel approach to verification}
+\newcommand{\fullname}{Matthew Britton}
+\newcommand{\shortname}{M. Britton}
+\newcommand{\thesissubjects}{Rust, Refactoring, Verification}
+\newcommand{\thesisdate}{July 2025}
+\newcommand{\fullthesisdate}{\today}
+\newcommand{\resubmissiondate}{\today}
+\newcommand{\thesisyear}{2025}
 
-%----------------------------------------------------------------------------------------
-%	COLUMNS
-%----------------------------------------------------------------------------------------
+\def\TODO#1{{\color{red}{\bf [TODO:} {\it{#1}}{\bf ]}}}
 
-\setlength{\columnsep}{0.55cm} % Distance between the two columns of text
-\setlength{\fboxrule}{0.75pt} % Width of the border around the abstract
+%%%%%% AUTHORS - PLACE YOUR OWN PACKAGES HERE %%%%%
 
-%----------------------------------------------------------------------------------------
-%	COLORS
-%----------------------------------------------------------------------------------------
+\usepackage{color}
+\usepackage[normalem]{ulem}
+\usepackage[dvipsnames]{xcolor}
+\usepackage[a4paper, left=1.2in, right=0.8in, top=1in, bottom=1in]{geometry}
 
-\definecolor{color1}{RGB}{0,0,90} % Color of the article title and sections
-\definecolor{color2}{RGB}{0,20,20} % Color of the boxes behind the abstract and headings
 
-%----------------------------------------------------------------------------------------
-%	HYPERLINKS
-%----------------------------------------------------------------------------------------
-
-\usepackage{hyperref}
-
-\hypersetup{
-	hidelinks,
-	colorlinks,
-	breaklinks=true,
-	urlcolor=color2,
-	citecolor=color1,
-	linkcolor=color1,
-	bookmarksopen=false,
-	pdftitle={Title},
-	pdfauthor={Author},
+\usepackage{minted}
+\setminted{
+	fontsize=\small,
+	linenos,
+	frame=lines,
+	baselinestretch=0.8,
 }
 
-%----------------------------------------------------------------------------------------
-%	ARTICLE INFORMATION
-%----------------------------------------------------------------------------------------
+% These are autoref macros
+\def\chapterautorefname{Chapter}
+\def\sectionautorefname{Section}
+\def\subsectionautorefname{Section}
+\def\subsubsectionautorefname{Section}
+\def\figureautorefname{Figure}
+\def\tableautorefname{Table}
+\def\equationautorefname{equation}
 
-\JournalInfo{ENGN3712: Major Research Project}
-\Archive{Mid Project Report}
+% i.e. -- e.g. -- etc. -- et. al.
+\newcommand{\eg}{{\em e.g.,}}
+\newcommand{\ie}{{\em i.e.,}}
+\newcommand{\etc}{{\em etc.}}
+\newcommand{\etal}{{\em et al.}}
+\newcommand{\cf}{{\em cf.}}
 
-\PaperTitle{Bringing Extract Method Refactoring to the Rust Programming Language:
-Experiments with REM}
+% There are editing macros
+\newcommand{\red}[1]{{\textcolor{red}{#1}}}
+\newcommand{\blue}[1]{{\textcolor{blue}{#1}}}
+\newcommand{\cyan}[1]{{\textcolor{cyan}{#1}}}
+\newcommand{\cut}[1]{{\red{\sout{#1}}}}
+\newcommand{\add}[1]{{\cyan{#1}}}
 
-\Authors{Matthew Britton\textsuperscript{1}, Supervisor: Alex Potanin\textsuperscript{2}}
-\affiliation{\textsuperscript{1}\textit{School of Engineering, The Australian
-National University. | matt.britton@anu.edu.au}}
-\affiliation{\textsuperscript{2}\textit{School of Computing, The Australian
-National University. | alex.potanin@anu.edu.au}}
+% Autoref macros
+\def\sectionautorefname{Section}
+\def\subsectionautorefname{Section}
+\def\subsubsectionautorefname{Section}
+\def\figureautorefname{Figure}
+\def\tableautorefname{Table}
+\def\equationautorefname{equation}
+\newcommand{\aref}[1]{\hyperref[#1]{Appendix~\ref{#1}}}
 
-\Keywords{Rust}
-\newcommand{\keywordname}{Keywords}
+% Only include extra packages if you really need them. Common packages are:
+%\usepackage{caption}
+%\usepackage{subcaption}
+%\captionsetup{compatibility=false} %https://tex.stackexchange.com/questions/31906/subcaption-package-compatibility-issue
+\usepackage{multicol}        % Multi-column entries in tables
+\usepackage{bm}		% Bold maths symbols, including upright Greek
+\usepackage{booktabs} %to include pandas latex tables
+\usepackage{ifpdf} %to fix issues while compiling on arxiv
+\usepackage{float}
+\usepackage{pdflscape}	% Landscape pages
+\usepackage{epigraph} % for quotes
 
-%----------------------------------------------------------------------------------------
-%	ABSTRACT
-%----------------------------------------------------------------------------------------
+%%%%%%%%%%%%%%%%%%%% DEFINE PAPER ALIASES  HERE %%%%%%%%%%%%%%%%%%%
 
-\input{frontmatter/abstract.tex}
-
-%----------------------------------------------------------------------------------------
+\onehalfspacing
 
 \begin{document}
 
-\maketitle
+% epigraph settings, for quotes at the start of introduction and conclusions
+\setlength{\epigraphwidth}{12cm}
+\setlength{\afterepigraphskip}{1.5cm}
+\renewcommand{\epigraphsize}{\small}
+\renewcommand{\epigraphrule}{1pt}
+\renewcommand{\epigraphflush}{flushright}
+%\renewcommand{\textflush}{flushleft}
+\citestyle{aa}
+\pagestyle{empty}
 
+%
+%%% TITLE PAGE:
+\pagenumbering{roman}  % first use Roman numerals for page numbers
+
+\begin{titlepage}
+	\begin{center}
+		\vspace*{0cm}
+		{ \fontsize{20}{10} \selectfont \thesistitle} \\
+		\vspace{0.3cm}
+		{ \fontsize{20}{10} \selectfont \thesistitletwo} \\
+            \vspace{0.3cm}
+		{ \fontsize{20}{10} \selectfont \thesistitlethree}
+
+		\vspace{2.0cm}
+		{\bf \huge \fullname}\\
+		%\vfill
+		\vspace{2cm}
+		{\large A Research and Development report submitted as part of }\\
+		\vspace{0.5cm}
+		{\large ENGN3712: Engineering Research and Development Project}\\
+		\vspace{0.5cm}
+		{\large The Australian National University}\\
+		\vspace{0.5cm}
+		{ \large Research School of Computing, School of Engineering} \par
+		\vspace{2.0cm}
+		\includegraphics[width=0.4\textwidth]{anu-logo-colour.pdf}\\
+		\vspace{2.0cm}
+		{\large \thesisdate}
+
+		% {\bf Submitted:}\\
+		%{\bf Approved:}\\
+		\vspace{1.75cm}
+		{\large  \textcopyright\ Copyright by \fullname,  \thesisyear \\}
+		\vspace{0.5cm}
+		{\large All Rights Reserved}
+    		%\maketitle
+	\end{center}
+\end{titlepage}
+
+\sloppy
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{1ex plus 0.5ex minus 0.2ex}
+
+
+% PREFACE TO ELECTRONIC COPY
+% remember to change bib style file to "astroads" for the PDF copy
+%%% COMMENT THIS OUT FOR THE PRINT COPY
+%\setcounter{page}{0}
+%\phantomsection\addcontentsline{toc}{section}{Notes on the digital copy}
+%\setlength\fboxsep{3mm}
+%\setlength\fboxrule{1pt}
+%\begin{center}
+%\framebox{\huge{\textsc{Notes on the Digital Copy}}}
+%\end{center}
+%\vspace{5mm}
+%This document makes extensive use of the hyperlinking features of \LaTeX. References to figures, tables, sections, chapters and the literature can be navigated from within the PDF by clicking on the reference. Internet addresses will be displayed in a browser.
+%
+%%Most object names are resolvable in the SIMBAD (\myurl{http://simbad.u-strasbg.fr/simbad/}) astronomical database. Click on an \object[NAME ETA CHA CLUSTER]{object} to be taken to its SIMBAD entry.
+%
+%The bibliography at the end of this thesis has been hyperlinked to the NASA Astrophysics Data Service (\myurl{http://www.adsabs.harvard.edu/}). Further information on each of the cited works is available through the link to ADS.
+%
+%\textbf{This page can be easily removed from the print copy\dots}
+
+%%% END
+
+%
+%%% FRONT CONTENT:
+%
+% page numbering as roman numerals
+% don't indent paragraphs
+% increase the amount of space between paragraphs
+\pagestyle{plain}
+\pagenumbering{roman}
+%
+% disclaimer
+%
+% I don't like things showing up in the contents BEFORE the contents
+% page itself, but you may wish to uncomment these lines.
+%
+%\phantomsection\addcontentsline{toc}{section}{Disclaimer}
+\include{disclaimer}
+%
+% acknowledgements
+% \phantomsection\addcontentsline{toc}{section}{Acknowledgments}
+%\cleardoublepage
+\include{acknowledgements}
+%
+% abstract
+%\phantomsection\addcontentsline{toc}{section}{Abstract}
+%\cleardoublepage
+\include{abstract}
+%
+% table of contents, figures and tables
+\setcounter{tocdepth}{1} % limit TOC to sections, i.e. 1.2, not the default 1.2.1
+\phantomsection\addcontentsline{toc}{section}{Contents}
 \tableofcontents
-
+\phantomsection\addcontentsline{toc}{section}{List of Figures}
 \listoffigures
+\phantomsection\addcontentsline{toc}{section}{List of Tables}
+\listoftables\cleardoublepage
 
-\listoftables
+%%% MAIN CONTENT:
+%
+% page numbering as numbers for content of thesis
+\pagenumbering{arabic}
+\pagestyle{fancy}
+\fancyhead[LO]{\nouppercase{\rightmark}}
+\fancyhead[RE]{\nouppercase{\leftmark}}
+\fancyhead[LE]{\thepage}
+\fancyhead[RO]{\thepage}
+\fancyfoot{}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0pt}
 
+%%%%%%%%%%%%%%%%%% MAIN CONTENT %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%----------------------------------------------------------------------------------------
-%	ARTICLE CONTENTS
-%----------------------------------------------------------------------------------------
+\include{0_Introduction/introduction}
+\include{1_Chapter1/body}
+\include{2_Chapter2/body}
+\include{3_Chapter3/body}
+\include{4_Chapter4/body}
+\include{5_Chapter5/body}
+\include{8_Conclusions/conclusions}
 
-\input{chapters/introduction.tex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% BACK CONTENT:
+%
+\cleardoublepage
+% for back matter, plain page style with no head/foot rules
+%\pagestyle{plain}
 
-\input{chapters/theory_background.tex}
+%
+% bibliography
+\phantomsection\addcontentsline{toc}{chapter}{Bibliography}
+% change bib style to 'apj' to remove the ADS links in the printed version
+\bibliographystyle{astroads}
+\bibliography{bibfile}
 
-\input{chapters/literature_review.tex}
-
-\input{chapters/experimental_methods.tex}
-
-\input{chapters/results_discussion.tex}
-
-\input{chapters/future_work.tex}
-
-\input{chapters/conclusions.tex}
-
-
-%------------------------------------------------
-
-\input{frontmatter/acknowledgements.tex}
-\addcontentsline{toc}{section}{Acknowledgments}
-
-So long and thanks for all the fish \cite{Figueredo:2009dg, Smith:2012qr}.
-
-%----------------------------------------------------------------------------------------
-%	REFERENCE LIST
-%----------------------------------------------------------------------------------------
-
+% appendices
+\cleardoublepage
 \phantomsection
-\bibliographystyle{unsrt}
-\bibliography{ref.bib}
-
-\include{appendix/appendix.tex}
-
-%----------------------------------------------------------------------------------------
+\appendix
 
 \end{document}
