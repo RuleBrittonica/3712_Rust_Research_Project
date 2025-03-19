@@ -1,68 +1,83 @@
 \chapter[Chapter 1]{Literature Review}
 \label{chap:lit_review}
 
-\section{Overview of Refactoring}
-\label{sec:overview_refactoring}
+\section{Introduction}
+\label{sec:lit_intro}
+Rust is a modern systems programming language that enforces memory safety
+through a strict ownership and borrowing discipline. This discipline, enforced
+by Rust's borrow checker, ensures that well-typed Rust programs are free from
+data races and dangling pointers without requiring a GC
+\cite{automated_refactoring_of_rust_programs}. However, Rust's unique type
+system — centered on ownership and lifetimes — poses
+new challenges for code transformation tools and formal reasoning. This
+literature review surveys academic work on automated refactoring techniques for
+Rust, approaches to verification of Rust programs (including formal methods and
+model checking), and efforts to formalize Rust's semantics. We compare Rust's
+refactoring and verification tooling to those of other languages, and we discuss
+integration with development environments. The goal is to highlight the state of
+the art in making Rust programs easier to evolve and prove correct, while
+pinpointing structural refinements for a clearer organization of this body of
+work.
 
-\section{``Extract Method'' Refactoring}
-\label{sec:extract_method}
+\section{Rust's Ownership Model and Formal Semantics}
+\label{sec:rust_owndership_model_formal_semantics}
 
-\section{Rusts Memory Model and the Implications for Refactoring}
-\label{sec:rust_memory_model}
+Rust's ownership model introduces compile-time enforced rules for aliasing and
+memory lifetime. Each value in Rust has a single owning scope, and references
+(borrows) must obey strict rules that prevent concurrent mutation and
+use-after-free \cite{automated_refactoring_of_rust_programs},\cite{the_rust_language}.
+While this model provides strong safety guarantees, it complicates formal
+semantics and tool development. Early efforts to rigorously define Rust's
+semantics culminated in \textit{RustBelt}, which provided the first machine-checked
+safety proof for a realistic subset of Rust's type system
+\cite{RustBelt}.\textit{RustBelt} demonstrated that safe Rust code (even when
+using unsafe internals of standard libraries) is memory and thread safe, by
+modeling Rust in the Coq proof assistant \cite{RustBelt}. This foundational work
+established confidence in Rust's core design and set the stage for verifying
+more complex properties. Subsequent research has extended Rust's semantic
+foundation to cover aliasing in unsafe code (e.g. Stacked Borrows and Tree
+Borrows models for pointer aliasing) \cite{AENEAS_PART_2}, and to connect Rust's
+high-level rules with low-level memory models. These formal models provide a
+basis on which verification tools and refactoring tools can reason about Rust
+code behavior. In summary, Rust's enforced aliasing discipline, while posing
+challenges, has inspired a rich line of work in formal semantics that underpins
+safe refactoring and verification.
 
-\subsection{Ownership, Borrowing and Lifetimes}
-\label{sec:ownership_borrowing_lifetimes}
+\section{Automated Refactoring in Rust vs Other Languages}
+\label{sec:automated_ref_rust_vs_other}
+Welll established languages like java and C\# benefit from decades of IDE
+support for refactorings such as \textit{Rename} and \textit{Extract Method}.
+Rust, being newer and with far more complex compile-time rulse, has lagged
+behind in automated refactoring support \cite{AdventureOfALifetime}. The
+ubiquitous \textit{Extract Method} is ``widely used in all major IDEs'' for
+other languages, but implementing it for Rust is surprisingly non-trivial due to
+Rust's ownership and lifetime constraints \cite{AdventureOfALifetime}. In
+contrast to a language like Java, where extracting a function involves mostly
+syntactic rearrangement, Rust's refacotring tools must also infer where to
+borrow or clone data and how to introduce lifetime parameters to satisfy the
+borrow checker \cite{automated_refactoring_of_rust_programs},
+\cite{automatically_enforcing_rust_trait_properties}. Early comparisons noted
+that Rust's lack of reflection and unstable compiler APIs made it harder to
+build refactoring tools as robust as those for Java / C\#. Even in the two years
+since REM was released, compiler APIs have changed so much that it proved
+impossible to compile the original project without significant rewrites. On the
+positive side, Rust's compiler errors can guide manual refactorign by
+pinpointing violations of borrowing rules, giving programmers immediate
+feedback; this meansd that if a refactoring compiles in Rust, it is likely
+behaviour-preserving \cite{Endler_2024}. Nonetheless, the consensus in both
+academia and industry is that first-class refactoring tools are needed to manage
+large Rust codebases with the same ease developers expect in other environments
+\cite{AdventureOfALifetime}, \cite{OneThousandOneStories-SoftwareRefactoring}. 
+\section{Automated Refactoring Techniques for Rust}
+\label{sec:automated_ref_tech_rust}
 
-\subsection{Existing Tools and Apporaches}
-\label{sec:existing_tools_approaches}
+\section{Verification and Formal Methods for Rust}
+\label{sec:verification_formal_methods}
 
-\section{The REM Algorithm and its Limitations}
-\label{sec:rem_algorithm_limitations}
+\section{Integration with IDEs and Language Servers}
+\label{sec:integration_language_server}
 
-\subsection{Recap of Adventure of a Lifetime}
-\label{sec:recap_adventure_lifetime}
-
-\subsection{Implementation Approach}
-\label{sec:implementation_approach}
-
-\subsection{Limitations}
-\label{sec:limitations_of_aol}
-
-\section{Verification of Refactoring}
-\label{sec:verification_refactoring}
-
-\subsection{Why Verification Matters}
-\label{sec:why_verification_matters}
-
-\subsection{Existing verification projects / older trusted refactoring software for JAVA}
-\label{sec:existing_verification_projects}
-
-\subsection{Approaches to Verification}
-\label{sec:approaches_verification}
-
-\section{Related work beyond Rust}
-\label{sec:related_work_beyond_rust}
-
-\subsection{Refactoring tools in other languages}
-\label{sec:refactoring_tools_other_languages}
-
-\subsection{Formal semantics in other systems}
-\label{sec:formal_semantics_other_systems}
-
-\section{Gaps in exsting Literature}
-\label{sec:gaps_existing_literature}
-
-\subsection{Insufficient Tooling for Advanced Rust Features}
-\label{sec:insufficient_tooling_advanced_rust_features}
-
-\subsection{Partial or Nonexistent Verification}
-\label{sec:partial_nonexistent_verification}
-
-\subsection{Integration with Langugage Servers}
-\label{sec:integration_language_servers}
-
-\section{Summary}
-\label{sec:summary_lit_review}
-
+\section{Conclusions and Insights}\
+\label{sec:lit_concusions}
 
 \renewcommand\thefigure{\thechapter .\arabic{figure}}

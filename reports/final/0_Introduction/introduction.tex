@@ -2,8 +2,23 @@
 \chapter{Introduction}
 \label{chap:introduction}
 
-Rust is a modern systems programming language tjat aims to reconcile low-level
-control with strong safety guarantees \cite{the_rust_language}. This 
+Rust is a modern systems programming language that aims to reconcile low-level
+control with strong safety guarantees \cite{the_rust_language}. This is in stark
+contrast to previous norms, where a program was often forced to choose between
+low-level control (with languages such as C/C++) and memory safety (with garbage
+collected languages such as Java). However, as prior work like \textit{Adventure of a
+Lifetime} (AoL) \cite{AdventureOfALifetime} and the subsequent \textit{Borrowing
+without Sorrowing} \cite{BorrowingWithoutSorrowing} plugin have shown, these
+very features that make Rust robust also complicate automated refactoring -
+particularly ``Extract Method'' transformations that are straightforward in
+garbage collected (GC) languages. Building on these initial efforts, this paper
+extends the Rusty Extraction Maestro (REM) tool, removing dependencies on
+outdated IDEs, handling a broader array of Rust constructs (including
+async/await and generics), and introducing a more rigorous verification strategy
+to ensure that refactorings preserve semantics. By providing a standalone
+command-line interface and a proof-of-concept Visual Studio Code extension, this
+project lays the groundwork for seamlessly integrating safe, behavior-preserving
+“Extract Method” refactoring into mainstream Rust development workflows.
 
 \section{Motivation and Background}
 \label{sec:motivation}
@@ -11,9 +26,9 @@ control with strong safety guarantees \cite{the_rust_language}. This
 It is an inevitable fact of software development that the engineer will spend a
 substantial amount of their time modifying and improving existing codebases.
 Such modifications will range from small bug fixes to complete architecture
-overhauls. Regardless of how large (or small) the situation is, refactoring –
+overhauls. Regardless of how large (or small) the situation is, refactoring -
 systematic restructuring of the codebase without altering its external behaviour
-– plays a pivotal role in maintaining code quality and limiting code smell over
+- plays a pivotal role in maintaining code quality and limiting code smell over
 time. Despite refactoring being commonplace in many systems programming
 languages like C++ or Java, implementing automated refactoring tools remains
 challenging, particularly in languages with advanced features and strict safety
@@ -31,9 +46,9 @@ the proverbial brick wall that is the Rust borrow checker. Whilst the borrow
 checker and other compilation checks will prevent unintended consequences, the
 programmer must now deal with a whole host of other issues.
 
-Against this backdrop, \textit{Adventure of a Lifetime} (AoL)~\cite{aol}
+Against this backdrop, \textit{Adventure of a Lifetime} (AoL)~\cite{AdventureOfALifetime}
 introduced the conceptual framework for automated “Extract Method” refactoring
-in Rust. From there, \textit{Borrowing without Sorrowing}~\cite{borrowing}
+in Rust. From there, \textit{Borrowing without Sorrowing}~\cite{BorrowingWithoutSorrowing}
 implemented the concepts outlined in \textit{Adventure of a Lifetime} as an
 IntelliJ IDEA plugin. This project now builds on those foundations, aiming to
 extend, improve and explore new frontiers for automated Rust refactoring.
@@ -45,7 +60,8 @@ Despite widespread agreement on the value of continuous, incremental code
 improvements, one might still wonder: do development teams truly refactor in
 practice, or is it just an idealized principle? A recent large-scale survey of
 1,183 professional developers by the JetBrains team, \textit{One Thousand and
-One Stories: A Large-Scale Survey of Software Refactoring}~\cite{jetbrains},
+One Stories: A Large-Scale Survey of Software
+Refactoring} \cite{OneThousandOneStories-SoftwareRefactoring},
 sheds light on this question. The results show that refactoring is
 unquestionably a routine part of modern software engineering:
 
@@ -77,7 +93,7 @@ crucial tool that helps engineers keep the technical debt at a manageable level.
 It ensures that system complexity remains manageable by promoting cleaner
 abstractions, fewer side effects, and much clearer data flows.
 
-Additionally, whilst refactoring itself doesn’t add new features, it often
+Additionally, whilst refactoring itself doesn't add new features, it often
 uncovers latent defects and unexpected behaviours or side effects. It can be
 used to bring clarity to confusing, hundred-plus line methods, and makes testing
 significantly more straightforward.
@@ -180,12 +196,12 @@ illustrates how this technique works at a superficial level.
 \label{sec:aol}
 
 A foundational contribution toward automated refactoring for Rust was made by
-Sergey et al.\ in \textit{Adventure of a Lifetime}~\cite{aol}. While ``Extract
+Sergey et al.\ in \textit{Adventure of a Lifetime}~\cite{AdventureOfALifetime}. While ``Extract
 Method'' refactoring is relatively straightforward in languages like Java, the
 challenges discussed in the previous section demonstrate why a similar algorithm
 for Rust is far from trivial. To tackle these unique challenges,
 \textit{Adventure of a Lifetime} introduced a specialized refactoring framework
-tailored to Rust’s complexities.
+tailored to Rust's complexities.
 
 Their approach addressed Rust-specific issues using multiple specialized passes.
 For example, one pass systematically encodes \texttt{return}, \texttt{break},
@@ -210,11 +226,11 @@ refactoring process.
 \end{figure}
 
 The authors implemented this approach as \textit{Rusty Extraction Maestro} (REM)
-on top of IntelliJ IDEA’s Rust plugin. Their empirical evaluation on multiple
+on top of IntelliJ IDEA's Rust plugin. Their empirical evaluation on multiple
 real-world Rust projects demonstrated that REM handles a wider range of
 extractions than existing IDE tools, including scenarios involving multiple
 borrows and nested references. Specifically, REM successfully managed 37 out of
-40 tested cases, outperforming both IntelliJ IDEA alone and VSCode’s Rust
+40 tested cases, outperforming both IntelliJ IDEA alone and VSCode's Rust
 Analyzer. The study also showed that REM-generated functions extracted quickly
 (on the order of one to two seconds), making it practical for everyday
 development. Most of the overhead arose from repeated calls to \texttt{cargo
@@ -309,7 +325,7 @@ reliable.
 This project seeks to improve and extend the capabilities of the \texttt{Rusty
 Extraction Maestro (REM)} tool while making the refactoring process more
 accessible and verifiable. Specifically, the aims can be grouped into three key
-areas: enhancing \texttt{REM}’s standalone functionality, establishing a solid
+areas: enhancing \texttt{REM}'s standalone functionality, establishing a solid
 approach to verifying refactorings, and developing a proof-of-concept
 \texttt{VSCode} extension. A long-term ambition is to explore potential
 integration with \texttt{Rust Analyzer} if future architectural changes permit.
@@ -317,7 +333,7 @@ integration with \texttt{Rust Analyzer} if future architectural changes permit.
 \subsection{Improve and Extend \texttt{REM}}
 \label{sec:improve-extend-rem}
 
-A principal goal is to remove \texttt{REM}’s existing dependencies on both
+A principal goal is to remove \texttt{REM}'s existing dependencies on both
 \texttt{rustc} and IntelliJ IDEA, allowing the tool to function independently.
 By offering a standalone solution, \texttt{REM} would be simpler to incorporate
 into various workflows, free of the overhead or version constraints tied to
@@ -328,7 +344,7 @@ To ensure broader adoption, another focus is to provide \texttt{VSCode}
 integration in the form of a user-friendly plugin. This plugin should install
 easily, require minimal setup, and offer automated \texttt{Extract Method}
 support for Rust directly in Visual Studio Code. In parallel, the project aims
-to expand \texttt{REM}’s capabilities to handle advanced Rust features, such as
+to expand \texttt{REM}'s capabilities to handle advanced Rust features, such as
 \texttt{async/await} constructs, macros, closures, \texttt{const} functions, and
 more intricate generics. Addressing these challenging language constructs will
 make \texttt{REM} suitable for a greater variety of real-world Rust codebases.
@@ -336,9 +352,9 @@ make \texttt{REM} suitable for a greater variety of real-world Rust codebases.
 \subsection{Verification of \texttt{REM} / Refactorings}
 \label{sec:verification-rem}
 
-Automated refactorings are only meaningful if they preserve the program’s
+Automated refactorings are only meaningful if they preserve the program's
 original semantics. While typical “copy-and-paste” style transformations rarely
-alter program logic, \texttt{REM}’s deeper rewrites---which may include lifetime
+alter program logic, \texttt{REM}'s deeper rewrites---which may include lifetime
 adjustments or reified control-flow enums---require stronger assurances that the
 resulting code truly behaves as intended. To achieve this, the project intends
 to develop a theoretical framework (or algorithm) for proving equivalence
@@ -350,16 +366,16 @@ proof purposes. Recent development to toolchains like
 \texttt{CHARON}\cite{charon} and \texttt{AENEAS}\cite{aeneas} can assist by
 allowing for a complete translation of a Rust program into a set of functional,
 proof oriented languages like \texttt{F*} and \texttt{Coq}. Though complete
-verification of all Rust code remains infeasible due to the language’s evolving
+verification of all Rust code remains infeasible due to the language's evolving
 semantics, partial or scenario-specific proofs can still bolster confidence in
-\texttt{REM}’s correctness. Demonstrating a handful of end-to-end
+\texttt{REM}'s correctness. Demonstrating a handful of end-to-end
 examples---from extraction in Rust to verified equivalence in a proof
 assistant---will illustrate the viability of this approach. Moreover, the
 verification pipeline has the potential to be integrated into the main body of
-\texttt{REM}, providing the programmer with a guarantee that their code’s
-functionality hasn’t been affected or alternatively, the verification tool can
+\texttt{REM}, providing the programmer with a guarantee that their code's
+functionality hasn't been affected or alternatively, the verification tool can
 be leveraged to execute a comprehensive series of case studies that further
-validate \texttt{REM}’s functionality.
+validate \texttt{REM}'s functionality.
 
 \subsection{Build a Proof-of-Concept Extension for \texttt{VSCode}}
 \label{sec:vscode-extension}
@@ -367,7 +383,7 @@ validate \texttt{REM}’s functionality.
 A strong emphasis is on producing a proof-of-concept \texttt{VSCode} extension
 that showcases \texttt{REM} in action within one of the most commonly used Rust
 development environments. This extension should seamlessly integrate into a
-developer’s normal workflow, from code editing to debugging, without burdensome
+developer's normal workflow, from code editing to debugging, without burdensome
 setup. By offering an easy-to-install plugin, the refactoring workflow becomes
 more accessible, and potential refinements can be validated in real-world coding
 sessions.
@@ -382,7 +398,7 @@ new, standalone core, instead of a platform or program specific implementation.
 \label{sec:long-term-goal}
 
 Finally, looking beyond the immediate development schedule, an intriguing
-possibility is merging \texttt{REM}’s functionality with \texttt{Rust Analyzer},
+possibility is merging \texttt{REM}'s functionality with \texttt{Rust Analyzer},
 the official language server for Rust. \texttt{Rust Analyzer} already converts
 source code into an intermediate representation to power syntax highlighting,
 code completion, and basic refactorings. If \texttt{REM} can leverage that IR,

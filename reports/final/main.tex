@@ -27,6 +27,8 @@ citecolor=black, breaklinks=true]{hyperref}
 \usepackage{threeparttablex}
 \usepackage{multirow}
 \usepackage{bbding}
+\usepackage{booktabs}
+\usepackage{tabularx}
 
 \usepackage{cleveref}
 \crefformat{footnote}{#2\footnotemark[#1]#3}
@@ -223,6 +225,10 @@ citecolor=black, breaklinks=true]{hyperref}
 \listoffigures
 \phantomsection\addcontentsline{toc}{section}{List of Tables}
 \listoftables\cleardoublepage
+
+% Glossary Table
+\phantomsection\addcontentsline{toc}{section}{Glossary}
+\input{glossary.tex}
 
 %%% MAIN CONTENT:
 %
