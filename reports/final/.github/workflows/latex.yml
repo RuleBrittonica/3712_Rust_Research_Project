@@ -1,6 +1,8 @@
-name: Build LaTeX Document
+name: Compile and Push LaTeX Document
 on:
   push:
+    branches:
+      - main
     paths-ignore:
       - '**/README.md'
       - '**/LICENSE'
@@ -8,6 +10,7 @@ on:
       - '**/.gitattributes'
       - '**/Makefile'
       - 'Assets/**'
+      - 'main.pdf'
   pull_request:
     paths-ignore:
         - '**/README.md'
@@ -20,14 +23,20 @@ jobs:
   build_latex:
     runs-on: ubuntu-latest
     steps:
-      - name: Setup Git Repository
+      - name: Checkout Repository
         uses: actions/checkout@v4
+
       - name: LaTeX Document Compilation
         uses: xu-cheng/latex-action@v3
         with:
-          root_file: IPLeiriaMain.tex
+          root_file: main.tex
           latexmk_use_xelatex: true
           latexmk_shell_escape: true
-          extra_fonts: |
-            ./Configurations/Fonts/*.ttf
-            ./Configurations/Fonts/*.otf
+          
+      - name: Commit PDF File
+        uses: EndBug/add-and-commit@v9
+        with:
+          author_name: "GitHub Actions"
+          author_email: "actions@github.com"
+          message: "Auto-update compiled report"
+          add: "main.pdf"

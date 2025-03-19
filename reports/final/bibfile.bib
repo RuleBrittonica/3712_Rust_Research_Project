@@ -264,24 +264,6 @@ keywords = {Rust, Traits, Software model checking},
 location = {London, United Kingdom}
 }
 
-@inproceedings{10.1145/2663171.2663188,
-author = {Matsakis, Nicholas D. and Klock, Felix S.},
-title = {The rust language},
-year = {2014},
-isbn = {9781450332170},
-publisher = {Association for Computing Machinery},
-address = {New York, NY, USA},
-url = {https://doi.org/10.1145/2663171.2663188},
-doi = {10.1145/2663171.2663188},
-abstract = {Rust is a new programming language for developing reliable and efficient systems. It is designed to support concurrency and parallelism in building applications and libraries that take full advantage of modern hardware. Rust's static type system is safe1 and expressive and provides strong guarantees about isolation, concurrency, and memory safety.Rust also offers a clear performance model, making it easier to predict and reason about program efficiency. One important way it accomplishes this is by allowing fine-grained control over memory representations, with direct support for stack allocation and contiguous record storage. The language balances such controls with the absolute requirement for safety: Rust's type system and runtime guarantee the absence of data races, buffer overflows, stack overflows, and accesses to uninitialized or deallocated memory.},
-booktitle = {Proceedings of the 2014 ACM SIGAda Annual Conference on High Integrity Language Technology},
-pages = {103–104},
-numpages = {2},
-keywords = {affine type systems, memory management, rust, systems programming},
-location = {Portland, Oregon, USA},
-series = {HILT '14}
-}
-
 @article{the_rust_language,
 author = {Matsakis, Nicholas D. and Klock, Felix S.},
 title = {The rust language},
@@ -333,4 +315,30 @@ series = {ACSW '17}
   PDF = {https://inria.hal.science/hal-03737878v1/file/main.pdf},
   HAL_ID = {hal-03737878},
   HAL_VERSION = {v1},
+}
+
+@Article{verifying_dynamic_trait_objects,
+ author = {Alexa VanHattum and Daniel Schwartz-Narbonne and Nathan Chong and Adrian Sampson},
+ title = {Verifying dynamic trait objects in rust},
+ year = {2023},
+ url = {https://www.amazon.science/publications/verifying-dynamic-trait-objects-in-rust},
+}
+
+@misc{Dorian_2022, title={Improving “extract function” in Rust analyzer }, url={https://dorianlistens.com/2022/07/improving-extract-function-in-rust-analyzer/#:~:text=According%20to%20the%20official%20Rust,Analyzer%20website}, journal={Dorian Listens}, author={Dorian}, year={2022}, month={Aug}}
+
+@inbook{prusti_project,
+author = {Astrauskas, Vytautas and Bílý, Aurel and Fiala, Jonáš and Grannan, Zachary and Müller, Peter and Poli, Federico and Summers, Alexander},
+year = {2022},
+month = {05},
+pages = {88-108},
+title = {The Prusti Project: Formal Verification for Rust},
+isbn = {978-3-031-06772-3},
+doi = {10.1007/978-3-031-06773-0_5}
+}
+
+@phdthesis{prust_in_practice,
+author = {Stef Gijsberts},
+title = {Prusti in Practice, A case sttudy of using the Prusti auto-active program verifyer for Rust},
+year = {2023},
+month = {03},
 }
