@@ -10,7 +10,7 @@ on:
       - '**/.gitattributes'
       - '**/Makefile'
       - 'Assets/**'
-      - 'main.pdf'
+      - 'reports/final/main.pdf'
   pull_request:
     paths-ignore:
         - '**/README.md'
@@ -39,4 +39,4 @@ jobs:
           author_name: "GitHub Actions"
           author_email: "actions@github.com"
           message: "Auto-update compiled report"
-          add: "main.pdf"
+          add: "reports/final/main.pdf"
