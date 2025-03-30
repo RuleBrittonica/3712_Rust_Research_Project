@@ -489,9 +489,38 @@ made available in a wide range of editors, not just heavyweight IDEs
 like Rust and Go, where a language server can provide refactoring assists
 consistently across many development environments.
 
-\section{Conclusions and Insights}
+\section{Conclusion} % TODO expand the conclusion, potentialy with a section
+% going over the gaps in the research. Alternatively, we could analyse each
+% source at the time it is introduced and discuss its limitations there.
 \label{sec:lit_concusions}
+The landscape of Rust refactoring and verification has rapidly evolved, marrying
+the Rust compiler’s strengths with novel algorithms from the research community.
+Automated refactoring tools for Rust have progressed from simple renaming
+utilities to sophisticated systems that integrate program repair and static
+analysis (REM and Rust-Lancet) to handle ownership and lifetime challenges
+\cite{AdventureOfALifetime}, \cite{RustLancet}. Verification tools leverage
+Rust’s unique guarantees to simplify proofs – whether by translating to pure
+functional models (Aeneas) \cite{AENEAS}, by encding lifetime reasoning into
+logical frameworks (RustBelt, RefinedRust) \cite{RustBelt}, \cite{RefinedRust},
+or by exploring executions with model checkers (Kani) that understand
+Rust-specific features \cite{verifying_dynamic_trait_objects}. A unifying theme
+is that Rust’s ownership semantics, once seen purely as a hurdle, have become an
+enabler for both refactoring and verification: they localize the reasoning about
+memory, allowing tools to either confidently transform code or assert properties
+with the guarantee that certain classes of bugs are already ruled out.
 
-
+In conclusion, Rust’s combination of strong static checks and low-level
+performance has fostered a unique blend of research. The advances in refactoring
+mean that developers can expect increasing assistance in restructuring Rust code
+without fear of breaking it. Meanwhile, the maturation of formal methods for
+Rust suggests that full verification of critical Rust code is becoming
+practical, supported by tools that integrate with Rust’s development ecosystem.
+By structuring the literature along clear axes (refactoring vs. verification,
+formal foundations vs. practical tools, compiler phases involved, safe vs.
+unsafe scope), future reviews can further improve clarity and coverage. The
+works cited here collectively show that Rust’s initially steep learning curve
+for both humans and tools can be mitigated by clever automation and rigorous
+semantics – turning Rust’s famed safety guarantees from a burden into a powerful
+ally for program analysis and transformation.
 
 \renewcommand\thefigure{\thechapter .\arabic{figure}}
