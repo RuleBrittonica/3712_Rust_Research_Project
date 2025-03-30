@@ -1,1 +1,38 @@
-%\chapter{Appendix for Chapter 1}
+\section{Appendix 1: Passing by Value and Reference}
+
+This appendix provides three short, self-containted examples of ``na\"ive''
+function hoisting in Rust. In each example, we will define a function that is
+getting refactored, and we will demonstrate the case where the arguments to the
+function are passed by value and the case where they are passed by reference. To
+achieve this, we are imagining an automated refactoring tool that initially
+takes an inline block of code and moves it into a new function. The compilation
+errors (if any) guide a subsequent ownership analysis, which deduces how each
+variable should be passed: by value (\texttt{T}), by shared reference
+(\texttt{\&T}), or by mutable reference (\texttt{\&mut T}).
+
+\subsection{Example 1: Passing by Value}
+\subsubsection*{Original Code (inline)}
+\inputminted{rust}{6_appendices/app1_code/ex1_oc.rs}
+
+\subsubsection*{Na\"ive Hoisted Code (before fixes)}
+\inputminted{rust}{6_appendices/app1_code/ex1_nhs.rs}
+
+\subsection{Example 2: Passing by Shared Reference}
+\subsubsection*{Original Code (inline)}
+\inputminted{rust}{6_appendices/app1_code/ex2_oc.rs}
+
+\subsubsection*{Na\"ive Hoisted Code (before fixes)}
+\inputminted{rust}{6_appendices/app1_code/ex2_nhs.rs}
+
+\subsubsection*{Automated Repair Yields}
+\inputminted{rust}{6_appendices/app1_code/ex2_ar.rs}
+
+\subsection{Example 3: Passing by Mutable Reference}
+\subsubsection*{Original Code (inline)}
+\inputminted{rust}{6_appendices/app1_code/ex3_oc.rs}
+
+\subsubsection*{Na\"ive Hoisted Code (before fixes)}
+\inputminted{rust}{6_appendices/app1_code/ex3_nhs.rs}
+
+\subsubsection*{Automated Repair Yields}
+\inputminted{rust}{6_appendices/app1_code/ex3_ar.rs}

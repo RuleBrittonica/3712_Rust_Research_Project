@@ -256,21 +256,20 @@ citecolor=black, breaklinks=true]{hyperref}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% BACK CONTENT:
 %
-\cleardoublepage
+% \cleardoublepage
 % for back matter, plain page style with no head/foot rules
 %\pagestyle{plain}
 
-%
+% appendices
+% \phantomsection
+% \appendix
+\include{6_appendices/appendix_main}
+
 % bibliography
+\cleardoublepage
 \phantomsection\addcontentsline{toc}{chapter}{Bibliography}
 % change bib style to 'apj' to remove the ADS links in the printed version
 \bibliographystyle{astroads}
 \bibliography{bibfile}
-
-% appendices
-\cleardoublepage
-\phantomsection
-\appendix
-% \include{6_appendices/appendix_main}
 
 \end{document}

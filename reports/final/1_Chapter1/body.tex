@@ -106,9 +106,45 @@ large Rust codebases with the same ease developers expect in other environments
 \section{Automated Refactoring Techniques for Rust}
 \label{sec:automated_ref_tech_rust}
 \subsection{Renaming and Simple Refactorings}
+One of the first efforts to build a Rust refactoring tool was by G. Sam et al.
+(2017), who created a proof-of-concept refactoring framework utilizing the Rust
+compiler's internal APIs. The team partnered with Mozilla Research to be among
+the first to implement the Rust specific refactorings of \textit{Lifetime
+Elision} and \textit{Lifetime Reification}. This allowed their program to
+introuce explicit lifetime parameters in instances where the compiler was
+implicitly inferring them - a refactoring that was brand new to Rust. The
+challenges encountered illustrated how Rust's stricter scoping and shadowing
+rules required careful handling of name conflicts during renaming (e.g. avoiding
+situations where renaming a variable could unintentionally shadow another)
+\cite{automated_refactoring_of_rust_programs}. Additionally, the 2017 study
+concluded that many refactorings are possible with Rust's compiler
+infrastructure, but ensuring \textit{behavioural preservation} (especially
+around ownership transfers) requires additional static analyses not needed in
+langauges without Rust's constraints. Their work on \textit{Lifetime Elision}
+has since formed part of the REM toolchain, where the rich feedback from the
+Rust compiler is leveraged to ensure that the final transformation is both
+valid Rust and as legible as possible \cite{AdventureOfALifetime},
+\cite{BorrowingWithoutSorrowing}.
 
 \subsection{Extract Method (REM)}
 
+A major advance in Rust refactoring came with the Rust Extract Maestro (REM),
+with the theoretical background provided by the work of Costea et al. (2023) in
+\textit{Adventure of a Lifetime: Extract Method Refactoring for Rust}. Thy et
+al. (2023) then provided a practical implementation of REM in \textit{Borrowing
+Without Sorrowing}. REM is a tool that tackled notoriously complex Extract
+Method refactoring for Rust. REM decomposes the extract-method process into a
+sequence of transformations, each addressing a specific aspect of Rust's type
+and borrow rules \cite{AdventureOfALifetime}. The approach begins with a
+``na\"ive'' function hoisting (moving a block of code into a new function), then
+applies a series of \textit{automated program repairs} to make the code compile
+correctly. This process is guided by \textit{oracles} - specialised analyses
+that resolve issues the compiler would flag. One such oracle is an
+intra-procedural \textbf{ownership analysis} which infers wheter each value
+moved to the new function should be passed by value, by shared reference (using
+\texttt{\&T}), or by mutable reference (using \texttt{\&mut T}). Appendix 1
+\ref{app:pass_by_x} provides a detailed example of what this looks like in
+practice.
 \subsection{Automated Fixes for Ownership Errors}
 
 \subsection{Comparison and Summary}
@@ -133,7 +169,7 @@ tools and techniques, and the formal semantics advances enabling them.
 \section{Integration with IDEs and Language Servers}
 \label{sec:integration_language_server}
 
-\subsection{Compiler Intenrals for Ownership and Borrowing}
+\subsection{Compiler Internals for Ownership and Borrowing}
 
 \subsection{Industry Perspective}
 
@@ -195,7 +231,7 @@ building blocks for automated program repair, such as applying
 behavior-preserving transformations to enable a later bug-fixing change, with
 one such case even mentioned in
 \textit{Adventure of a Lifetime} \cite{AdventureOfALifetime}. Tools like
-Facebook’s JScodeshift or Python’s Bowler allow developers to script custom
+Facebook's JScodeshift or Python's Bowler allow developers to script custom
 refactorings (essentially semi-automated transformations), which blurs the line
 between a ``human-driven'' refactoring ands a tool-driven migration. The
 incdeasing adoption of language servers means refactoing capablilities can be
@@ -204,7 +240,7 @@ made available in a wide range of editors, not just heavyweight IDEs
 like Rust and Go, where a language server can provide refactoring assists
 consistently across many development environments.
 
-\section{Conclusions and Insights}\
+\section{Conclusions and Insights}
 \label{sec:lit_concusions}
 
 \renewcommand\thefigure{\thechapter .\arabic{figure}}
