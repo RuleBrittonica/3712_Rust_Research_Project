@@ -152,7 +152,7 @@ illustrates how this technique works at a superficial level.
     require parameter signatures or function boundaries to be revised
     accordingly.
 
-    \begin{table}[h!]
+    \begin{table}[H]
         \centering
         \begin{tabular}{@{}p{0.47\textwidth}@{\hspace{0.03\textwidth}}|@{\hspace{0.03\textwidth}}p{0.47\textwidth}@{}}
         \textbf{Immutable Borrow} & \textbf{Mutable Borrow} \\[5pt] \hline \\[-5pt]
@@ -163,7 +163,9 @@ illustrates how this technique works at a superficial level.
     \label{tab:borrowing_imm_mut}
     \end{table}
 
-    \item \textbf{Lifetimes and their Management:}
+    \item \textbf{Lifetimes and their Management:} % TODO Add more details about
+    % what lifetimes signify and how they are used in Rust to garuntee the
+    % memory safety of the program.
     The Rust compiler tracks how long references live to guarantee memory
     safety. Any function that takes (or returns) references must define or infer
     lifetime parameters. When we write Rust code normally, such as the example
