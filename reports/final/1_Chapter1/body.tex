@@ -19,6 +19,40 @@ the art in making Rust programs easier to evolve and prove correct, while
 pinpointing structural refinements for a clearer organization of this body of
 work.
 
+\section{Overview of Refactoring}
+
+As previously mentioned, refactoring is the process of restructuring existing
+code to improve its internal structure wouthout changing its external behavior.
+It is a key practice for enhancing code maintainability and reducing technicanle
+debt in software projects \cite{OneThousandOneStories-SoftwareRefactoring}.
+Modern IDES, such as Eclipse and IntelliJ IDEA include a wide array fo automated
+refactorings, providing developers with quick, semantics- perserviding code
+transformations \cite{AdventureOfALifetime}. In theory, these automated
+refactorings offer a safe way to restructure code (backed by well-defined
+preconditions to preserve behaviour \cite{Formal_Specifiation_JAVA}) and should
+be widely used in practice.
+
+However, empirical studies show a disparity between tool support and actual
+usage. Developers often remain reluctant to use automated refactoring features,
+preferring manual code changes
+\cite{OneThousandOneStories-SoftwareRefactoring}. For example, even with
+“Rename” refactoring available at the click of a button, many programmers still
+rely on find-and-replace or other manual methods
+\cite{OneThousandOneStories-SoftwareRefactoring}. The survey also noted that
+many developers expressed a desire to better understand their IDE's refactoring
+capabilities. This suggests that while the tools exist, there is a gap in
+awareness and useability of the tooling available. Additionally, as evidenced by
+the lack of adoption of even ``Rename'' refactorings,  challenges still remain
+in getting developers to trust automated tools to perform complex manipulations.
+
+Research into automated refactoring aims to bridge this gap by making tools more
+reliable and intelligent. For instance, Tip (2007) demonstrated that
+refactorings can be modeled with type constraints to systematically explore
+alternative valid program structures \cite{RefactoringUsingTypeConstraints}.
+Such approaches use static analyses to ensure that transformations maintain type
+correctness and behavioral equivalence, giving developers confidence in the
+automation. Nevertheless, the human factor (usability, understandability of tool
+behavior) remains critical.
 \section{Rust's Ownership Model and Formal Semantics}
 \label{sec:rust_owndership_model_formal_semantics}
 
@@ -46,14 +80,15 @@ safe refactoring and verification.
 \section{Automated Refactoring in Rust vs Other Languages}
 \label{sec:automated_ref_rust_vs_other}
 Welll established languages like java and C\# benefit from decades of IDE
-support for refactorings such as \textit{Rename} and \textit{Extract Method}.
-Rust, being newer and with far more complex compile-time rulse, has lagged
+support for refactorings such as \textit{Rename}, \textit{Extract Method} and
+\textit{Extract Module / Variable}.
+Rust, being newer and with far more complex compile-time rules, has lagged
 behind in automated refactoring support \cite{AdventureOfALifetime}. The
 ubiquitous \textit{Extract Method} is ``widely used in all major IDEs'' for
 other languages, but implementing it for Rust is surprisingly non-trivial due to
 Rust's ownership and lifetime constraints \cite{AdventureOfALifetime}. In
 contrast to a language like Java, where extracting a function involves mostly
-syntactic rearrangement, Rust's refacotring tools must also infer where to
+syntactic rearrangement, Rust's refactoring tools must also infer where to
 borrow or clone data and how to introduce lifetime parameters to satisfy the
 borrow checker \cite{automated_refactoring_of_rust_programs},
 \cite{automatically_enforcing_rust_trait_properties}. Early comparisons noted
@@ -67,15 +102,107 @@ feedback; this meansd that if a refactoring compiles in Rust, it is likely
 behaviour-preserving \cite{Endler_2024}. Nonetheless, the consensus in both
 academia and industry is that first-class refactoring tools are needed to manage
 large Rust codebases with the same ease developers expect in other environments
-\cite{AdventureOfALifetime}, \cite{OneThousandOneStories-SoftwareRefactoring}. 
+\cite{AdventureOfALifetime}, \cite{OneThousandOneStories-SoftwareRefactoring}.
 \section{Automated Refactoring Techniques for Rust}
 \label{sec:automated_ref_tech_rust}
+\subsection{Renaming and Simple Refactorings}
+
+\subsection{Extract Method (REM)}
+
+\subsection{Automated Fixes for Ownership Errors}
+
+\subsection{Comparison and Summary}
 
 \section{Verification and Formal Methods for Rust}
 \label{sec:verification_formal_methods}
+Rust's appeal for building reliable software has spurred interest in applying
+formal verification techniques to Rust programs. Traditional deductive
+verification and model checking must be adapted to account for Rust's ownership,
+lifetimes, and possibly unsafe code. In this section, we review key verification
+tools and techniques, and the formal semantics advances enabling them.
+
+\subsection{RustBelt and Type-System Soundness}
+
+\subsection{Verification via Functional Translation (CHARON and AENEAS)}
+
+
+\subsection{Static Analysers and Model Checkers}
+
+\subsection{Summary}
 
 \section{Integration with IDEs and Language Servers}
 \label{sec:integration_language_server}
+
+\subsection{Compiler Intenrals for Ownership and Borrowing}
+
+\subsection{Industry Perspective}
+
+\section{Related Work Beyond Rust: Refactoring in Other Languages and Paradigms}
+\label{sec:related_work_beyond_rust}
+The challenges and advances in refactoring outlined throughout this review are
+not unique to Rust. Many other languages have ispired research and into
+automated refactoring and its many pitfalls. The easiest case study is Java,
+being one of the earliest targets of refactoring tools, and it has a rich
+literature. Beyond the generics case study mentioned earlier
+(\cite{GenericRefactoringJAVA}), researchers have looked at refactoring
+concurrent Java code, refactoring to use new language features, and large-scale
+restructuring of legacy systems. Zhang et al. (2024) recently proposed an
+automated refactoring approach for Java's asynchronous programming using the
+CompletableFuture API. Their tool, \textbf{ReFuture}, integrates static analysis
+(visitor patterns, alias analysis, etc.) to identify where an older async
+construct (like using raw threads or Futures) can be transformed into a modern
+CompletableFuture chain \cite{AutomaticRefactoringAsyncJAVA}. Impressively,
+\textbf{ReFuture} was evaluated on 9 large Java projects, including
+\textit{Hadoop} and \textit{ActiveMQ}, and managed to refactor 639 out of 813
+eligible code segments automatically, without introducing errors
+\cite{AutomaticRefactoringAsyncJAVA}. This demonstrates that automated
+refactoring can manage to tackle performance or paradigm-migration tasks, not just
+cosmetic and maintenance changes.
+
+In the mobile app domain, Lin et al. (2015) addressed refactoring for Android's
+asynchronous constructs. Android apps often mis-use the AsyncTask class, leading
+to memory leaks or lost UI updates. Lin and his team developed
+\textbf{ASYNCDROID}, a tool to refactor improper AsyncTask usage into a sover
+structures like IntentService \cite{AndroidAsncRefactoring}. Their formative
+study found that about 45\% of the AsyncTask occurrences in real apps could be
+automatically refactored by ASYNCDROID's rules, and an additional ~10\% could
+be handled with minor manual tweaks, resulting in more than half of problematic
+cases being fixed largely automatically. The tool was implemented as an Eclipse
+plugin and offered typical refactoring tool conveniences including a preview of
+the changes and a rollback option. Importantly, when the authors submitted some
+of these refactoring patches to open-source projects, the maintainers accepted
+them, validating that the transformations were indeed considered improvements
+with no behavioral regressions \cite{AndroidAsncRefactoring}. This work
+illustrates how automated refactoring can be applied in a specialized context
+(mobile asynchronous UI code) by encoding domain-specific knowledge as
+transformation rules and preconditions.
+
+Other notable refactoring research outside of Rust includes work on functional
+languages and dynamically-typed languages. In Haskell, for example, the HaRe
+tool (Li et al., 2005) brought refactoring support to a lazy, purely functional
+language, requiring careful handling of Haskell's scoping, type classes, and
+purity concerns \cite{HaRe}. In dynamic languages like JavaScript and Python, refactoring is
+complicated by the lack of static types; researchers have explored heuristic and
+runtime-analysis-based approaches to perform refactorings safely (e.g.,
+refactoring Python's modules or JavaScript's callbacks to promises). While we
+will refrain from delving into specific studies for those here, it is worth noting that each
+language tends to spawn its own refactoring research to address unique features.
+
+Finally, it is important that we note that refacotring is very closely
+intertwined with other software engineering tasks like code smell detection,
+program repair and modernisation. Refactoring tools are sometimes used as
+building blocks for automated program repair, such as applying
+behavior-preserving transformations to enable a later bug-fixing change, with
+one such case even mentioned in
+\textit{Adventure of a Lifetime} \cite{AdventureOfALifetime}. Tools like
+Facebook’s JScodeshift or Python’s Bowler allow developers to script custom
+refactorings (essentially semi-automated transformations), which blurs the line
+between a ``human-driven'' refactoring ands a tool-driven migration. The
+incdeasing adoption of language servers means refactoing capablilities can be
+made available in a wide range of editors, not just heavyweight IDEs
+\cite{AdventureOfALifetime}. This has been a positive development for languages
+like Rust and Go, where a language server can provide refactoring assists
+consistently across many development environments.
 
 \section{Conclusions and Insights}\
 \label{sec:lit_concusions}
