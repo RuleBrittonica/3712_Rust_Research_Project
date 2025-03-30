@@ -1,4 +1,5 @@
 \section{Appendix 1: Passing by Value and Reference}
+\label{sec:appendix1}
 
 This appendix provides three short, self-containted examples of ``na\"ive''
 function hoisting in Rust. In each example, we will define a function that is
@@ -15,24 +16,60 @@ variable should be passed: by value (\texttt{T}), by shared reference
 \inputminted{rust}{6_appendices/app1_code/ex1_oc.rs}
 
 \subsubsection*{Na\"ive Hoisted Code (before fixes)}
-\inputminted{rust}{6_appendices/app1_code/ex1_nhs.rs}
+Suppose an automated refactoring tool decides to “hoist” the multiplication
+logic into a new function: \newline
+\inputminted{rust}{6_appendices/app1_code/ex1_nhc.rs}
+In this example, no errors occur because after calling
+\texttt{hoisted\_block(x)}, we do not need \texttt{x} again in \texttt{main}, so
+moving (passing ownership) is safe. The automated repair analysis detects that
+\texttt{x} is no longer needed in \texttt{main} and decides it can be passed by
+value.
 
 \subsection{Example 2: Passing by Shared Reference}
 \subsubsection*{Original Code (inline)}
 \inputminted{rust}{6_appendices/app1_code/ex2_oc.rs}
 
 \subsubsection*{Na\"ive Hoisted Code (before fixes)}
-\inputminted{rust}{6_appendices/app1_code/ex2_nhs.rs}
+Let's say the refactoring tool decides to hoist the usage of \texttt{get\_first\_word} (or
+a bit more logic around it) into a new helper function:
+\inputminted{rust}{6_appendices/app1_code/ex2_nhc.rs}
+This version won't compile as expected if the function
+\texttt{print\_first\_word\_block} takes \texttt{text} by value. Once \texttt{text}
+is moved into \texttt{print\_first\_word\_block}, we can no longer use
+\texttt{text} afterward in \texttt{main}. The compiler will complain that
+\texttt{text} is moved, thus invalidating the line \texttt{println!("Total
+length is: {}", length);} if we needed \texttt{text} for anything else.
 
 \subsubsection*{Automated Repair Yields}
 \inputminted{rust}{6_appendices/app1_code/ex2_ar.rs}
+\noindent What's going on?
+\begin{itemize}
+    \item \textbf{Read-only usage}: The function \texttt{print\_first\_word\_block}
+    just needs to read the string (in order to print the first word).
+    \item \textbf{Shared reference}: Because the string must remain valid
+    afterward in \texttt{main}, the ownership analysis decides that passing by
+    shared reference (\texttt{\&String}) is correct.
+\end{itemize}
 
 \subsection{Example 3: Passing by Mutable Reference}
 \subsubsection*{Original Code (inline)}
 \inputminted{rust}{6_appendices/app1_code/ex3_oc.rs}
 
 \subsubsection*{Na\"ive Hoisted Code (before fixes)}
-\inputminted{rust}{6_appendices/app1_code/ex3_nhs.rs}
+Hoisting the push operation into a new function could look like this:
+\inputminted{rust}{6_appendices/app1_code/ex3_nhc.rs}
+Here, we have a compilation error similar to Example 2: once \texttt{values} is
+passed by value, ownership is transferred, and we cannot use \texttt{values}
+again in \texttt{main}. However, in this case, we truly do need to mutate
+\texttt{values}, and we want \texttt{main} to see the updated vector.
 
 \subsubsection*{Automated Repair Yields}
 \inputminted{rust}{6_appendices/app1_code/ex3_ar.rs}
+\noindent What's going on?
+\begin{itemize}
+    \item \textbf{Mutation required}: The code needs to modify the original
+    vector.
+    \item \textbf{Mutable reference}: By passing \texttt{\&mut Vec<i32>}, the
+    function can mutate \texttt{values} in place, and \texttt{main} retains
+    ownership of \texttt{values} to use afterward.
+\end{itemize}
