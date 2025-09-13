@@ -1,0 +1,69 @@
+@article{AENEAS,
+author = {Ho, Son and Protzenko, Jonathan},
+title = {Aeneas: Rust verification by functional translation},
+year = {2022},
+issue_date = {August 2022},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+volume = {6},
+number = {ICFP},
+url = {https://doi.org/10.1145/3547647},
+doi = {10.1145/3547647},
+abstract = {We present Aeneas, a new verification toolchain for Rust programs based on a lightweight functional translation. We leverage Rust's rich region-based type system to eliminate memory reasoning for a large class of Rust programs, as long as they do not rely on interior mutability or unsafe code. Doing so, we relieve the proof engineer of the burden of memory-based reasoning, allowing them to instead focus on functional properties of their code.
+
+The first contribution of Aeneas is a new approach to borrows and controlled aliasing. We propose a pure, functional semantics for LLBC, a Low-Level Borrow Calculus that captures a large subset of Rust programs. Our semantics is value-based, meaning there is no notion of memory, addresses or pointer arithmetic. Our semantics is also ownership-centric, meaning that we enforce soundness of borrows via a semantic criterion based on loans rather than through a syntactic type-based lifetime discipline. We claim that our semantics captures the essence of the borrow mechanism rather than its current implementation in the Rust compiler.
+
+The second contribution of Aeneas is a translation from LLBC to a pure lambda-calculus. This allows the user to reason about the original Rust program through the theorem prover of their choice, and fulfills our promise of enabling lightweight verification of Rust programs. To deal with the well-known technical difficulty of terminating a borrow, we rely on a novel approach, in which we approximate the borrow graph in the presence of function calls. This in turn allows us to perform the translation using a new technical device called backward functions.
+
+We implement our toolchain in a mixture of Rust and OCaml; our chief case study is a low-level, resizing hash table, for which we prove functional correctness, the first such result in Rust. Our evaluation shows significant gains of verification productivity for the programmer. This paper therefore establishes a new point in the design space of Rust verification toolchains, one that aims to verify Rust programs simply, and at scale.
+
+Rust goes to great lengths to enforce static control of aliasing; the proof engineer should not waste any time on memory reasoning when so much already comes “for free”!},
+journal = {Proc. ACM Program. Lang.},
+month = aug,
+articleno = {116},
+numpages = {31},
+keywords = {verification, functional translation, Rust}
+}
+@article{AENEAS_PART_2,
+author = {Ho, Son and Fromherz, Aymeric and Protzenko, Jonathan},
+title = {Sound Borrow-Checking for Rust via Symbolic Semantics},
+year = {2024},
+issue_date = {August 2024},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+volume = {8},
+number = {ICFP},
+url = {https://doi.org/10.1145/3674640},
+doi = {10.1145/3674640},
+abstract = {The Rust programming language continues to rise in popularity, and as such,                                                                warrants the close attention of the programming languages community. In this                                                                work, we present a new foundational contribution towards the theoretical                                                                understanding of Rust's semantics. We prove that LLBC, a high-level, borrow-centric model                                                                previously proposed for Rust's semantics and execution, is sound with regards to a low-level                                                                pointer-based language \`{a} la CompCert. Specifically, we prove the                                                                following: that LLBC is a correct view over a traditional model of execution;                                                                that LLBC's symbolic semantics are a correct abstraction of LLBC programs;                                                                and that LLBC's symbolic semantics act as a borrow-checker for LLBC, i.e. that                                                                symbolically-checked LLBC programs do not get stuck when executed on a                                                                heap-and-addresses model of execution.                                                                                                                                To prove these results, we introduce a new proof style that considerably                                                                simplifies our proofs of simulation, which relies on a notion of hybrid                                                                states. Equipped with this reasoning framework, we show that a new addition to                                                                LLBC's symbolic semantics, namely a join operation, preserves the abstraction                                                                and borrow-checking properties. This in turn allows us to add support for                                                                loops to the Aeneas framework; we show, using a series of examples and case                                                                studies, that this unlocks new expressive power for Aeneas.},
+journal = {Proc. ACM Program. Lang.},
+month = aug,
+articleno = {251},
+numpages = {29},
+keywords = {Rust, Semantics, Verification}
+}
+
+@article{AdventureOfALifetime,
+    author = {Thy, Sewen and Costea, Andreea and Gopinathan, Kiran and Sergey, Ilya},
+    title = {Adventure of a Lifetime: Extract Method Refactoring for Rust},
+    year = {2023},
+    issue_date = {October 2023},
+    publisher = {Association for Computing Machinery},
+    address = {New York, NY, USA},
+    volume = {7},
+    number = {OOPSLA2},
+    url = {https://doi.org/10.1145/3622821},
+    doi = {10.1145/3622821},
+    journal = {Proc. ACM Program. Lang.},
+    month = oct,
+    articleno = {245},
+    numpages = {28},
+    keywords = {program repair, automated code refactoring, Rust}
+}
+
+@article{BorrowingWithoutSorrowing,
+  author = {Sewen Thy},
+  title = {Borrowing without Sorrowing: Implementing Extract Method Refactoring for Rust},
+  year = {2023},
+  url= {https://verse-lab.github.io/papers/Sewen-Thy-Capstone.pdf}
+}

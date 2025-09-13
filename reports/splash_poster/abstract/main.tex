@@ -1,0 +1,363 @@
+%%
+%% This is file `sample-sigplan.tex',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% samples.dtx  (with options: `all,proceedings,bibtex,sigplan')
+%% 
+%% IMPORTANT NOTICE:
+%% 
+%% For the copyright see the source file.
+%% 
+%% Any modified versions of this file must be renamed
+%% with new filenames distinct from sample-sigplan.tex.
+%% 
+%% For distribution of the original source see the terms
+%% for copying and modification in the file samples.dtx.
+%% 
+%% This generated file may be distributed as long as the
+%% original source files, as listed above, are part of the
+%% same distribution. (The sources need not necessarily be
+%% in the same archive or directory.)
+%%
+%%
+%% Commands for TeXCount
+%TC:macro \cite [option:text,text]
+%TC:macro \citep [option:text,text]
+%TC:macro \citet [option:text,text]
+%TC:envir table 0 1
+%TC:envir table* 0 1
+%TC:envir tabular [ignore] word
+%TC:envir displaymath 0 word
+%TC:envir math 0 word
+%TC:envir comment 0 0
+%%
+%% The first command in your LaTeX source must be the \documentclass
+%% command.
+%%
+%% For submission and review of your manuscript please change the
+%% command to \documentclass[manuscript, screen, review]{acmart}.
+%%
+%% When submitting camera ready or to TAPS, please change the command
+%% to \documentclass[sigconf]{acmart} or whichever template is required
+%% for your publication.
+%%
+%%
+\documentclass[format=sigplan,screen,10pt]{acmart}
+%%
+%% \BibTeX command to typeset BibTeX logo in the docs
+\AtBeginDocument{%
+  \providecommand\BibTeX{{%
+    Bib\TeX}}}
+
+\frenchspacing
+
+%%% The following is specific to SPLASH '25-POSTERS and the paper
+%%% 'Verifying Extract Method Refactoring in Rust'
+%%% by Matthew Britton, Alex Potanin, and Sasha Pak.
+%%%
+\setcopyright{cc}
+\setcctype{by}
+\acmDOI{10.1145/3758316.3765486}
+\acmYear{2025}
+\copyrightyear{2025}
+\acmISBN{979-8-4007-2141-0/25/10}
+\acmConference[SPLASH Companion '25]{Companion Proceedings of the 2025 ACM SIGPLAN International Conference on Systems, Programming, Languages, and Applications: Software for Humanity}{October 12--18, 2025}{Singapore, Singapore}
+\acmBooktitle{Companion Proceedings of the 2025 ACM SIGPLAN International Conference on Systems, Programming, Languages, and Applications: Software for Humanity (SPLASH Companion '25), October 12--18, 2025, Singapore, Singapore}
+\received{2025-08-18}
+\received[accepted]{2025-08-24}
+
+
+
+
+%%
+%% Submission ID.
+%% Use this when submitting an article to a sponsored event. You'll
+%% receive a unique submission ID from the organizers
+%% of the event, and this ID should be used as the parameter to this command.
+%%\acmSubmissionID{123-A56-BU3}
+
+%%
+%% For managing citations, it is recommended to use bibliography
+%% files in BibTeX format.
+%%
+%% You can then either use BibTeX with the ACM-Reference-Format style,
+%% or BibLaTeX with the acmnumeric or acmauthoryear sytles, that include
+%% support for advanced citation of software artefact from the
+%% biblatex-software package, also separately available on CTAN.
+%%
+%% Look at the sample-*-biblatex.tex files for templates showcasing
+%% the biblatex styles.
+%%
+
+%%
+%% The majority of ACM publications use numbered citations and
+%% references.  The command \citestyle{authoryear} switches to the
+%% "author year" style.
+%%
+%% If you are preparing content for an event
+%% sponsored by ACM SIGGRAPH, you must use the "author year" style of
+%% citations and references.
+%% Uncommenting
+%% the next command will enable that style.
+%%\citestyle{acmauthoryear}
+
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{minted}
+\usemintedstyle{tango}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,fit}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{booktabs,tabularx}
+
+\setlength{\dblfloatsep}{6pt plus 2pt minus 2pt}
+\setlength{\dbltextfloatsep}{6pt plus 2pt minus 2pt}
+
+\usepackage{caption}
+\captionsetup[table]{skip=2pt,aboveskip=2pt,belowskip=0pt} % caption tighter
+
+
+%%
+%% end of the preamble, start of the body of the document source.
+\begin{document}
+
+
+%%
+%% The "title" command has an optional parameter,
+%% allowing the author to define a "short title" to be used in page headers.
+\title{Verifying Extract Method Refactoring in Rust}
+
+%%
+%% The "author" command and its associated commands are used to define
+%% the authors and their affiliations.
+\title{Verifying Extract Method Refactoring in Rust}
+
+\author{Matthew Britton}
+\orcid{0009-0001-7865-0375}
+\affiliation{%
+  \institution{Australian National University}
+  \city{Canberra}
+  \country{Australia}
+}
+\email{matt.britton@anu.edu.au}
+
+\author{Alex Potanin}
+\orcid{0000-0002-4242-2725}
+\affiliation{%
+  \institution{Australian National University}
+  \city{Canberra}
+  \country{Australia}
+}
+\email{alex.potanin@anu.edu.au}
+
+\author{Sasha Pak}
+\orcid{0009-0009-6265-8207}
+\affiliation{%
+  \institution{Australian National University}
+  \city{Canberra}
+  \country{Australia}
+}
+\email{sasha.pak@anu.edu.au}
+
+%%
+%% By default, the full list of authors will be used in the page
+%% headers. Often, this list is too long, and will overlap
+%% other information printed in the page headers. This command allows
+%% the author to define a more concise list
+%% of authors' names for this purpose.
+\renewcommand{\shortauthors}{Britton et al.}
+
+%%
+%% The abstract is a short summary of the work to be presented in the
+%% article.
+\begin{abstract}
+Refactoring is trustworthy only if semantics are preserved. In Rust, ownership and lifetimes make automatic extraction attractive yet risky: code that merely compiles can still change aliasing, lifetime structure, or observable effects. We present \textbf{REM-V}, an end-to-end pipeline that \emph{extracts}, \emph{fixes}, and \emph{verifies} Extract-Method refactorings. Built atop the Rusty Extraction Maestro (\textbf{REM}), a toolchain for extraction and compiler-guided repairs via \texttt{cargo check}, REM-V performs lightweight, zero-annotation \emph{equivalence checking}: $P$ and $P'$ are compiled to LLBC (CHARON) and functionalised (AENEAS), enabling automatic observational equivalence checks. Early results indicate feasibility and smooth IDE integration. A VSCode makes the Extract\,$\rightarrow$\,Fix\,$\rightarrow$\,Verify loop available to developers \footnote{\url{https://marketplace.visualstudio.com/items?itemName=MatthewBritton.remvscode&ssr=false#overview}}).
+
+% Refactoring tools are only trustworthy if they preserve semantics and the original code functionality. In Rust, ownership, borrowing, and lifetimes make automated refactoring both attractive and perilous: the borrow checker ensures safety, but a transformation that merely compiles may still alter aliasing, lifetime structure, or externally visible effects — breaking semantic equivalence. We present \textbf{REM-V}, an end-to-end pipeline that \emph{extracts}, \emph{fixes}, and \emph{verifies} Extract Method refactorings in Rust. REM-V builds atop the Rusty Extraction Maestro (\textbf{REM})—a compiler-guided extraction engine that iteratively repairs ownership and lifetime errors via \texttt{cargo check} — and extends it with a lightweight \emph{equivalence checking} stage: both the original and refactored code are compiled to LLBC via CHARON and then translated with AENEAS into a purely functional language where we can reason about equivalence, \emph{without user annotations}. Early results show both feasibility and the potential for tight integration with existing IDE workflows.
+% \noindent A VSCode extension makes the Extract\,$\rightarrow$\,Fix\,$\rightarrow$\,Verify workflow accessible to the everyday developer \footnote{\url{https://marketplace.visualstudio.com/items?itemName=MatthewBritton.remvscode&ssr=false#overview}}
+\end{abstract}
+
+\begin{CCSXML}
+<ccs2012>
+   <concept>
+       <concept_id>10011007.10011006.10011066.10011069</concept_id>
+       <concept_desc>Software and its engineering~Integrated and visual development environments</concept_desc>
+       <concept_significance>300</concept_significance>
+       </concept>
+   <concept>
+       <concept_id>10011007.10011006.10011073</concept_id>
+       <concept_desc>Software and its engineering~Software maintenance tools</concept_desc>
+       <concept_significance>300</concept_significance>
+       </concept>
+   <concept>
+       <concept_id>10011007.10011074.10011099.10011692</concept_id>
+       <concept_desc>Software and its engineering~Formal software verification</concept_desc>
+       <concept_significance>300</concept_significance>
+       </concept>
+ </ccs2012>
+\end{CCSXML}
+
+\ccsdesc[300]{Software and its engineering~Integrated and visual development environments}
+\ccsdesc[300]{Software and its engineering~Software maintenance tools}
+\ccsdesc[300]{Software and its engineering~Formal software verification}
+
+%%
+%% Keywords. The author(s) should pick words that accurately describe
+%% the work being presented. Separate the keywords with commas.
+
+\vspace{-0.4\baselineskip}
+\keywords{Automated Verification, Extract Method, Refactor as Repair, Rust}
+%% A "teaser" image appears between the author and affiliation
+%% information and the body of the document, and typically spans the
+%% page.
+% \begin{teaserfigure}
+%   \includegraphics[width=\textwidth]{sampleteaser}
+%   \caption{Seattle Mariners at Spring Training, 2010.}
+%   \Description{Enjoying the baseball game from the third-base
+%   seats. Ichiro Suzuki preparing to bat.}
+%   \label{fig:teaser}
+% \end{teaserfigure}
+
+% \received{}
+% \received[revised]{}
+% \received[accepted]{}
+
+\settopmatter{printacmref=true}
+
+%%
+%% This command processes the author and affiliation and title
+%% information and builds the first part of the formatted document.
+\maketitle
+
+\vspace{-0.4\baselineskip}
+\section{Introduction \& Motivation}
+
+Extract method refactoring improves readability and maintainability by lifting code fragments into named functions. Whilst very straightforward in garbage collected languages (think Java, Python, etc.), Rust's strict ownership and lifetime system complicates automated extraction. A misplaced borrow or incorrect lifetime can easily render code uncompilable, and in some cases, alter code semantics altogether. 
+
+To address the compilation problem, the Rusty Extraction Maestro (REM) tool-chain was built, using compiler feedback to iteratively address problems introduced by the standard Extract Method mechanics. It achieved a 92\% success rate across 5 popular crates \cite{AdventureOfALifetime, BorrowingWithoutSorrowing}. However, compilation alone cannot guarantee functional equivalence. In high assurance domains, a refactoring tool that \textit{might} change behaviour is unacceptable. 
+
+\vspace{-0.5\baselineskip}
+\subsection{REM in a Nutshell}
+\textbf{REM} is a compiler-guided Extract Method engine for Rust that turns a naïve hoist into a sequence of Rust-aware repairs: (i) it \emph{reifies} non-local control flow (\texttt{return}/\texttt{break}/\texttt{continue}) into a small result \texttt{enum} so the caller can reconstruct the original flow; (ii) it infers, per free variable, whether to pass by value, shared borrow (\texttt{\&T}), or unique borrow (\texttt{\&mut T}); and (iii) it repairs lifetimes in a feedback loop, runs \texttt{cargo check} to read errors, iteratively fix signatures, then applies lifetime elision. The result is a compiling, readable extraction that preserves borrow discipline and control-flow.
+
+\vspace{-0.5\baselineskip}
+\section{Approach}
+
+Our goal is to \emph{verify} that an Extract Method transformation preserves behaviour. We build on REM's existing success and add an automated, zero-annotation equivalence check.
+
+\vspace{-0.5\baselineskip}
+\subsection*{Pipeline}
+Our goal is to refactor a selected region and then certify that the refactoring preserves behaviour at the call boundary.
+
+\noindent
+\noindent\textbf{Pipeline.}
+\begin{enumerate}[leftmargin=*,nosep]
+  \item \textbf{Extract \& Fix (REM):} Extracts a user selected area, repairs control-flow, passing modes, and lifetimes to produce a compiling program $P'$ from $P$ \citep{AdventureOfALifetime}.
+  \item \textbf{Fix the boundary:} compare the original caller in $P$ (inlined region) to the modified caller in $P'$ using REM’s repaired signature and result \texttt{enum}.
+  \item \textbf{CHARON (LLBC):} compile $P$ and $P'$ to an ownership-explicit IR with moves/borrows/drops made explicit \citep{AENEAS_PART_2,AENEAS}.
+  \item \textbf{AENEAS (functionalisation):} translate LLBC to a pure $\lambda$-calculus while preserving behaviour.
+  \item \textbf{Equivalence check (Coq):} We automatically discharge \emph{observational equivalence} at the extracted call: for all inputs satisfying the same preconditions, $P$ and $P'$ return the same result and exhibit the same externally visible effects - all without user annotations.\footnote{Example output available at: \url{https://github.com/RuleBrittonica/REMV-SPLASH25-Posters/tree/main/complete_verification_output}}
+\end{enumerate}
+% \textbf{(1) Extract \& Fix (REM).} From a user-selected region, \textsc{Rem} reifies non-local control flow, infers how variables flow between caller and callee (\texttt{value}/\texttt{\&T}/\texttt{\&mut T}), and repairs lifetimes via a \texttt{cargo check}-driven loop, producing a compiling program $P'$ from $P$ \cite{AdventureOfALifetime}.\\
+% \textbf{(2) Setup for Proof.} We fix the call boundary at the outer function that contained the extracted region. From REM we retain the repaired function signature of the new helper and the result enum introduced at the call site. These define the comparison point: the original caller in $P$ (with the code inlined) versus the modified caller in $P'$.\\
+% \textbf{(3) Translate to LLBC (CHARON).} Both $P$ and $P'$ are compiled to the Low-Level Borrow Calculus, making moves, borrows, and drops explicit. The result is a value-centric, ownership-aware representation suitable for reasoning \cite{AENEAS,AENEAS_PART_2}.\\
+% \textbf{(4) Functionalise (AENEAS).} LLBC for $P$ and $P'$ is translated into a purely functional $\lambda$-calculus while preserving behaviour.\\
+% \textbf{(5) Check Equivalence (Coq).} We automatically discharge \emph{observational equivalence} at the extracted call: for all inputs satisfying the same preconditions, $P$ and $P'$ return the same result and exhibit the same externally visible effects—without user annotations.\footnote{Example output available at: \url{https://github.com/RuleBrittonica/REMV-SPLASH25-Posters/tree/main/complete_verification_output}}
+
+\vspace{-0.5\baselineskip}
+\paragraph*{Equivalence obligation.}
+Write $\llbracket f \rrbracket_{\lambda}^{P}(x)=(r,\tau)$ for the functionalised semantics (via \textsc{Aeneas}) of $f$ in program $P$ on input $x$, yielding a result $r$ and an effect trace $\tau$; similarly for $P'$. Let $\Phi(x)$ encode the call-site preconditions induced by the repaired signature and result enum, and let $\mathsf{obs}$ project the observable portion of a trace. The obligation we prove is:
+\begin{multline}
+\forall x.\;\Phi(x) \Rightarrow
+\Big( \llbracket f \rrbracket_{\lambda}^{P}(x) = (r,\tau) \;\wedge \\
+      \llbracket f \rrbracket_{\lambda}^{P'}(x) = (r',\tau') \Big)
+\;\Rightarrow\;
+\big( r = r' \;\wedge\; \mathsf{obs}(\tau) = \mathsf{obs}(\tau') \big).
+\end{multline}
+In effect-free fragments $\tau$ and $\tau'$ are empty (or observationally equal), so the goal reduces to plain extensional equality of results: $\forall x.\;\Phi(x) \Rightarrow \llbracket f \rrbracket_{\lambda}^{P}(x) = \llbracket f \rrbracket_{\lambda}^{P'}(x)$.
+
+\vspace{-0.5\baselineskip}
+\section{Preliminary Results}
+We adapted ten cases from the \emph{rust-analyzer} tests, each isolating one design feature. Table~\ref{tab:rem-results} reports the refactored signature, LOC before/after, and whether the check discharged automatically. Full cycles (extract\,/\,proof gen\,/\,verify) averaged \(\sim\)2s, suggesting IDE-friendly latency. \footnote{Cases are available at: \url{https://github.com/RuleBrittonica/REMV-SPLASH25-Posters/tree/main/verification_examples}} 
+Though not our focus, a full cycle (extract-fix-verify) completes in ~2 s, suggesting real-world viability.
+
+\vspace{-0.5\baselineskip}
+\begin{table}[h]
+\small
+\setlength{\tabcolsep}{4pt}
+\caption{Ten extraction sites adapted from the \textit{rust-analyzer} test suite.}
+
+\label{tab:rem-results}
+    \begin{tabularx}{\linewidth}{@{}c
+      >{\raggedright\arraybackslash}X
+      >{\ttfamily\raggedright\arraybackslash}X
+      c
+      c@{}}
+    \toprule
+    ID & Focus & refactored sig & LOC $P\rightarrow P'$ & Equiv \\
+    \midrule
+    0 & break loop & \texttt{n: i32 $\rightarrow$ Option<i32>} & 11$\rightarrow$18 & Y\\
+    1 & break with value & \texttt{() $\rightarrow$ Option<i32>} & 13$\rightarrow$19 & Y\\
+    2 & comments in block expr & \texttt{() $\rightarrow$ i32} & 9$\rightarrow$10 & Y\\
+    3 & extract from nested & \texttt{() $\rightarrow$ i32} & 9$\rightarrow$12 & Y\\
+    4 & extract method from trait impl & \texttt{\&self $\rightarrow$ i32} & 11$\rightarrow$16 & Y\\
+    5 & extract mut ref & \texttt{y: \&mut Foo} & 14$\rightarrow$17 & Y\\
+    6 & extract return stmt & \texttt{() $\rightarrow$ u32} & 5$\rightarrow$8 & Y\\
+    7 & mut method call & \texttt{mut n: i32} & 12$\rightarrow$15 & Y\\
+    8 & no args if let else & \texttt{() $\rightarrow$ i32} & 5$\rightarrow$8 & Y\\
+    9 & try option with return & \texttt{() $\rightarrow$ Option<i32>} & 12$\rightarrow$16 & Y\\
+    \bottomrule
+    \end{tabularx}
+\end{table}
+
+% \section{Contributions} 
+% \begin{itemize}
+%     \item \textbf{REM-V:} an end-to-end pipeline that layers \emph{automated equivalence checking} atop REM’s compiler-guided Extract Method for Rust.
+%     \item \textbf{Lightweight, zero-annotation proofs:} translation to LLBC and functional Coq terms enables automatic, machine-checked observational equivalence without user intervention.
+%     \item \textbf{Prototype and integration path:} a CLI and VSCode extension demo integrate verification into the developer loop.
+%     \item \textbf{Preliminary results:} Fast checks confirm no behaviour change on common cases and the program flags differences when they exist.
+
+% \end{itemize}
+
+\section{Future Work \& Limitations} 
+
+\subsection*{Current Limitations}
+\textbf{Verification backend.}
+``We currently target \emph{safe} Rust; \texttt{unsafe} code is out of scope'' \cite{AENEAS}. Known AENEAS limits include: no nested loops; no function pointers or closures (ongoing); limited type parametricity ; no nested borrows in function signatures (ongoing); incomplete modelling of interior mutability (e.g.\ \texttt{Cell}/\texttt{RefCell}); and no concurrency (long-term) — even coarse-grained parallelism needs additional semantics. \\
+\textbf{Language/features coverage.}
+End-to-end proofs are not yet guaranteed for code using complex generics, heavy macro expansion (incl.\ proc-macros), \texttt{async}/\texttt{await}, or intricate trait bounds. FFI, platform I/O, and panic/abort behaviour are only partially abstracted and may be treated as uninterpreted oracles. \\
+\textbf{What the proof says.}
+We check observational equivalence at the extraction boundary under the current abstraction of side effects. If the program relies on global state, time, or non-determinism, additional modelling is required. \\
+% \textbf{Granularity and scalability.}
+% To keep verification fast, we currently verify only the extracted function and (where possible) its immediate module context (slice-based), not the whole crate; this can miss cross-module aliases or invariants on large projects.
+
+\vspace{-0.5\baselineskip}
+\vspace{-0.5\baselineskip}
+\subsection*{Future Work} 
+\textbf{Expanded Evaluation} To ensure reliability, the extraction and verification engine must be tested against hundreds of different cases. We aim to pull the majority of these from major, ongoing rust projects, such as Deno. \\     
+\textbf{Unsafe and FFI.}
+Compose with tools that target \texttt{unsafe} (e.g.\ borrow-aware model checking or type-system-based frameworks) and introduce contracts for FFI boundaries to keep equivalence checks meaningful. \\
+\textbf{Concurrency.}
+The extraction engine is able to work with concurrent code, however, to integrate verification we will start with coarse-grained parallelism (task spawning/joining) under a sequentially-consistent abstraction. \\
+\textbf{IDE integration} 
+Work is already underway to create a VSCode extension that makes the functionality easily accessible to the developer.  \\
+\textbf{Better diagnostics.}
+When equivalence fails, surface a small, source-level counterexample trace at the call site (inputs, branch taken, differing outputs). Integrate this feedback into the editor so that developers can immediately adjust the extraction. \\
+\textbf{Scalable verification.}
+Adopt slice-based translation by default with sound stubbing of unrelated items; caching LLBC and proof artefacts for incremental re-verification. This will allow for significantly shorter overall verification times.
+%%
+%% The next two lines define the bibliography style to be used, and
+%% the bibliography file.
+\vspace{-0.5\baselineskip}
+\bibliographystyle{ACM-Reference-Format}
+\bibliography{rem_refs}
+
+%%
+%% If your work has an appendix, this is the place to put it.
+\appendix
+
+\end{document}
+\endinput
