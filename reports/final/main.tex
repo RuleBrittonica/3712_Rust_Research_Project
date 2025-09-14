@@ -21,8 +21,7 @@ urlcolor=black,
 citecolor=black, breaklinks=true]{hyperref}
 \usepackage{rotating}
 \usepackage{longtable}
-\usepackage{natbib}
-\bibpunct{(}{)}{;}{a}{}{,} % to follow A&A style
+\usepackage[authoryear]{natbib}
 \usepackage[flushleft]{threeparttable}
 \usepackage{threeparttablex}
 \usepackage{multirow}
@@ -97,9 +96,9 @@ citecolor=black, breaklinks=true]{hyperref}
 \newcommand{\aref}[1]{\hyperref[#1]{Appendix~\ref{#1}}}
 
 % Only include extra packages if you really need them. Common packages are:
-%\usepackage{caption}
-%\usepackage{subcaption}
-%\captionsetup{compatibility=false} %https://tex.stackexchange.com/questions/31906/subcaption-package-compatibility-issue
+\usepackage{caption}
+\usepackage{subcaption}
+\captionsetup{compatibility=false} %https://tex.stackexchange.com/questions/31906/subcaption-package-compatibility-issue
 \usepackage{multicol}        % Multi-column entries in tables
 \usepackage{bm}		% Bold maths symbols, including upright Greek
 \usepackage{booktabs} %to include pandas latex tables
@@ -107,6 +106,7 @@ citecolor=black, breaklinks=true]{hyperref}
 \usepackage{float}
 \usepackage{pdflscape}	% Landscape pages
 \usepackage{epigraph} % for quotes
+\usepackage[table,xcdraw]{xcolor} % for colored tables
 
 %%%%%%%%%%%%%%%%%%%% DEFINE PAPER ALIASES  HERE %%%%%%%%%%%%%%%%%%%
 
@@ -269,7 +269,7 @@ citecolor=black, breaklinks=true]{hyperref}
 \cleardoublepage
 \phantomsection\addcontentsline{toc}{chapter}{Bibliography}
 % change bib style to 'apj' to remove the ADS links in the printed version
-\bibliographystyle{astroads}
+\bibliographystyle{plainnat}
 \bibliography{bibfile}
 
 \end{document}
