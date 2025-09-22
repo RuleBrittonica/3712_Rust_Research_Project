@@ -12,6 +12,35 @@
 % - standalone CLI that handles all the logic
 % - integration with IDEs (VSCode)
 
+Automated refactoring in Rust has long been constrained by the languages strict
+ownership, borrwing and lifetime rules. Early prototypes of the Rusty Extraction
+Maestro demonstrated that \emph{Extract Method} refactorings could be made
+effective, but only within relatively narrow limits. Complex language features,
+such as generic types and asynchronous code, were not supported. Moreover, the
+entire toolchain was reliant on a fragile integration with IntelliJ, which
+quickly became outdated. As as result, REM remained an academic proof-of-concept
+rahter than a tool developers could realistically adopt.
+
+This chapters details how REM has been transformed from a fragile prototype into
+a robust and flexible system. We introduce support for two lanugage features
+that were previously out of reach - generic code and asynchronous functions -
+both of which are pervasive in real-world Rust codebases. We then describe the
+design of a standalone command-line interface (CLI), eliminating dependenceis on
+third-party IDEs and making REM portable across development environments.
+% TODO mention either here or later that the CLI could easily be ported into the
+% Language Server Protocol (LSP) framework to provide immediate IDE support.
+Finally, we present a prototype Visual Studio Code (VSCode) extension that
+integrates seamlessly into one of the most widely used Rust workflows. Together
+these advances greatly expand the scope and usability of REM, demonstrating that
+advanced refactoring can be brought to everyday developers without sacrificing
+continued improvement through research. This chapter thus sets the stage by
+showing how REM's capabilities now align with the realities of modern Rust programming.
+
+% TODO here we need to mention how the extraction algorithm is ported from
+% Rust-Analyzer. It has plently of custom modifications to make it work with
+% REM, but a lot of the core logic is taken from there. Addtionally, the goal is
+% either to implement incremental compilation (so that we don't need to fully
+% build out the AST every time) or to integrate directly into Rust-Analyzer
 \section{Refactoring Generics}
 \label{sec:refactoring_generics}
 

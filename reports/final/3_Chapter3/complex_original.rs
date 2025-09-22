@@ -1,0 +1,1 @@
+fn extract_include_path<'a>(target_config: &mut File<'a>, include_paths: &mut Vec<values::Path<'a>>, id: SectionId) 
