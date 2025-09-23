@@ -1,0 +1,36 @@
+\section{Appendix 3: GitOxide Example in Detail}
+\label{sec:appendix_3}
+
+
+The following diff shows how the `if add\_path` block was refactored into the
+new helper method \texttt{extract\_include\_path}.
+
+\begin{minted}[breaklines,fontsize=\small]{diff}
+-        if add_path {
+-            if let Some(body) = target_config.sections.get(&id) {
+-                let paths = body.values(&Key::from("path"));
+-                let paths = paths.iter().map(|path| values::Path::from(path.clone()));
+-                include_paths.extend(paths);
+-            }
+-        }
+         // Some specifics ommited for simplicity
++        if add_path {
++            extract_include_path(target_config, &mut include_paths, id)
++        }
+\end{minted}
+
+And here is the new method in full:
+
+\begin{minted}[linenos,breaklines,fontsize=\small]{rust}
+fn extract_include_path<'a>(
+    target_config: &mut File<'a>,
+    include_paths: &mut Vec<values::Path<'a>>,
+    id: SectionId
+) {
+    if let Some(body) = target_config.sections.get(&id) {
+        let paths = body.values(&Key::from("path"));
+        let paths = paths.iter().map(|path| values::Path::from(path.clone()));
+        include_paths.extend(paths);
+    }
+}
+\end{minted}
