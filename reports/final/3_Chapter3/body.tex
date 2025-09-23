@@ -158,23 +158,120 @@ transformation is syntactic and only sometimes results in valid Rust. The below 
 
 \begin{subfigure}{0.45\linewidth}
   \inputminted[fontsize=\footnotesize, frame=none, linenos=false, breaklines=true, breakanywhere=true]{rust}{3_Chapter3/complex_original.rs}
-  \caption{GitOxide function with manual extraction}
+  \caption{GitOxide function with manual extraction. See appendix \ref{sec:appendix_3} for details}
 \end{subfigure}
 \hfill
 \begin{subfigure}{0.45\linewidth}
   \inputminted[fontsize=\footnotesize, frame=none, linenos=false, breaklines=true, breakanywhere=true]{rust}{3_Chapter3/complex_extracted.rs}
   \caption{GitOxide function with automated extraction}
+  \label{content:bad_gitoxide_extraction}
 \end{subfigure}
 
 \caption{Two extraction examples: a trivial case (top) and a complex, failed case from real-world code (bottom).}
 \label{fig:extraction_examples}
 \end{figure}
 
-
-
 \subsection{REM}
 
+As seen in the above examples, a na\"ive extraction is often not going to compile. Free variables, non-local control flow and lifetimes make the extracted fragment ill-typed. the purpose of REM is to repair these issues automatically, producing a valid Rust program $P'$ while preserving the intent of the original code. At a high level, REM applies three classes of fixes:
+
+\begin{enumerate}[label=(\roman*)]
+    \item Reifying non-local control flow into a small result enum.
+    \item Inferring ownership for free variables (by value, \verb|&T|, or \verb|&mut T| and,
+    \item Adjusting lifetime parameters in an iterative manner, guided by \verb|rustc| until the borrow checker is satisfied.
+\end{enumerate}
+
+These steps transform a purely syntactic extraction into a valid program $P'$ that is much closer to what a developer would have written by hand.
+
+\subsubsection*{Example: Simple Case}
+
+In the toy example, extraction is trivial. REM observes that both \verb|x| and \verb|y| can be moved by valuie into the new function, so the inferred signature is simply:
+
+\begin{minted}[linenos,breaklines, frame=none, fontsize=\small]{rust}
+fn add(x: i32, y: i32) -> i32
+\end{minted}
+
+No further repairs are needed. This illustrates the best case: REM's analysis immediately determines that the signature is valid Rust and human readable.
+
+\subsubsection*{Example: Real World Case}
+
+By contrast, in the \verb|extract_include_path| example
+(\ref{content:bad_gitoxide_extraction}), naiive extraction fails. The plugin
+incorrectly infers that the loop variable \verb|id| must be borrowed
+(\verb|&SectionID|), and entirely misses the lifetime parameter \verb|<'a>|,
+required to properly scope our mutable references to \verb|File| and
+\verb|Vec<path>| throughout the entire function.
+
+REM corrects this in several ways:
+\begin{enumerate}
+    \item It detects that \verb|id| is consumed at the call site, so ownership
+    can be transferred rather than borrowed.
+    \item It generalises lifetime parameters across both \verb|File<'a>| and
+    \verb|Vec<Path<'a>>| to ensure consistent scoping.
+    \item It replays \verb|cargo check| until no lifetime mismatches remain.
+\end{enumerate}
+
+The resulting signature is significantly more natural (in this case it is
+identical to the manual extraction).
+
+\begin{minted}[linenos,breaklines, frame=none, fontsize=\small]{rust}
+fn extract_include_path<'a>(
+    target_config: &mut File<'a>,
+    include_paths: &mut Vec<Path<'a>>,
+    id: SectionId)
+\end{minted}
+
+The shift from \verb|&SectionId| to \verb|SectionId| demonstrates REM's key
+contribution: making semantically appropriate ownership decisions automatically,
+while still producing code that compiles under Rust's strict type system.
+
+% TODO if I end up writing an incrementally compiling version of CHARON, add
+% that information here.
 \subsection{CHARON}
+\label{subsec:charon}
+
+The first stage of our verification pipeline is translation from Rust into a lower-level, verification-friendly form. This role is performed by \textbf{CHARON}, a Rust to LLBC (Low-Level Borrow Calculus) translator. CHARON accepts Rust source code (or more precisely, its compiler intermediate representation MIR) \footnote{Even more precisely, the tool itself accepts Rust code, but its initial steps rely on a complex interaction with \texttt{rustc} to acquire the MIR}. CHARON's main task is to extract complex semantic information from \verb|rustc| and produce a machine readable output containing said information.
+
+CHARON performs several non-trivial transformations:
+\begin{description}[leftmargin=!,labelwidth=2cm]
+  \item[Structured control flow.] MIR is a control-flow graph with arbitrary
+  \texttt{goto}s; CHARON reconstructs this into structured \texttt{if},
+  \texttt{match}, and \texttt{loop} constructs, or preserves the raw form with
+  the \texttt{--ullbc} option.
+  \item[Trait and type resolution.] Explicitly records how trait bounds are
+  proven, normalises default methods, and can transform associated types into
+  explicit parameters (\texttt{--remove-associated-types}).
+  \item[Lifetime handling.] Hides the distinction between early- and late-bound
+  variables and makes implied bounds explicit, simplifying reasoning about
+  generic functions. \item[Closures and vtables.] Represented as ordinary
+  structs implementing the relevant
+  \texttt{Fn*} traits, making them accessible to later verification steps.
+  \item[Noise reduction.] Options such as \texttt{--hide-marker-traits} remove
+  built-in traits (\texttt{Sized}, \texttt{Send}, etc.) that would otherwise
+  clutter the output.
+\end{description}
+
+The result is a cleaned, semantically faithful program in LLBC form. Unlike raw
+MIR, which is compiler-oriented, LLBC is designed for verification: ownership
+and borrowing are represented directly, trait resolution is explicit, and
+control flow is structured. A sample program and small portion of its MIR are shown below. However, the output of CHARON is not designed for human readability, and even the tiny program in Figure \ref{fig:charon_translation} produces over 140,000 characters of LLBC. This (very verbose) explicitness is what enables the subsequent translation into pure functional code for verification.
+
+\begin{figure}[ht]
+  \centering
+  \begin{minipage}[t]{0.45\linewidth}
+    \inputminted[linenos, breaklines, frame=none, fontsize=\footnotesize]{rust}{3_Chapter3/CHARON_example/rust.rs}
+    \vfill
+    \caption*{Rust source}
+  \end{minipage}
+  \hfill
+  \begin{minipage}[t]{0.45\linewidth}
+    \inputminted[linenos, breaklines, frame=none, fontsize=\footnotesize]{text}{3_Chapter3/CHARON_example/mir.txt}
+    \vfill
+    \caption*{Excerpt of MIR (\texttt{rustc})}
+  \end{minipage}
+  \caption{Illustration of CHARON’s role. While only Rust and MIR are shown here, CHARON translates the MIR into LLBC}
+  \label{fig:charon_translation}
+\end{figure}
 
 \subsection{AENEAS}
 
