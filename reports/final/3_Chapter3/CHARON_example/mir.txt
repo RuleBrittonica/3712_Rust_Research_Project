@@ -1,0 +1,10 @@
+bb2: {
+    _9 = &_1;
+    _8 = <Vec<i32> as Index<usize>>::index(move _9, const 0_usize);
+}
+
+bb3: {
+    _7 = copy _8;
+    _16 = &_7;
+    _15 = core::fmt::rt::Argument::<'_>::new_display::<&i32>(copy _16);
+}
