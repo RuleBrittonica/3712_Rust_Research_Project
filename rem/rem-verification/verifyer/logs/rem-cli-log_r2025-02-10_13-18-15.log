@@ -1,0 +1,14 @@
+2025-02-10 13:18:15 [INFO] - Application Started
+2025-02-10 13:18:15 [INFO] - AENEAS path: /home/matt/rem-matt/rem-verification/programs/aeneas
+2025-02-10 13:18:15 [INFO] - Primitives.v path: /home/matt/rem-matt/rem-verification/verifyer/src/Primitives.v
+2025-02-10 13:18:15 [INFO] - Original Coq path: /home/matt/rem-matt/rem-verification/coq/SampleProject.v
+2025-02-10 13:18:15 [INFO] - Refactored Coq path: /home/matt/rem-matt/rem-verification/coq/SampleProjectRef.v
+2025-02-10 13:18:15 [INFO] - Original LLBC path: /home/matt/rem-matt/rem-verification/llbc/sample_project.llbc
+2025-02-10 13:18:15 [INFO] - Refactored LLBC path: /home/matt/rem-matt/rem-verification/llbc/sample_project_ref.llbc
+2025-02-10 13:18:15 [INFO] - Converting LLBC files to CoQ files
+2025-02-10 13:18:15 [INFO] - Settings: Settings { programs: Programs { aeneas: "/home/matt/rem-matt/rem-verification/programs/aeneas", primitives: "/home/matt/rem-matt/rem-verification/verifyer/src/Primitives.v" }, coq: Coq { original: "/home/matt/rem-matt/rem-verification/coq/SampleProject.v", refactored: "/home/matt/rem-matt/rem-verification/coq/SampleProjectRef.v" }, llbc: Llbc { original: "/home/matt/rem-matt/rem-verification/llbc/sample_project.llbc", refactored: "/home/matt/rem-matt/rem-verification/llbc/sample_project_ref.llbc" } }
+2025-02-10 13:18:15 [INFO] - AENEAS path: "/home/matt/rem-matt/rem-verification/programs/aeneas"
+2025-02-10 13:18:15 [INFO] - Output directory: "/home/matt/rem-matt/rem-verification/coq"
+2025-02-10 13:18:15 [INFO] - Output directory: "/home/matt/rem-matt/rem-verification/coq"
+2025-02-10 13:18:15 [INFO] - LLBC to CoQ conversion completed successfully.
+2025-02-10 13:18:15 [INFO] - Created _CoqProject file

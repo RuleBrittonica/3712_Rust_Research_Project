@@ -1,0 +1,12 @@
+2025-02-08 12:31:23 [INFO] - Application Started
+2025-02-08 12:31:23 [INFO] - AENEAS path: /home/matt/rem-matt/rem-verification/programs/aeneas
+2025-02-08 12:31:23 [INFO] - Primitives.v path: /home/matt/rem-matt/rem-verification/verifyer/src/Primitives.v
+2025-02-08 12:31:23 [INFO] - Original Coq path: /home/matt/rem-matt/rem-verification/coq/SampleProject.v
+2025-02-08 12:31:23 [INFO] - Refactored Coq path: /home/matt/rem-matt/rem-verification/coq/SampleProjectRef.v
+2025-02-08 12:31:23 [INFO] - Original LLBC path: /home/matt/rem-matt/rem-verification/llbc/sample_project.llbc
+2025-02-08 12:31:23 [INFO] - Refactored LLBC path: /home/matt/rem-matt/rem-verification/llbc/sample_project_ref.llbc
+2025-02-08 12:31:24 [INFO] - Primitives.v compiled successfully
+2025-02-08 12:31:24 [INFO] - Original Coq file compiled successfully
+2025-02-08 12:31:25 [INFO] - Refactored Coq file compiled successfully
+2025-02-08 12:31:25 [INFO] - EquivCheck.v compiled successfully
+2025-02-08 12:31:25 [INFO] - Verification successful!

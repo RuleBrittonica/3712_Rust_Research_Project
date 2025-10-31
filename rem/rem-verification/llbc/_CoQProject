@@ -1,0 +1,6 @@
+-R . EquivTest
+
+Primitives.v
+SampleProject.v
+SampleProjectRef.v
+EquivCheck.v

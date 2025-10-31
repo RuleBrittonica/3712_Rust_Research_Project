@@ -1,0 +1,17 @@
+2025-02-10 12:39:28 [INFO] - Application Started
+2025-02-10 12:39:28 [INFO] - AENEAS path: /home/matt/rem-matt/rem-verification/programs/aeneas
+2025-02-10 12:39:28 [INFO] - Primitives.v path: /home/matt/rem-matt/rem-verification/verifyer/src/Primitives.v
+2025-02-10 12:39:28 [INFO] - Original Coq path: /home/matt/rem-matt/rem-verification/coq/SampleProject.v
+2025-02-10 12:39:28 [INFO] - Refactored Coq path: /home/matt/rem-matt/rem-verification/coq/SampleProjectRef.v
+2025-02-10 12:39:28 [INFO] - Original LLBC path: /home/matt/rem-matt/rem-verification/llbc/sample_project.llbc
+2025-02-10 12:39:28 [INFO] - Refactored LLBC path: /home/matt/rem-matt/rem-verification/llbc/sample_project_ref.llbc
+2025-02-10 12:39:28 [INFO] - Converting LLBC files to CoQ files
+2025-02-10 12:39:28 [INFO] - Settings: Settings { programs: Programs { aeneas: "/home/matt/rem-matt/rem-verification/programs/aeneas", primitives: "/home/matt/rem-matt/rem-verification/verifyer/src/Primitives.v" }, coq: Coq { original: "/home/matt/rem-matt/rem-verification/coq/SampleProject.v", refactored: "/home/matt/rem-matt/rem-verification/coq/SampleProjectRef.v" }, llbc: Llbc { original: "/home/matt/rem-matt/rem-verification/llbc/sample_project.llbc", refactored: "/home/matt/rem-matt/rem-verification/llbc/sample_project_ref.llbc" } }
+2025-02-10 12:39:28 [INFO] - AENEAS path: "/home/matt/rem-matt/rem-verification/programs/aeneas"
+2025-02-10 12:39:28 [INFO] - Skipping creation of `Primitives.v` as it already exists
+2025-02-10 12:39:28 [INFO] - Output directory: "/home/matt/rem-matt/rem-verification/coq"
+2025-02-10 12:39:28 [WARN] - AENEAS failed to convert the LLBC file to CoQ
+2025-02-10 12:39:28 [WARN] - Stderr: 
+2025-02-10 12:39:28 [WARN] - Stdout: [[91mError[39m] error: Incompatible version of charon: this program supports llbc emitted by charon v0.1.67 but attempted to read a file emitted by charon v0.1.62.
+
+
