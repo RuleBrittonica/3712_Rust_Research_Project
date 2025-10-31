@@ -675,8 +675,9 @@ impl Into<syn::TypeParamBound> for RustTypeConstraint {
                 };
                 let mut args = Punctuated::new();
                 args.push(syn::GenericArgument::Type(t1.into()));
-                args.push(syn::GenericArgument::Binding(syn::Binding {
+                args.push(syn::GenericArgument::AssocType(syn::AssocType {
                     ident: syn::parse_str::<syn::Ident>("Output").unwrap(),
+                    generics: Default::default(),
                     eq_token: Default::default(),
                     ty: t2.into(),
                 }));
@@ -707,8 +708,9 @@ impl Into<syn::TypeParamBound> for RustTypeConstraint {
                 };
                 let mut args = Punctuated::new();
                 args.push(syn::GenericArgument::Type(t1.into()));
-                args.push(syn::GenericArgument::Binding(syn::Binding {
+                args.push(syn::GenericArgument::AssocType(syn::AssocType {
                     ident: syn::parse_str::<syn::Ident>("Output").unwrap(),
+                    generics: Default::default(),
                     eq_token: Default::default(),
                     ty: t2.into(),
                 }));
@@ -752,7 +754,7 @@ impl From<syn::TypeParamBound> for RustTypeConstraint {
                             _ => panic!("invalid constraint structure {:#?}", segments),
                         };
                         let out_ty = match args.args[1].clone() {
-                            syn::GenericArgument::Binding(binding) => binding.ty,
+                            syn::GenericArgument::AssocType(binding) => binding.ty,
                             _ => panic!("invalid constraint structure {:#?}", segments),
                         };
                         RustTypeConstraint::Index(in_ty.into(), out_ty.into())
@@ -763,7 +765,7 @@ impl From<syn::TypeParamBound> for RustTypeConstraint {
                             _ => panic!("invalid constraint structure {:#?}", segments),
                         };
                         let out_ty = match args.args[1].clone() {
-                            syn::GenericArgument::Binding(binding) => binding.ty,
+                            syn::GenericArgument::AssocType(binding) => binding.ty,
                             _ => panic!("invalid constraint structure {:#?}", segments),
                         };
                         RustTypeConstraint::IndexMut(in_ty.into(), out_ty.into())

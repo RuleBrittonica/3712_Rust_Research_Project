@@ -45,9 +45,9 @@ use syn::{
     ExprCall,
     ExprMethodCall,
     File,
-    ImplItemMethod,
+    ImplItemFn,
     ItemFn,
-    TraitItemMethod,
+    TraitItemFn,
     parse_file
 };
 
@@ -124,7 +124,7 @@ pub struct FindCaller<'a> {
 }
 
 impl VisitMut for FindCaller<'_> {
-    fn visit_impl_item_method_mut(&mut self, i: &mut ImplItemMethod) {
+    fn visit_impl_item_fn_mut(&mut self, i: &mut ImplItemFn) {
         if self.found {
             return;
         }
@@ -132,7 +132,7 @@ impl VisitMut for FindCaller<'_> {
         let id = i.sig.ident.to_string();
         match id == self.caller_fn_name {
             true => {
-                self.callee_finder.visit_impl_item_method_mut(i);
+                self.callee_finder.visit_impl_item_fn_mut(i);
                 if !self.callee_finder.found {
                     return;
                 }
@@ -141,10 +141,10 @@ impl VisitMut for FindCaller<'_> {
             }
             false => {}
         }
-        syn::visit_mut::visit_impl_item_method_mut(self, i);
+        syn::visit_mut::visit_impl_item_fn_mut(self, i);
     }
 
-    fn visit_trait_item_method_mut(&mut self, i: &mut TraitItemMethod) {
+    fn visit_trait_item_fn_mut(&mut self, i: &mut TraitItemFn) {
         if self.found {
             return;
         }
@@ -152,7 +152,7 @@ impl VisitMut for FindCaller<'_> {
         let id = i.sig.ident.to_string();
         match id == self.caller_fn_name {
             true => {
-                self.callee_finder.visit_trait_item_method_mut(i);
+                self.callee_finder.visit_trait_item_fn_mut(i);
                 if !self.callee_finder.found {
                     return;
                 }
@@ -161,7 +161,7 @@ impl VisitMut for FindCaller<'_> {
             }
             false => {}
         }
-        syn::visit_mut::visit_trait_item_method_mut(self, i);
+        syn::visit_mut::visit_trait_item_fn_mut(self, i);
     }
 
     fn visit_item_fn_mut(&mut self, i: &mut ItemFn) {
@@ -192,7 +192,7 @@ pub struct FindFn<'a> {
 }
 
 impl VisitMut for FindFn<'_> {
-    fn visit_impl_item_method_mut(&mut self, i: &mut ImplItemMethod) {
+    fn visit_impl_item_fn_mut(&mut self, i: &mut ImplItemFn) {
         if self.found {
             return;
         }
@@ -210,7 +210,7 @@ impl VisitMut for FindFn<'_> {
             }
             false => {}
         }
-        syn::visit_mut::visit_impl_item_method_mut(self, i);
+        syn::visit_mut::visit_impl_item_fn_mut(self, i);
     }
 
     fn visit_item_fn_mut(&mut self, i: &mut ItemFn) {
@@ -233,7 +233,7 @@ impl VisitMut for FindFn<'_> {
         }
     }
 
-    fn visit_trait_item_method_mut(&mut self, i: &mut TraitItemMethod) {
+    fn visit_trait_item_fn_mut(&mut self, i: &mut TraitItemFn) {
         if self.found {
             return;
         }
@@ -251,7 +251,7 @@ impl VisitMut for FindFn<'_> {
             }
             false => {}
         }
-        syn::visit_mut::visit_trait_item_method_mut(self, i);
+        syn::visit_mut::visit_trait_item_fn_mut(self, i);
     }
 }
 
