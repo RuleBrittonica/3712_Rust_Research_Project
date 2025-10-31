@@ -1,0 +1,31 @@
+1. Fix rem-extract and make sure it returns sensible data
+    - Make sure it works on original REM cases as well
+    - (Later) Split into a server that maintains the db and then actual
+    extraction logic!
+    - Convert the tests over from requiring workspace access etc into standalone
+    instances (to fix the workspace bug)
+2. Make sure rem-verification is working with new version / cli of AENEAS
+    - Pin an install script / similar to make sure that we don't have to change
+    this in the future
+3. Make sure rem-repairer is still working
+4. Migrate to latest version of rustnightly
+    - Ensure everything is pinned to a version of rustnightly that works
+    - pin as many packages as possible in the top level workspace instead of
+    throughout the crate
+5. Polish up the VSCode extension - specifically the main readme that gets
+converted into a view screen for anyone downloading the extension!
+    - Integrate timing into the VSCode extension so we get the end to end times!
+6. Get CLI working with Extract, Repairer and Verification
+    - Sensible way for results to be passed to VSCode (with a clearly documented
+    spec)
+7. Integrate timing and analysis data into each part of the toolchain - then
+have a sensible way to get said data out of the toolchain
+8. Setup an evaluation harness and a way to get results out of the CLI
+
+
+Misc when everything is done:
+- Push all software to crates (making sure the pins reference the version
+available on crates)
+- Push vscode to the marketplace
+- Ensure vscode extension still works
+- Make sure all crates + top level crate have suitable readmes / documentation

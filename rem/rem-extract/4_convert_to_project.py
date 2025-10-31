@@ -19,6 +19,8 @@ with open(toolchain, 'r') as f:
 import os
 os.remove(toolchain)
 
+env = {**os.environ, "CARGO_TERM_COLOR": "always"}
+
 # Iterate over each file in the input directory
 for filename in os.listdir(input_directory):
     if filename.endswith('.rs'):
@@ -34,7 +36,7 @@ for filename in os.listdir(input_directory):
             cwd=input_directory,
             capture_output=True,
             text=True,
-            env=dict(CARGO_TERM_COLOR='always')  # Ensure Cargo uses color
+            env=env  # Ensure Cargo uses color
         )
 
         # Filter out te see more line

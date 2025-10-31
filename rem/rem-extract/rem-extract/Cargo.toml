@@ -2,7 +2,6 @@
 name = "rem-extract"
 version = "0.1.3"
 edition = "2021"
-rust-version = "1.80.0"
 authors = ["Matthew Britton <matt.britton@anu.edu.au>"]
 license = "MIT"
 description = "Providing extract method capability for the REM toolchain"

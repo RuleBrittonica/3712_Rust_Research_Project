@@ -1,0 +1,8 @@
+[workspace]
+members = [
+    "rem-cli",
+    "rem-extract",
+    "rem-repairer",
+    "rem-verification",
+    "rem-utils",
+]

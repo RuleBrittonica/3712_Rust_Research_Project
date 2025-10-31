@@ -1,5 +1,0 @@
-2024-10-03 00:42:25 [INFO] - Application Started
-2024-10-03 00:42:25 [INFO] - Running 'test' subcommand
-2024-10-03 00:42:25 [INFO] - Verbose: yes
-2024-10-03 00:42:25 [INFO] - Starting tests...
-2024-10-03 00:42:27 [INFO] - Test 1 | FAILED: Blank Type Fixup failed for file AbsPathBuf("C:\\Coding\\rem-matt\\rem-extract\\output\\argument_and_locals") | N/A: argument_and_locals in 1.85s
