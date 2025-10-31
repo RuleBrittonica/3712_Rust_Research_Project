@@ -148,6 +148,10 @@ impl VisitMut for LooseLifetimeAnnotatorTypeHelper {
                             self.has_struct_lt = true;
                         }
                     }
+                    // syn v2 marks TypeParamBound as #[non_exhaustive]; cover any future variants.
+                    TypeParamBound::PreciseCapture(precise_capture) => todo!(),
+                    TypeParamBound::Verbatim(token_stream) => todo!(),
+                    _ => todo!(),
                 });
                 syn::visit_mut::visit_type_mut(self, i);
             }
@@ -239,14 +243,14 @@ struct LooseLifetimeAnnotator<'a> {
 }
 
 impl VisitMut for LooseLifetimeAnnotator<'_> {
-    fn visit_impl_item_method_mut(&mut self, i: &mut ImplItemMethod) {
+    fn visit_impl_item_fn_mut(&mut self, i: &mut syn::ImplItemFn) {
         let id = i.sig.ident.to_string();
         //println!("caller name: {}, at: {}", self.caller_fn_name, &id);
         match id == self.fn_name.to_string() {
             false => (),
             true => self.loose_lifetime_annotator(&mut i.sig),
         }
-        syn::visit_mut::visit_impl_item_method_mut(self, i);
+        syn::visit_mut::visit_impl_item_fn_mut(self, i);
     }
 
     fn visit_item_fn_mut(&mut self, i: &mut syn::ItemFn) {
@@ -257,14 +261,14 @@ impl VisitMut for LooseLifetimeAnnotator<'_> {
         }
     }
 
-    fn visit_trait_item_method_mut(&mut self, i: &mut TraitItemMethod) {
+    fn visit_trait_item_fn_mut(&mut self, i: &mut TraitItemFn) {
         let id = i.sig.ident.to_string();
         //println!("caller name: {}, at: {}", self.caller_fn_name, &id);
         match id == self.fn_name.to_string() {
             false => (),
             true => self.loose_lifetime_annotator(&mut i.sig),
         }
-        syn::visit_mut::visit_trait_item_method_mut(self, i);
+        syn::visit_mut::visit_trait_item_fn_mut(self, i);
     }
 }
 
@@ -311,7 +315,7 @@ impl LooseLifetimeAnnotator<'_> {
                 };
                 for lt in 0..self.lt_num {
                     let lifetime = Lifetime::new(format!("'lt{}", lt).as_str(), Span::call_site());
-                    gen.params.push(syn::GenericParam::Lifetime(LifetimeDef {
+                    gen.params.push(syn::GenericParam::Lifetime(LifetimeParam {
                         attrs: vec![],
                         lifetime,
                         colon_token: None,

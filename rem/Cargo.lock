@@ -2468,6 +2468,7 @@ dependencies = [
  "ra_ap_syntax",
  "ra_ap_vfs",
  "regex",
+ "rem-interface",
  "rem-utils",
  "rowan",
  "syn",

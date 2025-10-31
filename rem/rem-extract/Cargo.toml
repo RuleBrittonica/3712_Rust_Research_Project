@@ -29,9 +29,10 @@ rowan         = { workspace = true }
 clap          = { workspace = true, features = ["derive"] }
 lazy_static   = { workspace = true }
 cov-mark      = { workspace = true }
-syn = { workspace = true, features = ["full"] }
+syn           = { workspace = true, features = ["full"] }
 
 rem-utils     = { workspace = true }
+rem-interface = { workspace = true }
 
 ra_ap_hir              = { workspace = true }
 ra_ap_ide              = { workspace = true }

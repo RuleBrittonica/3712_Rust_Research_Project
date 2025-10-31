@@ -51,6 +51,8 @@ use crate::{
     },
 };
 
+use rem_interface::metrics as mx;
+
 #[derive(Debug, PartialEq, Clone)]
 pub struct ExtractionInput {
     pub file_path: String,
@@ -136,6 +138,8 @@ fn verify_input(input: &ExtractionInput) -> Result<(), ExtractionError> {
 /// `String` of the caller method
 pub fn extract_method(input: ExtractionInput) -> Result<(String, String), ExtractionError> {
 
+    mx::mark("Extraction Start");
+
     // Extract the struct information
     let input_path: &str = &input.file_path;
     let callee_name: &str = &input.new_fn_name;
@@ -154,14 +158,25 @@ pub fn extract_method(input: ExtractionInput) -> Result<(String, String), Extrac
     let cargo_toml: AbsPathBuf = get_cargo_toml( &manifest_dir );
     // println!("Cargo.toml {:?}", cargo_toml);
 
+    mx::mark("Load the project workspace");
+
     let project_manifest: ProjectManifest = load_project_manifest( &cargo_toml );
     // println!("Project Manifest {:?}", project_manifest);
+
+    // MARKER: Load the cargo config
+    mx::mark("Load the cargo config");
 
     let cargo_config: CargoConfig = get_cargo_config( &project_manifest );
     // println!("Cargo Config {:?}", cargo_config);
 
+    // MARKER: Load the project workspace
+    mx::mark("Load the project workspace");
+
     let workspace: ProjectWorkspace = load_project_workspace( &project_manifest, &cargo_config );
     // println!("Project Workspace {:?}", workspace);
+
+    // MARKER: Load the analysis database and VFS
+    mx::mark("Load the analysis database and VFS");
 
     let (db, vfs) = load_workspace_data(workspace, &cargo_config);
 
@@ -184,12 +199,17 @@ pub fn extract_method(input: ExtractionInput) -> Result<(String, String), Extrac
     check_comment( &source_file, &range )?;
     check_braces( &source_file, &range )?;
 
+    // MARKER: Run the analysis
+    mx::mark("Run the analysis");
+
     let analysis_host: AnalysisHost = AnalysisHost::with_database( db );
     let analysis: Analysis = run_analysis( analysis_host );
 
+    // MARKER: Get the assists and filter for extract function assist
+    mx::mark("Get the assists and filter for extract function assist");
+
     let assists: Vec<Assist> = get_assists( &analysis, &vfs, &input_abs_path, range );
     let assist: Assist = filter_extract_function_assist( assists )?;
-
 
     let modified_code: String = apply_extract_function(
         &assist,
@@ -202,6 +222,9 @@ pub fn extract_method(input: ExtractionInput) -> Result<(String, String), Extrac
         &source_file,
         range,
     )?;
+
+    // MARKER: Extraction End
+    mx::mark("Extraction End");
 
     Ok( (modified_code, parent_method) )
 }

@@ -4,7 +4,7 @@ use regex::Regex;
 
 use log::debug;
 use std::fs;
-use syn::{visit_mut::VisitMut, FnArg, Lifetime, LifetimeDef, Type};
+use syn::{visit_mut::VisitMut, FnArg, Lifetime, LifetimeParam, Type};
 
 use crate::common::{
     callee_renamer, elide_lifetimes_annotations, repair_bounds_help, repair_iteration,
@@ -151,7 +151,7 @@ impl VisitMut for TightLifetimeAnnotator<'_> {
                 }
                 (inputs, gen, out) => {
                     let lifetime = Lifetime::new("'lt0", Span::call_site());
-                    gen.params.push(syn::GenericParam::Lifetime(LifetimeDef {
+                    gen.params.push(syn::GenericParam::Lifetime(LifetimeParam {
                         attrs: vec![],
                         lifetime,
                         colon_token: None,
@@ -239,13 +239,13 @@ impl VisitMut for BoundsLoosener<'_> {
                 let gen = &mut i.sig.generics;
                 for i in &gen.params {
                     match i {
-                        syn::GenericParam::Lifetime(LifetimeDef { .. }) => lt_count += 1,
+                        syn::GenericParam::Lifetime(LifetimeParam { .. }) => lt_count += 1,
                         _ => (),
                     }
                 }
                 let lt = format!("'lt{}", lt_count);
                 let lifetime = Lifetime::new(lt.as_str(), Span::call_site());
-                gen.params.push(syn::GenericParam::Lifetime(LifetimeDef {
+                gen.params.push(syn::GenericParam::Lifetime(LifetimeParam {
                     attrs: vec![],
                     lifetime,
                     colon_token: None,

@@ -11,7 +11,7 @@ use std::io::{BufWriter, Write};
 use std::process::Command;
 use syn::{
     visit_mut::VisitMut, ExprCall, ExprMethodCall, FnArg, GenericArgument, GenericParam,
-    ImplItemMethod, ItemFn, Lifetime, PredicateLifetime, ReturnType, Signature, TraitItemMethod,
+    ImplItemFn, ItemFn, Lifetime, PredicateLifetime, ReturnType, Signature, TraitItemFn,
     TypeReference, WhereClause, WherePredicate,
 };
 use std::fmt::{
@@ -150,14 +150,14 @@ struct FnLifetimeBounder<'a> {
 }
 
 impl VisitMut for FnLifetimeBounder<'_> {
-    fn visit_impl_item_method_mut(&mut self, i: &mut ImplItemMethod) {
+    fn visit_impl_item_fn_mut(&mut self, i: &mut syn::ImplItemFn) {
         let id = i.sig.ident.to_string();
         //println!("caller name: {}, at: {}", self.caller_fn_name, &id);
         match id == self.fn_name.to_string() {
             false => (),
             true => self.fn_lifetime_bounder(&mut i.sig),
         }
-        syn::visit_mut::visit_impl_item_method_mut(self, i);
+        syn::visit_mut::visit_impl_item_fn_mut(self, i);
     }
 
     fn visit_item_fn_mut(&mut self, i: &mut ItemFn) {
@@ -168,14 +168,14 @@ impl VisitMut for FnLifetimeBounder<'_> {
         }
     }
 
-    fn visit_trait_item_method_mut(&mut self, i: &mut TraitItemMethod) {
+    fn visit_trait_item_fn_mut(&mut self, i: &mut syn::TraitItemFn) {
         let id = i.sig.ident.to_string();
         //println!("caller name: {}, at: {}", self.caller_fn_name, &id);
         match id == self.fn_name.to_string() {
             false => (),
             true => self.fn_lifetime_bounder(&mut i.sig),
         }
-        syn::visit_mut::visit_trait_item_method_mut(self, i);
+    syn::visit_mut::visit_trait_item_fn_mut(self, i);
     }
 }
 
@@ -404,14 +404,14 @@ impl VisitMut for ChangeLtHelperElider<'_> {
 }
 
 impl VisitMut for FnLifetimeElider<'_> {
-    fn visit_impl_item_method_mut(&mut self, i: &mut ImplItemMethod) {
+    fn visit_impl_item_fn_mut(&mut self, i: &mut syn::ImplItemFn) {
         let id = i.sig.ident.to_string();
         //println!("caller name: {}, at: {}", self.caller_fn_name, &id);
         match id == self.fn_name.to_string() {
             false => (),
             true => self.fn_lifetime_elider(&mut i.sig),
         }
-        syn::visit_mut::visit_impl_item_method_mut(self, i);
+        syn::visit_mut::visit_impl_item_fn_mut(self, i);
     }
 
     fn visit_item_fn_mut(&mut self, i: &mut ItemFn) {
@@ -422,14 +422,14 @@ impl VisitMut for FnLifetimeElider<'_> {
         }
     }
 
-    fn visit_trait_item_method_mut(&mut self, i: &mut TraitItemMethod) {
+    fn visit_trait_item_fn_mut(&mut self, i: &mut syn::TraitItemFn) {
         let id = i.sig.ident.to_string();
         //println!("caller name: {}, at: {}", self.caller_fn_name, &id);
         match id == self.fn_name.to_string() {
             false => (),
             true => self.fn_lifetime_elider(&mut i.sig),
         }
-        syn::visit_mut::visit_trait_item_method_mut(self, i);
+        syn::visit_mut::visit_trait_item_fn_mut(self, i);
     }
 }
 
@@ -689,7 +689,7 @@ impl VisitMut for RenameFn<'_> {
         }
         syn::visit_mut::visit_expr_call_mut(self, i);
     }
-    fn visit_impl_item_method_mut(&mut self, i: &mut ImplItemMethod) {
+    fn visit_impl_item_fn_mut(&mut self, i: &mut syn::ImplItemFn) {
         let callee = i.sig.ident.to_string();
         match callee.contains(self.callee_name) {
             true => {
@@ -698,7 +698,7 @@ impl VisitMut for RenameFn<'_> {
             }
             false => {}
         }
-        syn::visit_mut::visit_impl_item_method_mut(self, i);
+        syn::visit_mut::visit_impl_item_fn_mut(self, i);
     }
 
     fn visit_item_fn_mut(&mut self, i: &mut ItemFn) {
@@ -712,7 +712,7 @@ impl VisitMut for RenameFn<'_> {
         }
         syn::visit_mut::visit_item_fn_mut(self, i);
     }
-    fn visit_trait_item_method_mut(&mut self, i: &mut TraitItemMethod) {
+    fn visit_trait_item_fn_mut(&mut self, i: &mut syn::TraitItemFn) {
         let callee = i.sig.ident.to_string();
         match callee.contains(self.callee_name) {
             true => {
@@ -721,7 +721,7 @@ impl VisitMut for RenameFn<'_> {
             }
             false => {}
         }
-        syn::visit_mut::visit_trait_item_method_mut(self, i);
+        syn::visit_mut::visit_trait_item_fn_mut(self, i);
     }
 }
 
