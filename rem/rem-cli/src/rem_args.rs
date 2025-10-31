@@ -41,43 +41,7 @@ pub enum REMCommands {
         callee_fn_name: String,
     },
 
-    // Run just the controller
-    Controller {
-        #[arg(help = "The path to the file that contains just the code that will be refactored", index = 1)]
-        file_path: PathBuf,
-
-        #[arg(help = "The path to the output file (where the refactored code ends up)", index = 2)]
-        new_file_path: PathBuf,
-
-        #[arg(help = "The name of the function that contains the code to be refactored", index = 3)]
-        caller_fn_name: String,
-
-        #[arg(help = "The name of the new function that is being extracted", index = 4)]
-        callee_fn_name: String,
-    },
-
-    //
-    Borrower {
-
-        #[arg(help = "The path to the file that contains just the code that will be refactored", index = 1)]
-        file_path: PathBuf,
-
-        #[arg(help = "The path to the output file (where the refactored code ends up)", index = 2)]
-        new_file_path: PathBuf,
-
-        #[arg(help = "The name of the function that contains the code to be refactored", index = 3)]
-        caller_fn_name: String,
-
-        #[arg(help = "The name of the new function that is being extracted", index = 4)]
-        callee_fn_name: String,
-
-        #[arg(help = "The path to the file where the mutated method will be dumped", index = 5)]
-        mut_method_file_path: PathBuf,
-
-        #[arg(help = "The path to the original file", index = 6)]
-        pre_extract_file_path: PathBuf,
-    },
-
+    // Run just the repairer component (rem-repairer)
     Repairer {
 
         #[arg(help = "The path to the file that contains just the code that will be refactored", index = 1)]

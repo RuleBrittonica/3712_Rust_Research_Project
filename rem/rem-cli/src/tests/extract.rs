@@ -35,8 +35,6 @@ use rem_utils::{
 
 use lazy_static::lazy_static;
 
-use crate::refactor::throughput::Extract;
-
 struct TestFile<'a> {
     pub input_file: &'a str, // Just the name of the file. It is assumed the file is in ./input/{testname}/src/main.rs, and there is a corresponding file in ./correct_output (./correct_output/{testname}.rs)
     pub start_idx: u32,
@@ -44,7 +42,7 @@ struct TestFile<'a> {
 }
 
 impl TestFile<'_> {
-    pub fn new(input_file: &str, start_idx: u32, end_idx: u32) -> TestFile {
+    pub fn new(input_file: &str, start_idx: u32, end_idx: u32) -> TestFile<'_> {
         TestFile {
             input_file,
             start_idx,

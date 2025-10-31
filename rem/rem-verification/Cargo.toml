@@ -1,0 +1,19 @@
+[package]
+name = "rem-verification"
+version = "0.1.0"
+edition = "2021"
+authors = [ "Matthew Britton <matt.britton@anu.edu.au>",]
+license = "MIT"
+description = "Verification tool for the REM toolchain. Built to be implemented into the VSCode extension for REM. Relies on AENEAS and CoQ"
+repository = "https://github.com/RuleBrittonica/rem-verification"
+categories = [ "development-tools",]
+readme = "README.md"
+
+[dependencies]
+serde = { workspace = true }
+flexi_logger = { workspace = true }
+rem-utils = { workspace = true }
+log = { workspace = true }
+regex = { workspace = true }
+clap = { workspace = true }
+config = { workspace = true }

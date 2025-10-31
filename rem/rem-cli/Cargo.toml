@@ -1,46 +1,41 @@
+[[bin]]
+name = "rem-cli"
+path = "src/main.rs"
+
 [package]
 name = "rem-cli"
 version = "0.1.0"
 edition = "2021"
-authors = ["Matthew Britton <matt.britton@anu.edu.au>"]
+authors = [ "Matthew Britton <matt.britton@anu.edu.au>",]
 license = "MIT"
 description = "CLI interface for the REM toolchain. Built to be implemented into the VSCode extension for REM"
 repository = "https://github.com/RuleBrittonica/rem-cli"
-categories = ["command-line-utilities", "development-tools"]
+categories = [ "command-line-utilities", "development-tools",]
 readme = "README.md"
+default-run = "rem-cli"
 
 [dependencies]
+log = { workspace = true }
+flexi_logger = { workspace = true }
+colored = { workspace = true }
+git2 = { workspace = true }
+ra_ap_vfs = { workspace = true }
+camino = { workspace = true }
+lazy_static = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+clap = { workspace = true, features = ["derive"] }
 
-# Listed here in the order they are used in the program. Because why not?
-# rem-extract    = { version = "0.1.2" }
-# rem-controller = { version = "0.1.3" }
-# rem-borrower   = { version = "0.1.3" }
-# rem-repairer   = { version = "0.1.2" }
-# rem-utils      = { version = "0.1.3" }
-
-rem-extract    = { path = "../rem-extract/rem-extract" }
-rem-controller = { path = "../rem-controller" }
-rem-borrower   = { path = "../rem-borrower" }
-rem-repairer   = { path = "../rem-repairer" }
-rem-utils      = { path = "../rem-utils" }
-
-clap = { version = "4.5.16", features = ["derive"] }
-log = "0.4.22"
-flexi_logger = "0.29.2"
-colored = "2.1.0"
-git2 = "0.19.0"
-ra_ap_vfs = "0.0.238"
-camino = "1.1.9"
-lazy_static = "1.5.0"
+# REM toolchain components
+rem-extract = { workspace = true }
+rem-repairer = { workspace = true }
+rem-utils = { workspace = true }
 
 [build-dependencies]
 
 [dev-dependencies]
-tempfile = "3.13"
+tempfile = { workspace = true }
 
 [features]
 default = []
 
-[[bin]]
-name = "rem-cli"
-path = "src/main.rs"

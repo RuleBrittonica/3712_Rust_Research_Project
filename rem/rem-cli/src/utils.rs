@@ -16,8 +16,6 @@ use log::{
 
 use crate::tests::{
     extract,
-    controller,
-    borrower,
     repairer,
 };
 
@@ -139,27 +137,6 @@ pub fn run_tests(path: std::path::PathBuf) -> Result<u8, TestFailed> {
     };
     info!("Extract tests successful, {} tests failed", extract_failed);
     total_failed_tests += extract_failed;
-
-    // Run controller tests
-    let controller_failed: u8 = match controller::test(path.clone()) {
-        Ok(failed) => failed,
-        Err(e) => {
-            error!("Controller tests failed: {:?}", e);
-            return Err(TestFailed::ControllerFailed(e));
-        }
-    };
-    info!("Controller tests successful, {} tests failed", controller_failed);
-    total_failed_tests += controller_failed;
-
-    let borrower_failed: u8 = match borrower::test(path.clone()) {
-        Ok(failed) => failed,
-        Err(e) => {
-            error!("Borrower tests failed: {:?}", e);
-            return Err(TestFailed::BorrowerFailed(e));
-        }
-    };
-    info!("Borrower tests successful, {} tests failed", borrower_failed);
-    total_failed_tests += borrower_failed;
 
     // Run repairer tests
     let repairer_failed: u8 = match repairer::test(path.clone()) {

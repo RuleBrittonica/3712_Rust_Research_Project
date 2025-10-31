@@ -5,4 +5,118 @@ members = [
     "rem-repairer",
     "rem-verification",
     "rem-utils",
+    "rem-interface",
 ]
+
+workspace.resolver = "3"
+default-members = ["rem-cli"]
+
+[workspace.package]
+edition      = "2021"
+license      = "MIT"
+authors      = ["Matthew Britton <matt.britton@anu.edu.au>"]
+rust-version = "1.89.0"
+
+[workspace.dependencies]
+# shared libs
+clap         = { version = "4.5.31", features = ["derive"] }
+config       = "0.15.9"
+env_logger   = "0.11.5"
+flexi_logger = "0.31.7"
+log          = "0.4.26"
+regex        = "1.11.1"
+rustfix      = "0.9.0"
+serde        = { version = "1.0.218", features = ["derive"] }
+serde_json   = "1.0.145"
+thiserror    = "2.0.17"
+colored      = "3.0.0"
+diff         = "0.1.13"
+ena          = "0.14"
+home         = "0.5.11"
+lazy_static  = "1.5.0"
+nom          = "7.1.0"
+string_cache = "0.8.8"
+tempfile     = "3.13"
+camino       = "1.1.9"
+git2         = "0.20.2"
+
+# parsing / proc-macro ecosystem
+proc-macro2  = "1.0"
+quote        = "1.0.39"
+syn          = "1.0.80"
+cov-mark     = "2.0.0-pre.1"
+
+# Rust Analyzer crates. Note ROWAN must be the same version as used by RA crates
+ra_ap_hir              = "0.0.262"
+ra_ap_ide              = "0.0.262"
+ra_ap_ide_assists      = "0.0.262"
+ra_ap_ide_db           = "0.0.262"
+"ra_ap_load-cargo"     = "0.0.262"
+ra_ap_project_model    = "0.0.262"
+"ra_ap_rust-analyzer"  = "0.0.262"
+ra_ap_vfs              = "0.0.262"
+ra_ap_parser           = "0.0.262"
+ra_ap_syntax           = "0.0.262"
+rowan                  = "0.15.15"
+
+# REM member crates
+rem-utils     = { path = "rem-utils" }
+rem-extract   = { path = "rem-extract" }
+rem-repairer  = { path = "rem-repairer" }
+rem-interface = { path = "rem-interface" }
+rem-verifyer  = { path = "rem-verification" }
+
+# [patch.crates-io]
+# rem-utils = { path = "rem-utils" }
+
+
+[workspace.lints.rust]
+# remember to update RUSTFLAGS in ci.yml if you add something here
+
+elided_lifetimes_in_paths = "warn"
+explicit_outlives_requirements = "warn"
+unsafe_op_in_unsafe_fn = "warn"
+unused_extern_crates = "warn"
+unused_lifetimes = "warn"
+unreachable_pub = "warn"
+
+[workspace.lints.clippy]
+## lint groups
+complexity = { level = "warn", priority = -1 }
+correctness = { level = "deny", priority = -1 }
+perf = { level = "deny", priority = -1 }
+restriction = { level = "allow", priority = -1 }
+style = { level = "warn", priority = -1 }
+suspicious = { level = "warn", priority = -1 }
+
+## allow following lints
+too_long_first_doc_paragraph = "allow"
+# subjective
+single_match = "allow"
+# () makes a fine error in most cases
+result_unit_err = "allow"
+# We don't expose public APIs that matter like this
+len_without_is_empty = "allow"
+# We have macros that rely on this currently
+enum_variant_names = "allow"
+# Builder pattern disagrees
+new_ret_no_self = "allow"
+# Has a bunch of false positives
+useless_asref = "allow"
+# Has false positives
+assigning_clones = "allow"
+
+## Following lints should be tackled at some point
+too_many_arguments = "allow"
+type_complexity = "allow"
+wrong_self_convention = "allow"
+
+## warn at following lints
+# CI raises these to deny
+dbg_macro = "warn"
+todo = "warn"
+print_stdout = "warn"
+print_stderr = "warn"
+
+rc_buffer = "warn"
+str_to_string = "warn"

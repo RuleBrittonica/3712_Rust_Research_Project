@@ -13,12 +13,6 @@ mod logging;
 mod error;
 mod tests;
 
-mod refactor;
-use refactor::{
-    non_local_controller::non_local_controller,
-    borrow::borrow,
-};
-
 use rem_repairer::{
     common::{
         RepairResult,
@@ -42,13 +36,6 @@ mod rem_args;
 use rem_args::{
     REMArgs,
     REMCommands,
-};
-
-use crate::refactor::throughput::{
-    Extract,
-    Controller,
-    Borrower,
-    Repairer,
 };
 
 #[derive(Debug, PartialEq, Eq)]
@@ -86,95 +73,6 @@ fn main() {
             let new_file_path = new_file_path.to_str().expect("Path is not valid UTF-8");
         },
 
-        REMCommands::Controller {
-            file_path,
-            new_file_path,
-            caller_fn_name,
-            callee_fn_name
-        } => {
-            // Create our backup
-            backup_path = backup_file(file_path.clone());
-
-            let file_path: &str = file_path.to_str().expect("Path is not valid UTF-8");
-            let new_file_path: &str = new_file_path.to_str().expect("Path is not valid UTF-8");
-
-            let controller: Controller = todo!();
-
-            let result: Result<String, error::RefactoringError>  = non_local_controller(
-                controller,
-            );
-
-            // TODO Handle the result
-            let success: bool = match result {
-                Ok(_) => true,
-                Err(e) => {
-                    error!("Controller failed: {:?}", e);
-                    false
-                }
-            };
-
-            handle_result(
-                success,
-                "Controller",
-                &format!(
-                    "Controller was run on its own with file_path: {} | new_file_path: {} | caller_fn_name: {} | callee_fn_name: {}",
-                    file_path,
-                    new_file_path,
-                    caller_fn_name,
-                    callee_fn_name,
-                    ),
-            )
-
-        },
-
-        REMCommands::Borrower {
-            file_path,
-            new_file_path,
-            caller_fn_name,
-            callee_fn_name,
-            mut_method_file_path,
-            pre_extract_file_path
-        } => {
-            // Create our backup
-            backup_path = backup_file(file_path.clone());
-
-            let file_path: &str = file_path.to_str().expect("Path is not valid UTF-8");
-            let new_file_path: &str = new_file_path.to_str().expect("Path is not valid UTF-8");
-            let mut_method_file_path: &str = mut_method_file_path.to_str().expect("Path is not valid UTF-8");
-            let pre_extract_file_path: &str = pre_extract_file_path.to_str().expect("Path is not valid UTF-8");
-
-            let input_borrower: Borrower = todo!();
-            let result  = borrow(
-                input_borrower,
-                // file_path,
-                // new_file_path,
-                // callee_fn_name,
-                // caller_fn_name,
-                // mut_method_file_path,
-                // pre_extract_file_path,
-            );
-            let success: bool = match result {
-                Ok(_) => true,
-                Err(e) => {
-                    error!("Borrower failed: {:?}", e);
-                    false
-                }
-            };
-
-            handle_result(success,
-                "Borrower",
-                &format!(
-                    "Borrower was run on its own with file_path: {} | new_file_path: {} | caller_fn_name: {} | callee_fn_name: {} | mut_method_file_path: {} | pre_extract_file_path: {}",
-                    file_path,
-                    new_file_path,
-                    caller_fn_name,
-                    callee_fn_name,
-                    mut_method_file_path,
-                    pre_extract_file_path,
-                ),
-            )
-
-        },
 
         REMCommands::Repairer {
             file_path,

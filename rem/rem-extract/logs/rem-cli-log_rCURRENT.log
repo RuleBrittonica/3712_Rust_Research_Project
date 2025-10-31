@@ -1,127 +1,22 @@
-2025-10-31 18:02:36 [INFO] - Application Started
-2025-10-31 18:02:36 [INFO] - Running 'test' subcommand
-2025-10-31 18:02:36 [INFO] - Verbose: yes
-2025-10-31 18:02:36 [INFO] - Starting tests...
-2025-10-31 18:02:37 [INFO] - Test 1 | PASSED | PASSED | PASSED: argument_and_locals in 161.46ms
-2025-10-31 18:02:37 [INFO] - Test 2 | FAILED: No Extract Function Assist found for the given selection of assists [] | N/A | N/A: argument_form_expr in 150.34ms
-2025-10-31 18:02:37 [INFO] - Test 3 | FAILED: No Extract Function Assist found for the given selection of assists [] | N/A | N/A: argument_used_twice_form_expr in 158.97ms
-2025-10-31 18:02:37 [INFO] - Test 4 | PASSED | PASSED | PASSED: break_from_nested_and_outer_loops in 270.65ms
-2025-10-31 18:02:38 [INFO] - Test 5 | PASSED | PASSED | PASSED: break_from_nested_loop in 280.24ms
-2025-10-31 18:02:39 [INFO] - Test 6 | PASSED | PASSED | PASSED: break_loop in 589.03ms
-2025-10-31 18:02:40 [INFO] - Test 7 | PASSED | PASSED | PASSED: break_loop_nested in 410.30ms
-2025-10-31 18:02:40 [INFO] - Test 8 | FAILED: No Extract Function Assist found for the given selection of assists [] | N/A | N/A: break_loop_nested_labeled in 420.54ms
-2025-10-31 18:02:41 [INFO] - Test 9 | PASSED | PASSED | PASSED: break_loop_with_if in 359.24ms
-2025-10-31 18:02:42 [INFO] - Test 10 | PASSED | PASSED | FAILED: break_stmt in 282.77ms
-2025-10-31 18:02:42 [INFO] - Test 11 | PASSED | PASSED | PASSED: break_with_value in 296.65ms
-2025-10-31 18:02:43 [INFO] - Test 12 | PASSED | PASSED | PASSED: break_with_value_and_label in 450.22ms
-2025-10-31 18:02:44 [INFO] - Test 13 | PASSED | FAILED | PASSED: break_with_value_and_return in 270.35ms
-2025-10-31 18:02:45 [INFO] - Test 14 | PASSED | FAILED | FAILED: closure_arguments in 416.29ms
-2025-10-31 18:02:46 [INFO] - Test 15 | PASSED | FAILED | PASSED: comments_in_block_expr in 320.28ms
-2025-10-31 18:02:46 [INFO] - Test 16 | PASSED | FAILED | FAILED: continue_loop_nested_labeled in 518.35ms
-2025-10-31 18:02:47 [INFO] - Test 17 | PASSED | PASSED | PASSED: copy_custom_used_after in 716.96ms
-2025-10-31 18:02:49 [INFO] - Test 18 | PASSED | PASSED | PASSED: copy_used_after in 858.63ms
-2025-10-31 18:02:49 [INFO] - Test 19 | PASSED | PASSED | PASSED: does_not_add_extra_whitespace in 306.65ms
-2025-10-31 18:02:50 [INFO] - Test 20 | PASSED | PASSED | PASSED: does_not_import_control_flow in 612.34ms
-2025-10-31 18:02:51 [INFO] - Test 21 | PASSED | FAILED | FAILED: dont_emit_type_with_hidden_lifetime_parameter in 286.99ms
-2025-10-31 18:02:51 [INFO] - Test 22 | PASSED | FAILED | FAILED: empty_generic_param_list in 581.83ms
-2025-10-31 18:02:52 [INFO] - Test 23 | PASSED | PASSED | FAILED: extract_cast in 456.35ms
-2025-10-31 18:02:53 [INFO] - Test 24 | PASSED | PASSED | PASSED: extract_does_not_tear_body_apart in 286.23ms
-2025-10-31 18:02:54 [INFO] - Test 25 | PASSED | PASSED | PASSED: extract_does_not_tear_comments_apart in 418.97ms
-2025-10-31 18:02:54 [INFO] - Test 26 | PASSED | PASSED | FAILED: extract_does_not_wrap_res_in_res in 448.39ms
-2025-10-31 18:02:54 [INFO] - Test 27 | FAILED: No Extract Function Assist found for the given selection of assists [Assist { id: AssistId("extract_variable", RefactorExtract), label: "Extract into variable", group: Some(GroupLabel("Extract into...")), target: 67..71, source_change: None, command: None }, Assist { id: AssistId("extract_constant", RefactorExtract), label: "Extract into constant", group: Some(GroupLabel("Extract into...")), target: 67..71, source_change: None, command: None }, Assist { id: AssistId("extract_static", RefactorExtract), label: "Extract into static", group: Some(GroupLabel("Extract into...")), target: 67..71, source_change: None, command: None }] | N/A | N/A: extract_from_nested in 269.91ms
-2025-10-31 18:02:55 [INFO] - Test 28 | PASSED | PASSED | PASSED: extract_function_copies_comment_at_end in 365.78ms
-2025-10-31 18:02:56 [INFO] - Test 29 | PASSED | PASSED | PASSED: extract_function_copies_comment_at_start in 482.38ms
-2025-10-31 18:02:57 [INFO] - Test 30 | PASSED | FAILED | PASSED: extract_function_copies_comment_in_between in 468.54ms
-2025-10-31 18:02:58 [INFO] - Test 31 | PASSED | PASSED | PASSED: extract_function_copies_comment_indented in 277.36ms
-2025-10-31 18:02:59 [INFO] - Test 32 | PASSED | PASSED | PASSED: extract_function_does_preserve_whitespace in 298.51ms
-2025-10-31 18:02:59 [INFO] - Test 33 | FAILED: No Extract Function Assist found for the given selection of assists [] | N/A | N/A: extract_function_from_trait_with_existing_non_empty_impl_block in 338.62ms
-2025-10-31 18:03:00 [INFO] - Test 34 | PASSED | PASSED | PASSED: extract_function_long_form_comment in 662.95ms
-2025-10-31 18:03:00 [INFO] - Test 35 | FAILED: No Extract Function Assist found for the given selection of assists [] | N/A | N/A: extract_method_from_trait_impl in 315.91ms
-2025-10-31 18:03:01 [INFO] - Test 36 | FAILED: Extraction not applicable for braces | N/A | N/A: extract_method_from_trait_with_existing_non_empty_impl_block in 410.08ms
-2025-10-31 18:03:01 [INFO] - Test 37 | FAILED: No Extract Function Assist found for the given selection of assists [Assist { id: AssistId("extract_module", RefactorExtract), label: "Extract Module", group: None, target: 280..289, source_change: None, command: None }, Assist { id: AssistId("extract_variable", RefactorExtract), label: "Extract into variable", group: Some(GroupLabel("Extract into...")), target: 301..311, source_change: None, command: None }, Assist { id: AssistId("extract_constant", RefactorExtract), label: "Extract into constant", group: Some(GroupLabel("Extract into...")), target: 301..311, source_change: None, command: None }, Assist { id: AssistId("extract_static", RefactorExtract), label: "Extract into static", group: Some(GroupLabel("Extract into...")), target: 301..311, source_change: None, command: None }] | N/A | N/A: extract_method_from_trait_with_multiple_existing_impl_blocks in 382.35ms
-2025-10-31 18:03:01 [INFO] - Test 38 | FAILED: No Extract Function Assist found for the given selection of assists [Assist { id: AssistId("extract_variable", RefactorExtract), label: "Extract into variable", group: Some(GroupLabel("Extract into...")), target: 441..451, source_change: None, command: None }, Assist { id: AssistId("extract_constant", RefactorExtract), label: "Extract into constant", group: Some(GroupLabel("Extract into...")), target: 441..451, source_change: None, command: None }, Assist { id: AssistId("extract_static", RefactorExtract), label: "Extract into static", group: Some(GroupLabel("Extract into...")), target: 441..451, source_change: None, command: None }, Assist { id: AssistId("extract_module", RefactorExtract), label: "Extract Module", group: None, target: 412..422, source_change: None, command: None }] | N/A | N/A: extract_method_from_trait_with_multiple_existing_trait_impl_blocks in 392.68ms
-2025-10-31 18:03:02 [INFO] - Test 39 | FAILED: No Extract Function Assist found for the given selection of assists [Assist { id: AssistId("extract_variable", RefactorExtract), label: "Extract into variable", group: Some(GroupLabel("Extract into...")), target: 123..129, source_change: None, command: None }] | N/A | N/A: extract_mut_ref_param_has_no_mut_binding_in_loop in 195.59ms
-2025-10-31 18:03:02 [INFO] - Test 40 | PASSED | PASSED | PASSED: extract_partial_block in 447.95ms
-2025-10-31 18:03:03 [INFO] - Test 41 | PASSED | PASSED | PASSED: extract_partial_block_single_line in 431.91ms
-2025-10-31 18:03:04 [INFO] - Test 42 | PASSED | PASSED | PASSED: extract_return_stmt in 242.84ms
-2025-10-31 18:03:04 [INFO] - Test 43 | PASSED | FAILED | FAILED: extract_with_await in 450.15ms
-2025-10-31 18:03:04 [INFO] - Test 44 | FAILED: I/O error: File not found: testdata/extract_with_await_and_result_not_producing_match_expr/input/src/main.rs | N/A | N/A: extract_with_await_and_result_not_producing_match_expr in 0.03ms
-2025-10-31 18:03:05 [INFO] - Test 45 | PASSED | FAILED | FAILED: extract_with_await_and_result_producing_match_expr in 388.28ms
-2025-10-31 18:03:06 [INFO] - Test 46 | PASSED | FAILED | FAILED: extract_with_await_in_args in 498.91ms
-2025-10-31 18:03:06 [INFO] - Test 47 | FAILED: No Extract Function Assist found for the given selection of assists [] | N/A | N/A: extract_with_macro_arg in 492.74ms
-2025-10-31 18:03:06 [INFO] - Test 48 | PASSED | FAILED | FAILED: filter_unused_generics in 202.73ms
-2025-10-31 18:03:07 [INFO] - Test 49 | PASSED | FAILED | FAILED: filter_unused_where_clause in 455.43ms
-2025-10-31 18:03:07 [INFO] - Test 50 | PASSED | FAILED | FAILED: filters_unused_nested_generics in 469.68ms
-2025-10-31 18:03:08 [INFO] - Test 51 | PASSED | FAILED | FAILED: filters_unused_nested_where_clauses in 604.81ms
-2025-10-31 18:03:09 [INFO] - Test 52 | PASSED | PASSED | FAILED: function_expr in 634.39ms
-2025-10-31 18:03:09 [INFO] - Test 53 | PASSED | PASSED | PASSED: indented_stmts in 221.49ms
-2025-10-31 18:03:10 [INFO] - Test 54 | PASSED | PASSED | PASSED: indented_stmts_inside_mod in 478.06ms
-2025-10-31 18:03:11 [INFO] - Test 55 | PASSED | PASSED | PASSED: it_should_not_generate_duplicate_function_names in 480.58ms
-2025-10-31 18:03:12 [INFO] - Test 56 | FAILED: No Extract Function Assist found for the given selection of assists [Assist { id: AssistId("extract_variable", RefactorExtract), label: "Extract into variable", group: Some(GroupLabel("Extract into...")), target: 59..62, source_change: None, command: None }, Assist { id: AssistId("extract_constant", RefactorExtract), label: "Extract into constant", group: Some(GroupLabel("Extract into...")), target: 59..62, source_change: None, command: None }, Assist { id: AssistId("extract_static", RefactorExtract), label: "Extract into static", group: Some(GroupLabel("Extract into...")), target: 59..62, source_change: None, command: None }] | N/A | N/A: method_to_freestanding in 375.85ms
-2025-10-31 18:03:12 [INFO] - Test 57 | PASSED | FAILED | PASSED: method_with_mut in 209.85ms
-2025-10-31 18:03:13 [INFO] - Test 58 | PASSED | FAILED | PASSED: method_with_reference in 724.33ms
-2025-10-31 18:03:14 [INFO] - Test 59 | PASSED | PASSED | PASSED: multi_variables_defined_inside_and_used_after_mutably_no_ret in 247.83ms
-2025-10-31 18:03:15 [INFO] - Test 60 | PASSED | FAILED | PASSED: mut_field_from_outer_scope in 551.34ms
-2025-10-31 18:03:16 [INFO] - Test 61 | PASSED | FAILED | PASSED: mut_method_call in 260.72ms
-2025-10-31 18:03:17 [INFO] - Test 62 | PASSED | FAILED | PASSED: mut_nested_field_from_outer_scope in 578.33ms
-2025-10-31 18:03:18 [INFO] - Test 63 | PASSED | PASSED | PASSED: mut_param_because_of_mut_ref in 411.39ms
-2025-10-31 18:03:19 [INFO] - Test 64 | PASSED | FAILED | FAILED: mut_param_many_usages_expr in 365.63ms
-2025-10-31 18:03:19 [INFO] - Test 65 | PASSED | FAILED | FAILED: mut_param_many_usages_stmt in 339.78ms
-2025-10-31 18:03:20 [INFO] - Test 66 | PASSED | FAILED | PASSED: mut_var_from_outer_scope in 360.48ms
-2025-10-31 18:03:20 [INFO] - Test 67 | PASSED | FAILED | PASSED: nested_generics in 216.37ms
-2025-10-31 18:03:21 [INFO] - Test 68 | PASSED | FAILED | PASSED: nested_where_clauses in 317.58ms
-2025-10-31 18:03:22 [INFO] - Test 69 | PASSED | PASSED | PASSED: no_args_for in 361.75ms
-2025-10-31 18:03:22 [INFO] - Test 70 | FAILED: No Extract Function Assist found for the given selection of assists [Assist { id: AssistId("extract_variable", RefactorExtract), label: "Extract into variable", group: Some(GroupLabel("Extract into...")), target: 20..25, source_change: None, command: None }, Assist { id: AssistId("extract_constant", RefactorExtract), label: "Extract into constant", group: Some(GroupLabel("Extract into...")), target: 20..25, source_change: None, command: None }, Assist { id: AssistId("extract_static", RefactorExtract), label: "Extract into static", group: Some(GroupLabel("Extract into...")), target: 20..25, source_change: None, command: None }] | N/A | N/A: no_args_from_binary_expr in 220.90ms
-2025-10-31 18:03:23 [INFO] - Test 71 | PASSED | FAILED | FAILED: no_args_from_binary_expr_in_module in 455.00ms
-2025-10-31 18:03:23 [INFO] - Test 72 | FAILED: No Extract Function Assist found for the given selection of assists [Assist { id: AssistId("extract_variable", RefactorExtract), label: "Extract into variable", group: Some(GroupLabel("Extract into...")), target: 16..25, source_change: None, command: None }, Assist { id: AssistId("extract_constant", RefactorExtract), label: "Extract into constant", group: Some(GroupLabel("Extract into...")), target: 16..25, source_change: None, command: None }, Assist { id: AssistId("extract_static", RefactorExtract), label: "Extract into static", group: Some(GroupLabel("Extract into...")), target: 16..25, source_change: None, command: None }] | N/A | N/A: no_args_from_binary_expr_indented in 247.16ms
-2025-10-31 18:03:23 [INFO] - Test 73 | PASSED | PASSED | PASSED: no_args_from_loop_unit in 260.55ms
-2025-10-31 18:03:24 [INFO] - Test 74 | PASSED | PASSED | PASSED: no_args_from_loop_with_return in 318.84ms
-2025-10-31 18:03:25 [INFO] - Test 75 | PASSED | PASSED | PASSED: no_args_from_match in 389.60ms
-2025-10-31 18:03:26 [INFO] - Test 76 | PASSED | PASSED | PASSED: no_args_from_stmt_unit in 324.92ms
-2025-10-31 18:03:26 [INFO] - Test 77 | PASSED | PASSED | PASSED: no_args_from_stmt_with_last_expr in 232.34ms
-2025-10-31 18:03:27 [INFO] - Test 78 | PASSED | PASSED | PASSED: no_args_if in 366.89ms
-2025-10-31 18:03:28 [INFO] - Test 79 | PASSED | PASSED | PASSED: no_args_if_else in 416.76ms
-2025-10-31 18:03:29 [INFO] - Test 80 | PASSED | PASSED | PASSED: no_args_if_let_else in 294.66ms
-2025-10-31 18:03:29 [INFO] - Test 81 | PASSED | PASSED | PASSED: no_args_match in 460.48ms
-2025-10-31 18:03:30 [INFO] - Test 82 | PASSED | PASSED | PASSED: no_args_while in 239.41ms
-2025-10-31 18:03:31 [INFO] - Test 83 | PASSED | PASSED | PASSED: non_tail_expr_of_tail_expr_loop in 260.86ms
-2025-10-31 18:03:31 [INFO] - Test 84 | PASSED | FAILED | FAILED: non_tail_expr_of_tail_if_block in 528.42ms
-2025-10-31 18:03:32 [INFO] - Test 85 | PASSED | PASSED | PASSED: non_tail_expr_with_comment_of_tail_expr_loop in 441.16ms
-2025-10-31 18:03:33 [INFO] - Test 86 | PASSED | PASSED | PASSED: nontrivial_patterns_define_variables in 481.07ms
-2025-10-31 18:03:34 [INFO] - Test 87 | PASSED | PASSED | FAILED: param_from_closure in 428.40ms
-2025-10-31 18:03:35 [INFO] - Test 88 | PASSED | PASSED | PASSED: param_usage_in_macro in 517.11ms
-2025-10-31 18:03:35 [INFO] - Test 89 | PASSED | PASSED | PASSED: param_usage_in_macro_with_nested_tt in 247.17ms
-2025-10-31 18:03:36 [INFO] - Test 90 | PASSED | FAILED | PASSED: param_usage_in_macro_with_nested_tt_2 in 472.78ms
-2025-10-31 18:03:37 [INFO] - Test 91 | FAILED: No Extract Function Assist found for the given selection of assists [Assist { id: AssistId("extract_variable", RefactorExtract), label: "Extract into variable", group: Some(GroupLabel("Extract into...")), target: 16..21, source_change: None, command: None }, Assist { id: AssistId("extract_constant", RefactorExtract), label: "Extract into constant", group: Some(GroupLabel("Extract into...")), target: 16..21, source_change: None, command: None }, Assist { id: AssistId("extract_static", RefactorExtract), label: "Extract into static", group: Some(GroupLabel("Extract into...")), target: 16..21, source_change: None, command: None }] | N/A | N/A: part_of_expr_stmt in 576.90ms
-2025-10-31 18:03:37 [INFO] - Test 92 | PASSED | FAILED | FAILED: preserve_generics in 493.24ms
-2025-10-31 18:03:38 [INFO] - Test 93 | PASSED | PASSED | PASSED: preserve_generics_from_body in 398.91ms
-2025-10-31 18:03:38 [INFO] - Test 94 | PASSED | FAILED | FAILED: preserve_where_clause in 297.13ms
-2025-10-31 18:03:39 [INFO] - Test 95 | PASSED | FAILED | FAILED: reference_mutable_param_with_further_usages in 526.61ms
-2025-10-31 18:03:39 [INFO] - Test 96 | PASSED | FAILED | FAILED: reference_mutable_param_without_further_usages in 380.39ms
-2025-10-31 18:03:41 [INFO] - Test 97 | PASSED | PASSED | PASSED: return_from_nested_fn in 615.09ms
-2025-10-31 18:03:41 [INFO] - Test 98 | PASSED | FAILED | PASSED: return_from_nested_loop in 233.68ms
-2025-10-31 18:03:42 [INFO] - Test 99 | PASSED | PASSED | PASSED: return_to_parent in 451.28ms
-2025-10-31 18:03:43 [INFO] - Test 100 | PASSED | PASSED | PASSED: should_increment_suffix_until_it_finds_space in 293.90ms
-2025-10-31 18:03:43 [INFO] - Test 101 | PASSED | Error: Parse error: expected `;` | FAILED: struct_with_two_fields_pattern_define_variables in 625.78ms
-2025-10-31 18:03:44 [INFO] - Test 102 | PASSED | PASSED | FAILED: tail_expr_no_extra_control_flow in 387.77ms
-2025-10-31 18:03:45 [INFO] - Test 103 | PASSED | FAILED | FAILED: tail_expr_of_tail_block_nested in 622.62ms
-2025-10-31 18:03:45 [INFO] - Test 104 | PASSED | PASSED | FAILED: try_and_return_ok in 586.26ms
-2025-10-31 18:03:46 [INFO] - Test 105 | PASSED | PASSED | FAILED: try_option in 503.94ms
-2025-10-31 18:03:47 [INFO] - Test 106 | PASSED | PASSED | FAILED: try_option_unit in 433.55ms
-2025-10-31 18:03:47 [INFO] - Test 107 | PASSED | PASSED | FAILED: try_option_with_return in 868.77ms
-2025-10-31 18:03:48 [INFO] - Test 108 | PASSED | PASSED | FAILED: try_result in 275.67ms
-2025-10-31 18:03:48 [INFO] - Test 109 | PASSED | PASSED | FAILED: try_result_with_return in 429.85ms
-2025-10-31 18:03:49 [INFO] - Test 110 | PASSED | PASSED | PASSED: two_arguments_form_expr in 232.83ms
-2025-10-31 18:03:50 [INFO] - Test 111 | PASSED | PASSED | PASSED: two_variables_defined_inside_and_used_after_no_ret in 355.09ms
-2025-10-31 18:03:50 [INFO] - Test 112 | PASSED | FAILED | FAILED: unresolveable_types_default_to_placeholder in 248.72ms
-2025-10-31 18:03:51 [INFO] - Test 113 | PASSED | PASSED | PASSED: variable_defined_inside_and_used_after_mutably_no_ret in 464.49ms
-2025-10-31 18:03:52 [INFO] - Test 114 | PASSED | PASSED | PASSED: variable_defined_inside_and_used_after_no_ret in 527.29ms
-2025-10-31 18:03:52 [INFO] - ------------------------------------------------------------------
-2025-10-31 18:03:52 [INFO] - Total tests run: 114
-2025-10-31 18:03:52 [INFO] - Tests passed stage 1: 98
-2025-10-31 18:03:52 [INFO] - Tests passed: 63
-2025-10-31 18:03:52 [INFO] - Tests failed: 51
-2025-10-31 18:03:52 [INFO] - Total time: 75.56s
-2025-10-31 18:03:52 [INFO] - Average time per test: 398.64ms
-2025-10-31 18:03:52 [INFO] - Shortest test time: 0.03ms
-2025-10-31 18:03:52 [INFO] - Longest test time: 868.77ms
+2025-10-31 18:20:17 [INFO] - Application Started
+2025-10-31 18:20:17 [INFO] - Running 'run' subcommand
+2025-10-31 18:20:17 [INFO] - File Path: "examples/example1/src/main.rs"
+2025-10-31 18:20:17 [INFO] - New Function Name: extracted_function
+2025-10-31 18:20:17 [INFO] - Start Index: 39
+2025-10-31 18:20:17 [INFO] - End Index: 60
+2025-10-31 18:20:17 [INFO] - Verbose: no
+2025-10-31 18:20:20 [INFO] - Output Code: fn foo() -> u32 {
+    let n = 2;
+    extracted_function(n)
+}
+
+fn extracted_function(n: u32) -> u32 {
+    let m = 1;
+    n + m
+}
+
+fn main() {
+
+}
+
+2025-10-31 18:20:20 [INFO] - Caller Method: foo

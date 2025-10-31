@@ -2,17 +2,12 @@
 name = "break_from_nested_loop"
 version = "0.1.0"
 edition = "2021"
-
 rust-version = "1.80"
-
-authors = ["N/A"]
-
+authors = [ "N/A",]
 license = "MIT"
-
 repository = "https://github.com/RuleBrittonica/rem-testfiles"
-
 description = "Test Data"
-
 
 [dependencies]
 
+[workspace]

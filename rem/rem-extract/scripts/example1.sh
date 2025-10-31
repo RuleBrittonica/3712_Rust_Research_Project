@@ -5,7 +5,7 @@ cargo update
 cargo build --release --bin rem-extract
 
 # Variables
-PATH="C:\Coding\rem-matt\rem-extract\examples\example1\src\main.rs"
+PATH="examples/example1/src/main.rs"
 NAME="extracted_function"
 START=39
 END=60
