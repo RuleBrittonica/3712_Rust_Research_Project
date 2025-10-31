@@ -1,82 +1,59 @@
-[workspace]
-members = ["input/argument_and_locals","input/argument_form_expr", "input/argument_used_twice_form_expr", "input/break_from_nested_and_outer_loops", "input/break_from_nested_loop", "input/break_loop", "input/break_loop_nested", "input/break_loop_nested_labeled", "input/break_loop_with_if", "input/break_stmt", "input/break_with_value", "input/break_with_value_and_label", "input/break_with_value_and_return","input/closure_arguments", "input/comments_in_block_expr", "input/continue_loop_nested_labeled", "input/copy_custom_used_after", "input/copy_used_after", "input/does_not_add_extra_whitespace", "input/does_not_import_control_flow", "input/dont_emit_type_with_hidden_lifetime_parameter", "input/empty_generic_param_list", "input/extract_cast", "input/extract_does_not_tear_body_apart", "input/extract_does_not_tear_comments_apart", "input/extract_does_not_wrap_res_in_res", "input/extract_from_nested", "input/extract_function_copies_comment_at_end", "input/extract_function_copies_comment_at_start", "input/extract_function_copies_comment_in_between", "input/extract_function_copies_comment_indented", "input/extract_function_does_preserve_whitespace", "input/extract_function_from_trait_with_existing_non_empty_impl_block", "input/extract_function_long_form_comment", "input/extract_method_from_trait_impl", "input/extract_method_from_trait_with_existing_non_empty_impl_block", "input/extract_method_from_trait_with_multiple_existing_impl_blocks", "input/extract_method_from_trait_with_multiple_existing_trait_impl_blocks", "input/extract_mut_ref_param_has_no_mut_binding_in_loop", "input/extract_partial_block", "input/extract_partial_block_single_line", "input/extract_return_stmt", "input/extract_with_await", "input/extract_with_await_and_result_not_producing_match_expr", "input/extract_with_await_and_result_producing_match_expr", "input/extract_with_await_in_args", "input/extract_with_macro_arg", "input/filter_unused_generics", "input/filter_unused_where_clause", "input/filters_unused_nested_generics", "input/filters_unused_nested_where_clauses", "input/function_expr", "input/indented_stmts", "input/indented_stmts_inside_mod", "input/it_should_not_generate_duplicate_function_names", "input/method_to_freestanding", "input/method_with_mut", "input/method_with_reference", "input/multi_variables_defined_inside_and_used_after_mutably_no_ret", "input/mut_field_from_outer_scope", "input/mut_method_call", "input/mut_nested_field_from_outer_scope", "input/mut_param_because_of_mut_ref", "input/mut_param_many_usages_expr", "input/mut_param_many_usages_stmt", "input/mut_var_from_outer_scope", "input/nested_generics", "input/nested_where_clauses", "input/no_args_for", "input/no_args_from_binary_expr", "input/no_args_from_binary_expr_in_module", "input/no_args_from_binary_expr_indented", "input/no_args_from_loop_unit", "input/no_args_from_loop_with_return", "input/no_args_from_match", "input/no_args_from_stmt_unit", "input/no_args_from_stmt_with_last_expr", "input/no_args_if", "input/no_args_if_else", "input/no_args_if_let_else", "input/no_args_match", "input/no_args_while", "input/non_tail_expr_of_tail_expr_loop", "input/non_tail_expr_of_tail_if_block", "input/non_tail_expr_with_comment_of_tail_expr_loop", "input/nontrivial_patterns_define_variables", "input/param_from_closure", "input/param_usage_in_macro", "input/param_usage_in_macro_with_nested_tt", "input/param_usage_in_macro_with_nested_tt_2", "input/part_of_expr_stmt", "input/preserve_generics", "input/preserve_generics_from_body", "input/preserve_where_clause", "input/reference_mutable_param_with_further_usages", "input/reference_mutable_param_without_further_usages", "input/return_from_nested_fn", "input/return_from_nested_loop", "input/return_to_parent", "input/should_increment_suffix_until_it_finds_space", "input/struct_with_two_fields_pattern_define_variables", "input/tail_expr_no_extra_control_flow", "input/tail_expr_of_tail_block_nested", "input/try_and_return_ok", "input/try_option", "input/try_option_unit", "input/try_option_with_return", "input/try_result", "input/try_result_with_return", "input/two_arguments_form_expr", "input/two_variables_defined_inside_and_used_after_no_ret", "input/unresolveable_types_default_to_placeholder", "input/variable_defined_inside_and_used_after_mutably_no_ret", "input/variable_defined_inside_and_used_after_no_ret",
-"rem-extract"
-]
+[[bin]]
+name = "rem-extract"
+path = "src/main.rs"
 
-resolver = "2"
-
-[workspace.package]
-edition = "2021"
-rust-version = "1.80.0"
-authors = ["Matt Britton <matt.britton@anu.edu.au>"]
-license = "MIT"
-repository = "https://github.com/RuleBrittonica/rem-extract"
+[package]
+name        = "rem-extract"
+version     = "0.1.3"
 description = "Providing extract method capability for the REM toolchain"
+repository  = "https://github.com/RuleBrittonica/rem-extract"
+readme      = "README.md"
+default-run = "rem-extract"
 
-[workspace.dependencies]
-# Local Crates
+# inherit common metadata from the workspace
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
 
-# non-local crates
-log = "0.4.22"
-flexi_logger = "0.29.0"
-clap = { version = "4.5.18", features = ["derive"] }
-colored = "2.1.0"
-syn = { version = "2.0.79", features = ["full"]}
-quote = "1.0.37"
-rem-utils = "0.1.5"
-lazy_static = "1.5.0"
-regex = "1.10.6"
-proc-macro2 = "1.0.86"
-diff = "0.1.13"
-cov-mark = "2.0.0-pre.1"
+[dependencies]
+# shared, pinned at the workspace
+log           = { workspace = true }
+flexi_logger  = { workspace = true }
+colored       = { workspace = true }
+quote         = { workspace = true }
+regex         = { workspace = true }
+proc-macro2   = { workspace = true }
+diff          = { workspace = true }
+camino        = { workspace = true }
+rowan         = { workspace = true }
+clap          = { workspace = true, features = ["derive"] }
+lazy_static   = { workspace = true }
+cov-mark      = { workspace = true }
 
-[workspace.lints.rust]
-# remember to update RUSTFLAGS in ci.yml if you add something here
+rem-utils     = { workspace = true }
 
-elided_lifetimes_in_paths = "warn"
-explicit_outlives_requirements = "warn"
-unsafe_op_in_unsafe_fn = "warn"
-unused_extern_crates = "warn"
-unused_lifetimes = "warn"
-unreachable_pub = "warn"
+ra_ap_hir              = { workspace = true }
+ra_ap_ide              = { workspace = true }
+ra_ap_ide_assists      = { workspace = true }
+ra_ap_ide_db           = { workspace = true }
+"ra_ap_load-cargo"     = { workspace = true }
+ra_ap_project_model    = { workspace = true }
+"ra_ap_rust-analyzer"  = { workspace = true }
+ra_ap_vfs              = { workspace = true }
+ra_ap_parser           = { workspace = true }
+ra_ap_syntax           = { workspace = true }
 
-[workspace.lints.clippy]
-## lint groups
-complexity = { level = "warn", priority = -1 }
-correctness = { level = "deny", priority = -1 }
-perf = { level = "deny", priority = -1 }
-restriction = { level = "allow", priority = -1 }
-style = { level = "warn", priority = -1 }
-suspicious = { level = "warn", priority = -1 }
+# TODO change this when we update repairer to syn 2
+syn = { version = "2.0.79", features = ["full"] }
 
-## allow following lints
-too_long_first_doc_paragraph = "allow"
-# subjective
-single_match = "allow"
-# () makes a fine error in most cases
-result_unit_err = "allow"
-# We don't expose public APIs that matter like this
-len_without_is_empty = "allow"
-# We have macros that rely on this currently
-enum_variant_names = "allow"
-# Builder pattern disagrees
-new_ret_no_self = "allow"
-# Has a bunch of false positives
-useless_asref = "allow"
-# Has false positives
-assigning_clones = "allow"
+[build-dependencies]
 
-## Following lints should be tackled at some point
-too_many_arguments = "allow"
-type_complexity = "allow"
-wrong_self_convention = "allow"
+[dev-dependencies]
+tempfile = { workspace = true }
 
-## warn at following lints
-# CI raises these to deny
-dbg_macro = "warn"
-todo = "warn"
-print_stdout = "warn"
-print_stderr = "warn"
+[features]
+default = []
 
-rc_buffer = "warn"
-str_to_string = "warn"
+[lib]
+name = "rem_extract"
+path = "src/lib.rs"

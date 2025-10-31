@@ -1,7 +1,0 @@
-2024-11-20 20:13:02 [INFO] - Application Started
-2024-11-20 20:13:02 [INFO] - Running 'run' subcommand
-2024-11-20 20:13:02 [INFO] - File Path: "C:\\Coding\\rem-matt\\rem-extract\\examples\\example1\\src\\main.rs"
-2024-11-20 20:13:02 [INFO] - New Function Name: extracted_function
-2024-11-20 20:13:02 [INFO] - Start Index: 39
-2024-11-20 20:13:02 [INFO] - End Index: 60
-2024-11-20 20:13:02 [INFO] - Verbose: no
