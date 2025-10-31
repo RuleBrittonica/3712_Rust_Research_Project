@@ -15,8 +15,8 @@ use log::info;
 use regex::Regex;
 
 use crate::{
-    extraction::extract_method,
-    extraction::ExtractionInput,
+    extract::extraction::extract_method,
+    extract::extraction::ExtractionInput,
     error::ExtractionError,
     test_details::TEST_FILES, // Import Test Files Information from test_details.rs
 };

@@ -32,6 +32,7 @@ notify        = { workspace = true }
 ctrlc         = { workspace = true }
 anyhow        = { workspace = true }
 sha2          = { workspace = true }
+serde         = { workspace = true, features = ["derive"] }
 
 rem-utils     = { workspace = true }
 rem-interface = { workspace = true }

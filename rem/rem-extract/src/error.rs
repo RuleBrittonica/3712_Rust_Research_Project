@@ -1,3 +1,4 @@
+use std::error::Error as StdError;
 use std::fmt;
 use std::io;
 use syn::Error as SynError;
@@ -28,7 +29,8 @@ impl fmt::Display for ExtractionError {
             ExtractionError::InvalidEndIdx => write!(f, "Invalid end index"),
             ExtractionError::SameIdx => write!(f, "Start and end indices are the same"),
             ExtractionError::InvalidIdxPair => write!(f, "Invalid pair of start and end indices"),
-            ExtractionError::NoExtractFunction(assists) => write!(f, "No Extract Function Assist found for the given selection of assists {:?}", assists),
+            ExtractionError::NoExtractFunction(assists) =>
+                write!(f, "No Extract Function Assist found for the given selection of assists {:?}", assists),
             ExtractionError::CommentNotApplicable => write!(f, "Extraction not applicable for comment"),
             ExtractionError::BracesNotApplicable => write!(f, "Extraction not applicable for braces"),
             ExtractionError::ParentMethodNotFound => write!(f, "Parent method not found"),
@@ -36,15 +38,20 @@ impl fmt::Display for ExtractionError {
     }
 }
 
+// This makes `anyhow::Error` able to wrap `ExtractionError`
+impl StdError for ExtractionError {
+    fn source(&self) -> Option<&(dyn StdError + 'static)> {
+        match self {
+            ExtractionError::Io(e) => Some(e),
+            ExtractionError::Parse(e) => Some(e),
+            _ => None,
+        }
+    }
+}
+
 impl From<io::Error> for ExtractionError {
-    fn from(error: io::Error) -> Self {
-        ExtractionError::Io(error)
-    }
+    fn from(e: io::Error) -> Self { ExtractionError::Io(e) }
 }
-
 impl From<SynError> for ExtractionError {
-    fn from(error: SynError) -> Self {
-        ExtractionError::Parse(error)
-    }
+    fn from(e: SynError) -> Self { ExtractionError::Parse(e) }
 }
-

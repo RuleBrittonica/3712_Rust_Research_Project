@@ -32,7 +32,7 @@ use ra_ap_vfs::AbsPathBuf;
 
 use crate::{
     error::ExtractionError,
-    extraction_utils::{
+    extract::extraction_utils::{
         apply_extract_function,
         convert_to_abs_path_buf,
         filter_extract_function_assist,

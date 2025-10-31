@@ -7,6 +7,7 @@ use std::{
     env,
     fs,
     path::PathBuf,
+    io::ErrorKind,
 };
 
 use camino::Utf8PathBuf;
@@ -549,6 +550,32 @@ fn fixup_controlflow( text: String, ) -> String {
         text = format!("use std::ops::ControlFlow;\n\n{}", text);
     }
     text
+}
+
+// Check if the idx pair is valid
+pub fn check_idx(start: &u32, end: &u32) -> Result<(), ExtractionError> {
+    let start = *start;
+    let end = *end;
+    if start == end {
+        return Err(ExtractionError::SameIdx);
+    } else if start > end {
+        return Err(ExtractionError::InvalidIdxPair);
+    }
+    if end == 0 {
+        return Err(ExtractionError::InvalidEndIdx);
+    }
+    Ok(())
+}
+
+// Check if the file exists and is readable
+pub fn check_file_exists(file_path: &str) -> Result<(), ExtractionError> {
+    if fs::metadata(file_path).is_err() {
+        return Err(ExtractionError::Io(std::io::Error::new(
+            ErrorKind::NotFound,
+            format!("File not found: {}", file_path),
+        )));
+    }
+    Ok(())
 }
 
 #[cfg(test)]

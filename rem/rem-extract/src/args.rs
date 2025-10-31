@@ -17,15 +17,6 @@ pub struct EXTRACTArgs {
 
 #[derive(Subcommand)]
 pub enum EXTRACTCommands {
-    /// Start or connect to the background analysis server
-    Daemon {
-        manifest_path: PathBuf,
-    },
-
-    Close {
-        manifest_path: PathBuf,
-    },
-
     // Run the extraction process with specific arguments
     Extract {
         #[arg(help = "The path to the file to refactor")]

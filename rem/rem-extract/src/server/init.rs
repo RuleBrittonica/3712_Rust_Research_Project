@@ -1,19 +1,20 @@
-//! daemon/init.rs
-//! Step 1: Initialise the Daemon (persistent RA state + file lists)
-
 use anyhow::{anyhow, Context, Result};
-use ra_ap_ide::RootDatabase;
+use ra_ap_ide::AnalysisHost;
 use ra_ap_project_model::{CargoConfig, ProjectManifest, ProjectWorkspace};
 use ra_ap_vfs::{Vfs, AbsPathBuf};
 use std::{
-    fs,
     path::{Path, PathBuf},
 };
-use crate::{daemon::utils::hash_file_list, extraction_utils::{
-    convert_to_abs_path_buf, get_cargo_config, load_project_manifest, load_project_workspace, load_workspace_data
-}};
+use crate::extract::extraction_utils::{
+    convert_to_abs_path_buf,
+    get_cargo_config,
+    load_project_manifest,
+    load_project_workspace,
+    load_workspace_data
+};
 
-use crate::daemon::utils::enumerate_rust_files;
+use walkdir::WalkDir;
+use sha2::{Sha256, Digest};
 
 // Public daemon state (kept alive until shutdown)
 
@@ -26,7 +27,7 @@ pub struct DaemonCore {
     /// Loaded once, kept and incrementally updated later
     pub cargo_config: CargoConfig,
     pub workspace: ProjectWorkspace,
-    pub db: RootDatabase,
+    pub ah: AnalysisHost,
     pub vfs: Vfs,
 
     /// Current snapshot of all .rs files under the workspace (excludes target/)
@@ -69,6 +70,7 @@ pub fn init_daemon(entry: &Path) -> Result<DaemonCore> {
 
     // 5) Load Analysis DB + VFS (long-lived incremental state)
     let (db, vfs) = load_workspace_data(workspace.clone(), &cargo_config);
+    let ah: AnalysisHost = AnalysisHost::with_database( db );
 
     let files = enumerate_rust_files(&manifest_dir);
     let hashed_files = hash_file_list(files);
@@ -78,7 +80,7 @@ pub fn init_daemon(entry: &Path) -> Result<DaemonCore> {
         cargo_toml,
         cargo_config,
         workspace,
-        db,
+        ah,
         vfs,
         hashed_files,
     })
@@ -88,8 +90,6 @@ pub fn close_daemon(_core: DaemonCore) -> Result<()> {
     // Currently no special action needed to close the daemon.
     Ok(())
 }
-
-// Helpers
 
 /// Accept either a Cargo.toml path or a .rs file and climb upwards to find one.
 /// Returns the absolute path to Cargo.toml or a sensible error (for VSCode to retry).
@@ -153,4 +153,57 @@ fn climb_to_manifest(mut dir_opt: Option<&Path>) -> Option<PathBuf> {
         dir_opt = dir.parent();
     }
     None
+}
+
+/// Enumerate all `.rs` files under the workspace root (excluding target/ and hidden dirs).
+pub fn enumerate_rust_files(root: &PathBuf) -> Vec<PathBuf> {
+    let mut out = Vec::new();
+    for e in WalkDir::new(root)
+        .into_iter()
+        .filter_entry(|de| should_descend(de.path()))
+        .filter_map(|e| e.ok())
+    {
+        let p = e.path();
+        if p.is_file() && p.extension().and_then(|s| s.to_str()) == Some("rs") {
+            out.push(p.to_path_buf());
+        }
+    }
+    out
+}
+
+pub fn hash_file_list(list: Vec<PathBuf>) -> Vec<FileRepr> {
+    let mut out = Vec::new();
+
+    for path in list {
+        let contents = std::fs::read_to_string(&path).expect("Failed to read file for hashing");
+        let mut hasher = Sha256::new();
+        hasher.update(contents.as_bytes());
+        let hash_result = hasher.finalize();
+        let hash_string = format!("{:x}", hash_result);
+        out.push(FileRepr {
+            path: convert_to_abs_path_buf(path.to_str().unwrap()).unwrap(),
+            hash: hash_string,
+        });
+    }
+    out
+}
+
+fn should_descend(p: &Path) -> bool {
+    // Skip target/, .git/, .hg/, .svn/, node_modules/, and hidden dirs to reduce noise.
+    if let Some(name) = p.file_name().and_then(|s| s.to_str()) {
+        let lower = name.to_ascii_lowercase();
+        if lower == "target"
+            || lower == ".git"
+            || lower == ".hg"
+            || lower == ".svn"
+            || lower == "node_modules"
+        {
+            return false;
+        }
+        // Skip other dot-directories at top levels
+        if name.starts_with('.') && p.is_dir() {
+            return false;
+        }
+    }
+    true
 }

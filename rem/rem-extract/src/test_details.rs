@@ -1,5 +1,5 @@
 use lazy_static::lazy_static;
-use crate::extract_tests::TestFile;
+use crate::extract::extract_tests::TestFile;
 lazy_static! {
     pub static ref TEST_FILES: Vec<TestFile<'static>> = vec![
         TestFile::new(
