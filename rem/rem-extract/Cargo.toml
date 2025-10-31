@@ -29,6 +29,7 @@ rowan         = { workspace = true }
 clap          = { workspace = true, features = ["derive"] }
 lazy_static   = { workspace = true }
 cov-mark      = { workspace = true }
+syn = { workspace = true, features = ["full"] }
 
 rem-utils     = { workspace = true }
 
@@ -42,9 +43,6 @@ ra_ap_project_model    = { workspace = true }
 ra_ap_vfs              = { workspace = true }
 ra_ap_parser           = { workspace = true }
 ra_ap_syntax           = { workspace = true }
-
-# TODO change this when we update repairer to syn 2
-syn = { version = "2.0.79", features = ["full"] }
 
 [build-dependencies]
 

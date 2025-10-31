@@ -43,7 +43,7 @@ git2         = "0.20.2"
 # parsing / proc-macro ecosystem
 proc-macro2  = "1.0"
 quote        = "1.0.39"
-syn          = "1.0.80"
+syn          = "2.0.108"
 cov-mark     = "2.0.0-pre.1"
 
 # Rust Analyzer crates. Note ROWAN must be the same version as used by RA crates

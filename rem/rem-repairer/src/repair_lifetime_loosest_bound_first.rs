@@ -4,8 +4,8 @@ use quote::ToTokens;
 use std::borrow::BorrowMut;
 use std::fs;
 use syn::{
-    visit_mut::VisitMut, AngleBracketedGenericArguments, FnArg, GenericArgument, ImplItemMethod,
-    Lifetime, LifetimeDef, PathArguments, ReturnType, Signature, TraitItemMethod, Type,
+    visit_mut::VisitMut, AngleBracketedGenericArguments, FnArg, GenericArgument, ImplItemFn,
+    Lifetime, LifetimeParam, PathArguments, ReturnType, Signature, TraitItemFn, Type,
     TypeParamBound,
 };
 
