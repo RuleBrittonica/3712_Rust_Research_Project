@@ -1,0 +1,10 @@
+2024-10-11 03:22:22 [INFO] - Application Started
+2024-10-11 03:22:22 [INFO] - Running 'test' subcommand
+2024-10-11 03:22:22 [INFO] - Verbose: yes
+2024-10-11 03:22:22 [INFO] - Starting tests...
+2024-10-11 03:22:25 [INFO] - Test 1 | PASSED | PASSED | PASSED: argument_and_locals in 2.31s
+2024-10-11 03:22:27 [INFO] - Test 2 | PASSED | PASSED | PASSED: argument_form_expr in 1.67s
+2024-10-11 03:22:29 [INFO] - Test 3 | PASSED | PASSED | PASSED: argument_used_twice_form_expr in 1.51s
+2024-10-11 03:22:31 [INFO] - Test 4 | PASSED | PASSED | PASSED: break_from_nested_and_outer_loops in 1.46s
+2024-10-11 03:22:32 [INFO] - Test 5 | PASSED | PASSED | PASSED: break_from_nested_loop in 1.35s
+2024-10-11 03:22:34 [INFO] - Test 6 | PASSED | PASSED | PASSED: break_loop in 1.33s

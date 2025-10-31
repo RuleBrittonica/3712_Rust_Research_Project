@@ -1,0 +1,7 @@
+{
+  "git": {
+    "sha1": "f3998f7f8a197596c5edf72e937996e6674b423b",
+    "dirty": true
+  },
+  "path_in_vcs": "crates/rust-analyzer"
+}

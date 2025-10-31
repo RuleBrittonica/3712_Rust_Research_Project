@@ -1,0 +1,7 @@
+2025-02-08 14:22:00 [INFO] - Application Started
+2025-02-08 14:22:00 [INFO] - Running 'run' subcommand
+2025-02-08 14:22:00 [INFO] - File Path: "/home/matt/rem-matt/rem-extract/test_crates/sample_project/src/main.rs"
+2025-02-08 14:22:00 [INFO] - New Function Name: fun_name
+2025-02-08 14:22:00 [INFO] - Start Index: 63
+2025-02-08 14:22:00 [INFO] - End Index: 75
+2025-02-08 14:22:00 [INFO] - Verbose: no

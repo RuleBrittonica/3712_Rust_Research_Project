@@ -1,0 +1,11 @@
+[toolchain]
+channel = "nightly-2025-02-08"
+components = [
+    "rustc-src",
+    "rustc-dev",
+    "llvm-tools-preview",
+    "rust-analyzer-preview",
+    "rustfmt",
+]
+
+profile = "minimal"

@@ -1,0 +1,127 @@
+2024-10-03 02:24:27 [INFO] - Application Started
+2024-10-03 02:24:27 [INFO] - Running 'test' subcommand
+2024-10-03 02:24:27 [INFO] - Verbose: yes
+2024-10-03 02:24:27 [INFO] - Starting tests...
+2024-10-03 02:24:31 [INFO] - Test 1 | PASSED | PASSED | PASSED: argument_and_locals in 3.74s
+2024-10-03 02:24:33 [INFO] - Test 2 | FAILED: No Extract Function Assist found for the given selection of assists [] | N/A | N/A: argument_form_expr in 1.92s
+2024-10-03 02:24:35 [INFO] - Test 3 | FAILED: No Extract Function Assist found for the given selection of assists [] | N/A | N/A: argument_used_twice_form_expr in 1.89s
+2024-10-03 02:24:37 [INFO] - Test 4 | PASSED | PASSED | PASSED: break_from_nested_and_outer_loops in 1.92s
+2024-10-03 02:24:39 [INFO] - Test 5 | PASSED | PASSED | PASSED: break_from_nested_loop in 1.90s
+2024-10-03 02:24:41 [INFO] - Test 6 | PASSED | PASSED | PASSED: break_loop in 1.82s
+2024-10-03 02:24:43 [INFO] - Test 7 | PASSED | PASSED | PASSED: break_loop_nested in 1.72s
+2024-10-03 02:24:45 [INFO] - Test 8 | FAILED: No Extract Function Assist found for the given selection of assists [] | N/A | N/A: break_loop_nested_labeled in 1.67s
+2024-10-03 02:24:47 [INFO] - Test 9 | PASSED | PASSED | PASSED: break_loop_with_if in 1.78s
+2024-10-03 02:24:49 [INFO] - Test 10 | PASSED | PASSED | FAILED: break_stmt in 1.82s
+2024-10-03 02:24:51 [INFO] - Test 11 | PASSED | PASSED | PASSED: break_with_value in 1.86s
+2024-10-03 02:24:53 [INFO] - Test 12 | PASSED | PASSED | PASSED: break_with_value_and_label in 1.73s
+2024-10-03 02:24:55 [INFO] - Test 13 | PASSED | FAILED | PASSED: break_with_value_and_return in 1.67s
+2024-10-03 02:24:57 [INFO] - Test 14 | PASSED | FAILED | FAILED: closure_arguments in 1.70s
+2024-10-03 02:24:59 [INFO] - Test 15 | PASSED | FAILED | PASSED: comments_in_block_expr in 1.75s
+2024-10-03 02:25:01 [INFO] - Test 16 | PASSED | FAILED | FAILED: continue_loop_nested_labeled in 1.84s
+2024-10-03 02:25:03 [INFO] - Test 17 | PASSED | FAILED | PASSED: copy_custom_used_after in 1.72s
+2024-10-03 02:25:05 [INFO] - Test 18 | PASSED | FAILED | PASSED: copy_used_after in 1.66s
+2024-10-03 02:25:07 [INFO] - Test 19 | PASSED | PASSED | PASSED: does_not_add_extra_whitespace in 1.72s
+2024-10-03 02:25:09 [INFO] - Test 20 | PASSED | PASSED | PASSED: does_not_import_control_flow in 1.81s
+2024-10-03 02:25:11 [INFO] - Test 21 | PASSED | FAILED | FAILED: dont_emit_type_with_hidden_lifetime_parameter in 1.71s
+2024-10-03 02:25:13 [INFO] - Test 22 | PASSED | FAILED | FAILED: empty_generic_param_list in 1.90s
+2024-10-03 02:25:15 [INFO] - Test 23 | PASSED | PASSED | FAILED: extract_cast in 1.81s
+2024-10-03 02:25:17 [INFO] - Test 24 | PASSED | PASSED | PASSED: extract_does_not_tear_body_apart in 1.86s
+2024-10-03 02:25:19 [INFO] - Test 25 | PASSED | PASSED | PASSED: extract_does_not_tear_comments_apart in 1.83s
+2024-10-03 02:25:21 [INFO] - Test 26 | PASSED | FAILED | FAILED: extract_does_not_wrap_res_in_res in 1.67s
+2024-10-03 02:25:23 [INFO] - Test 27 | FAILED: No Extract Function Assist found for the given selection of assists [Assist { id: AssistId("extract_variable", RefactorExtract), label: "Extract into variable", group: None, target: 67..71, source_change: None, command: None }] | N/A | N/A: extract_from_nested in 1.64s
+2024-10-03 02:25:25 [INFO] - Test 28 | PASSED | PASSED | PASSED: extract_function_copies_comment_at_end in 1.76s
+2024-10-03 02:25:27 [INFO] - Test 29 | PASSED | PASSED | PASSED: extract_function_copies_comment_at_start in 1.74s
+2024-10-03 02:25:29 [INFO] - Test 30 | PASSED | FAILED | PASSED: extract_function_copies_comment_in_between in 1.72s
+2024-10-03 02:25:31 [INFO] - Test 31 | PASSED | PASSED | PASSED: extract_function_copies_comment_indented in 1.76s
+2024-10-03 02:25:33 [INFO] - Test 32 | PASSED | PASSED | PASSED: extract_function_does_preserve_whitespace in 1.81s
+2024-10-03 02:25:34 [INFO] - Test 33 | FAILED: No Extract Function Assist found for the given selection of assists [] | N/A | N/A: extract_function_from_trait_with_existing_non_empty_impl_block in 1.78s
+2024-10-03 02:25:36 [INFO] - Test 34 | PASSED | PASSED | PASSED: extract_function_long_form_comment in 1.79s
+2024-10-03 02:25:38 [INFO] - Test 35 | FAILED: No Extract Function Assist found for the given selection of assists [] | N/A | N/A: extract_method_from_trait_impl in 1.73s
+2024-10-03 02:25:40 [INFO] - Test 36 | FAILED: No Extract Function Assist found for the given selection of assists [Assist { id: AssistId("extract_variable", RefactorExtract), label: "Extract into variable", group: None, target: 166..176, source_change: None, command: None }] | N/A | N/A: extract_method_from_trait_with_existing_non_empty_impl_block in 1.92s
+2024-10-03 02:25:42 [INFO] - Test 37 | FAILED: No Extract Function Assist found for the given selection of assists [Assist { id: AssistId("extract_module", RefactorExtract), label: "Extract Module", group: None, target: 280..289, source_change: None, command: None }, Assist { id: AssistId("extract_variable", RefactorExtract), label: "Extract into variable", group: None, target: 301..311, source_change: None, command: None }] | N/A | N/A: extract_method_from_trait_with_multiple_existing_impl_blocks in 1.78s
+2024-10-03 02:25:44 [INFO] - Test 38 | FAILED: No Extract Function Assist found for the given selection of assists [Assist { id: AssistId("extract_variable", RefactorExtract), label: "Extract into variable", group: None, target: 441..451, source_change: None, command: None }, Assist { id: AssistId("extract_module", RefactorExtract), label: "Extract Module", group: None, target: 412..422, source_change: None, command: None }] | N/A | N/A: extract_method_from_trait_with_multiple_existing_trait_impl_blocks in 1.74s
+2024-10-03 02:25:45 [INFO] - Test 39 | FAILED: No Extract Function Assist found for the given selection of assists [Assist { id: AssistId("extract_variable", RefactorExtract), label: "Extract into variable", group: None, target: 123..129, source_change: None, command: None }] | N/A | N/A: extract_mut_ref_param_has_no_mut_binding_in_loop in 1.77s
+2024-10-03 02:25:47 [INFO] - Test 40 | PASSED | PASSED | PASSED: extract_partial_block in 1.77s
+2024-10-03 02:25:50 [INFO] - Test 41 | PASSED | PASSED | PASSED: extract_partial_block_single_line in 1.82s
+2024-10-03 02:25:51 [INFO] - Test 42 | PASSED | PASSED | PASSED: extract_return_stmt in 1.72s
+2024-10-03 02:25:53 [INFO] - Test 43 | PASSED | FAILED | FAILED: extract_with_await in 1.37s
+2024-10-03 02:25:54 [INFO] - Test 44 | FAILED: No Extract Function Assist found for the given selection of assists [Assist { id: AssistId("extract_variable", RefactorExtract), label: "Extract into variable", group: None, target: 40..54, source_change: None, command: None }] | N/A | N/A: extract_with_await_and_result_not_producing_match_expr in 1.30s
+2024-10-03 02:25:56 [INFO] - Test 45 | PASSED | FAILED | FAILED: extract_with_await_and_result_producing_match_expr in 1.29s
+2024-10-03 02:25:57 [INFO] - Test 46 | PASSED | FAILED | FAILED: extract_with_await_in_args in 1.28s
+2024-10-03 02:25:58 [INFO] - Test 47 | FAILED: No Extract Function Assist found for the given selection of assists [Assist { id: AssistId("extract_module", RefactorExtract), label: "Extract Module", group: None, target: 90..93, source_change: None, command: None }, Assist { id: AssistId("extract_variable", RefactorExtract), label: "Extract into variable", group: None, target: 90..97, source_change: None, command: None }] | N/A | N/A: extract_with_macro_arg in 1.27s
+2024-10-03 02:26:00 [INFO] - Test 48 | PASSED | FAILED | FAILED: filter_unused_generics in 1.30s
+2024-10-03 02:26:01 [INFO] - Test 49 | PASSED | FAILED | FAILED: filter_unused_where_clause in 1.24s
+2024-10-03 02:26:03 [INFO] - Test 50 | PASSED | PASSED | FAILED: filters_unused_nested_generics in 1.31s
+2024-10-03 02:26:04 [INFO] - Test 51 | PASSED | PASSED | FAILED: filters_unused_nested_where_clauses in 1.25s
+2024-10-03 02:26:05 [INFO] - Test 52 | PASSED | PASSED | FAILED: function_expr in 1.26s
+2024-10-03 02:26:07 [INFO] - Test 53 | PASSED | PASSED | PASSED: indented_stmts in 1.28s
+2024-10-03 02:26:08 [INFO] - Test 54 | PASSED | PASSED | PASSED: indented_stmts_inside_mod in 1.25s
+2024-10-03 02:26:10 [INFO] - Test 55 | PASSED | PASSED | PASSED: it_should_not_generate_duplicate_function_names in 1.36s
+2024-10-03 02:26:11 [INFO] - Test 56 | FAILED: No Extract Function Assist found for the given selection of assists [Assist { id: AssistId("extract_variable", RefactorExtract), label: "Extract into variable", group: None, target: 59..62, source_change: None, command: None }] | N/A | N/A: method_to_freestanding in 1.27s
+2024-10-03 02:26:13 [INFO] - Test 57 | PASSED | FAILED | PASSED: method_with_mut in 1.32s
+2024-10-03 02:26:14 [INFO] - Test 58 | PASSED | PASSED | PASSED: method_with_reference in 1.25s
+2024-10-03 02:26:15 [INFO] - Test 59 | PASSED | PASSED | PASSED: multi_variables_defined_inside_and_used_after_mutably_no_ret in 1.26s
+2024-10-03 02:26:17 [INFO] - Test 60 | PASSED | FAILED | PASSED: mut_field_from_outer_scope in 1.48s
+2024-10-03 02:26:19 [INFO] - Test 61 | PASSED | FAILED | PASSED: mut_method_call in 1.40s
+2024-10-03 02:26:20 [INFO] - Test 62 | PASSED | PASSED | PASSED: mut_nested_field_from_outer_scope in 1.49s
+2024-10-03 02:26:22 [INFO] - Test 63 | PASSED | PASSED | PASSED: mut_param_because_of_mut_ref in 1.40s
+2024-10-03 02:26:24 [INFO] - Test 64 | PASSED | FAILED | FAILED: mut_param_many_usages_expr in 1.34s
+2024-10-03 02:26:25 [INFO] - Test 65 | PASSED | FAILED | FAILED: mut_param_many_usages_stmt in 1.22s
+2024-10-03 02:26:26 [INFO] - Test 66 | PASSED | FAILED | PASSED: mut_var_from_outer_scope in 1.34s
+2024-10-03 02:26:28 [INFO] - Test 67 | PASSED | PASSED | PASSED: nested_generics in 1.27s
+2024-10-03 02:26:29 [INFO] - Test 68 | PASSED | PASSED | PASSED: nested_where_clauses in 1.32s
+2024-10-03 02:26:31 [INFO] - Test 69 | PASSED | PASSED | PASSED: no_args_for in 1.23s
+2024-10-03 02:26:32 [INFO] - Test 70 | FAILED: No Extract Function Assist found for the given selection of assists [Assist { id: AssistId("extract_variable", RefactorExtract), label: "Extract into variable", group: None, target: 20..25, source_change: None, command: None }] | N/A | N/A: no_args_from_binary_expr in 1.37s
+2024-10-03 02:26:34 [INFO] - Test 71 | PASSED | FAILED | FAILED: no_args_from_binary_expr_in_module in 1.40s
+2024-10-03 02:26:35 [INFO] - Test 72 | FAILED: No Extract Function Assist found for the given selection of assists [Assist { id: AssistId("extract_variable", RefactorExtract), label: "Extract into variable", group: None, target: 16..25, source_change: None, command: None }] | N/A | N/A: no_args_from_binary_expr_indented in 1.33s
+2024-10-03 02:26:37 [INFO] - Test 73 | PASSED | PASSED | PASSED: no_args_from_loop_unit in 1.36s
+2024-10-03 02:26:38 [INFO] - Test 74 | PASSED | PASSED | PASSED: no_args_from_loop_with_return in 1.21s
+2024-10-03 02:26:39 [INFO] - Test 75 | PASSED | PASSED | PASSED: no_args_from_match in 1.19s
+2024-10-03 02:26:41 [INFO] - Test 76 | PASSED | PASSED | PASSED: no_args_from_stmt_unit in 1.36s
+2024-10-03 02:26:42 [INFO] - Test 77 | PASSED | PASSED | PASSED: no_args_from_stmt_with_last_expr in 1.31s
+2024-10-03 02:26:44 [INFO] - Test 78 | PASSED | PASSED | PASSED: no_args_if in 1.23s
+2024-10-03 02:26:45 [INFO] - Test 79 | PASSED | PASSED | PASSED: no_args_if_else in 1.41s
+2024-10-03 02:26:47 [INFO] - Test 80 | PASSED | PASSED | PASSED: no_args_if_let_else in 1.33s
+2024-10-03 02:26:48 [INFO] - Test 81 | PASSED | PASSED | PASSED: no_args_match in 1.34s
+2024-10-03 02:26:50 [INFO] - Test 82 | PASSED | PASSED | PASSED: no_args_while in 1.47s
+2024-10-03 02:26:52 [INFO] - Test 83 | PASSED | FAILED | PASSED: non_tail_expr_of_tail_expr_loop in 1.36s
+2024-10-03 02:26:53 [INFO] - Test 84 | PASSED | FAILED | FAILED: non_tail_expr_of_tail_if_block in 1.35s
+2024-10-03 02:26:55 [INFO] - Test 85 | PASSED | FAILED | PASSED: non_tail_expr_with_comment_of_tail_expr_loop in 1.37s
+2024-10-03 02:26:58 [INFO] - Test 86 | PASSED | PASSED | PASSED: nontrivial_patterns_define_variables in 2.77s
+2024-10-03 02:26:59 [INFO] - Test 87 | PASSED | PASSED | FAILED: param_from_closure in 1.37s
+2024-10-03 02:27:01 [INFO] - Test 88 | PASSED | PASSED | PASSED: param_usage_in_macro in 1.40s
+2024-10-03 02:27:02 [INFO] - Test 89 | PASSED | FAILED | PASSED: param_usage_in_macro_with_nested_tt in 1.46s
+2024-10-03 02:27:04 [INFO] - Test 90 | PASSED | PASSED | PASSED: param_usage_in_macro_with_nested_tt_2 in 1.28s
+2024-10-03 02:27:05 [INFO] - Test 91 | FAILED: No Extract Function Assist found for the given selection of assists [Assist { id: AssistId("extract_variable", RefactorExtract), label: "Extract into variable", group: None, target: 16..21, source_change: None, command: None }] | N/A | N/A: part_of_expr_stmt in 1.24s
+2024-10-03 02:27:07 [INFO] - Test 92 | PASSED | FAILED | FAILED: preserve_generics in 1.30s
+2024-10-03 02:27:08 [INFO] - Test 93 | PASSED | PASSED | PASSED: preserve_generics_from_body in 1.30s
+2024-10-03 02:27:09 [INFO] - Test 94 | PASSED | FAILED | FAILED: preserve_where_clause in 1.25s
+2024-10-03 02:27:12 [INFO] - Test 95 | PASSED | FAILED | FAILED: reference_mutable_param_with_further_usages in 2.71s
+2024-10-03 02:27:14 [INFO] - Test 96 | PASSED | FAILED | FAILED: reference_mutable_param_without_further_usages in 1.39s
+2024-10-03 02:27:15 [INFO] - Test 97 | PASSED | PASSED | PASSED: return_from_nested_fn in 1.50s
+2024-10-03 02:27:17 [INFO] - Test 98 | PASSED | FAILED | PASSED: return_from_nested_loop in 1.45s
+2024-10-03 02:27:19 [INFO] - Test 99 | PASSED | FAILED | PASSED: return_to_parent in 1.26s
+2024-10-03 02:27:20 [INFO] - Test 100 | PASSED | PASSED | PASSED: should_increment_suffix_until_it_finds_space in 1.26s
+2024-10-03 02:27:21 [INFO] - Test 101 | PASSED | Error: Parse error: expected `;` | FAILED: struct_with_two_fields_pattern_define_variables in 1.26s
+2024-10-03 02:27:23 [INFO] - Test 102 | PASSED | FAILED | FAILED: tail_expr_no_extra_control_flow in 1.35s
+2024-10-03 02:27:24 [INFO] - Test 103 | PASSED | FAILED | FAILED: tail_expr_of_tail_block_nested in 1.31s
+2024-10-03 02:27:26 [INFO] - Test 104 | PASSED | FAILED | FAILED: try_and_return_ok in 1.30s
+2024-10-03 02:27:27 [INFO] - Test 105 | PASSED | FAILED | FAILED: try_option in 1.40s
+2024-10-03 02:27:29 [INFO] - Test 106 | PASSED | FAILED | FAILED: try_option_unit in 1.30s
+2024-10-03 02:27:30 [INFO] - Test 107 | PASSED | FAILED | FAILED: try_option_with_return in 1.32s
+2024-10-03 02:27:32 [INFO] - Test 108 | PASSED | FAILED | FAILED: try_result in 1.45s
+2024-10-03 02:27:33 [INFO] - Test 109 | PASSED | FAILED | FAILED: try_result_with_return in 1.24s
+2024-10-03 02:27:34 [INFO] - Test 110 | PASSED | PASSED | PASSED: two_arguments_form_expr in 1.31s
+2024-10-03 02:27:36 [INFO] - Test 111 | PASSED | PASSED | PASSED: two_variables_defined_inside_and_used_after_no_ret in 1.38s
+2024-10-03 02:27:37 [INFO] - Test 112 | PASSED | FAILED | FAILED: unresolveable_types_default_to_placeholder in 1.29s
+2024-10-03 02:27:39 [INFO] - Test 113 | PASSED | PASSED | PASSED: variable_defined_inside_and_used_after_mutably_no_ret in 1.24s
+2024-10-03 02:27:41 [INFO] - Test 114 | PASSED | PASSED | PASSED: variable_defined_inside_and_used_after_no_ret in 1.38s
+2024-10-03 02:27:41 [INFO] - ------------------------------------------------------------------
+2024-10-03 02:27:41 [INFO] - Total tests run: 114
+2024-10-03 02:27:41 [INFO] - Tests passed stage 1: 98
+2024-10-03 02:27:41 [INFO] - Tests passed: 56
+2024-10-03 02:27:41 [INFO] - Tests failed: 58
+2024-10-03 02:27:41 [INFO] - Total time: 193.31s
+2024-10-03 02:27:41 [INFO] - Average time per test: 1.53s
+2024-10-03 02:27:41 [INFO] - Shortest test time: 1.19s
+2024-10-03 02:27:41 [INFO] - Longest test time: 3.74s

@@ -1,0 +1,17 @@
+2024-10-03 01:55:06 [INFO] - Application Started
+2024-10-03 01:55:06 [INFO] - Running 'test' subcommand
+2024-10-03 01:55:06 [INFO] - Verbose: yes
+2024-10-03 01:55:06 [INFO] - Starting tests...
+2024-10-03 01:55:31 [INFO] - Test 1 | PASSED | PASSED | PASSED: argument_and_locals in 24.90s
+2024-10-03 01:55:33 [INFO] - Test 2 | FAILED: No Extract Function Assist found for the given selection of assists [] | N/A | N/A: argument_form_expr in 1.30s
+2024-10-03 01:55:34 [INFO] - Test 3 | FAILED: No Extract Function Assist found for the given selection of assists [] | N/A | N/A: argument_used_twice_form_expr in 1.28s
+2024-10-03 01:55:35 [INFO] - Test 4 | PASSED | PASSED | PASSED: break_from_nested_and_outer_loops in 1.23s
+2024-10-03 01:55:37 [INFO] - Test 5 | PASSED | PASSED | PASSED: break_from_nested_loop in 1.28s
+2024-10-03 01:55:38 [INFO] - Test 6 | PASSED | PASSED | PASSED: break_loop in 1.24s
+2024-10-03 01:55:40 [INFO] - Test 7 | PASSED | PASSED | PASSED: break_loop_nested in 1.21s
+2024-10-03 01:55:41 [INFO] - Test 8 | FAILED: No Extract Function Assist found for the given selection of assists [] | N/A | N/A: break_loop_nested_labeled in 1.24s
+2024-10-03 01:55:42 [INFO] - Test 9 | PASSED | PASSED | PASSED: break_loop_with_if in 1.23s
+2024-10-03 01:55:44 [INFO] - Test 10 | PASSED | PASSED | FAILED: break_stmt in 1.36s
+2024-10-03 01:55:45 [INFO] - Test 11 | PASSED | PASSED | PASSED: break_with_value in 1.29s
+2024-10-03 01:55:47 [INFO] - Test 12 | PASSED | PASSED | PASSED: break_with_value_and_label in 1.30s
+2024-10-03 01:55:48 [INFO] - Test 13 | PASSED | FAILED | PASSED: break_with_value_and_return in 1.21s

@@ -1,0 +1,25 @@
+2025-02-08 14:27:32 [INFO] - Application Started
+2025-02-08 14:27:32 [INFO] - Running 'run' subcommand
+2025-02-08 14:27:32 [INFO] - File Path: "/home/matt/rem-matt/rem-extract/test_crates/sample_project/src/main.rs"
+2025-02-08 14:27:32 [INFO] - New Function Name: fun_name
+2025-02-08 14:27:32 [INFO] - Start Index: 63
+2025-02-08 14:27:32 [INFO] - End Index: 75
+2025-02-08 14:27:32 [INFO] - Verbose: no
+2025-02-08 14:27:32 [INFO] - Output Code: fn main() {
+    test_incr();
+}
+
+fn ref_incr(x: &mut i32) {
+    fun_name(x);
+}
+
+fn fun_name(x: &mut i32) {
+    *x = *x + 1;
+}
+
+fn test_incr() {
+    let mut y = 0i32;
+    ref_incr(&mut y);
+    assert!(y == 1);
+}
+2025-02-08 14:27:32 [INFO] - Caller Method: ref_incr
