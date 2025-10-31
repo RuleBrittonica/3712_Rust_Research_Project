@@ -30,6 +30,7 @@ clap = { workspace = true, features = ["derive"] }
 rem-extract = { workspace = true }
 rem-repairer = { workspace = true }
 rem-utils = { workspace = true }
+once_cell = "1.21.3"
 
 [build-dependencies]
 

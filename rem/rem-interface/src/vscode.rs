@@ -25,7 +25,7 @@ pub struct Envelope<T> {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Schema {
-    pub name: &'static str,
+    pub name: String,
     pub version: u32,
 }
 
@@ -94,7 +94,7 @@ pub struct Timing {
 
 pub fn ok_extract(extracted_fn: String, callsite: String, timings: Vec<Timing>) -> Envelope<ExtractData> {
     Envelope {
-        schema: Schema { name: SCHEMA_NAME, version: SCHEMA_VERSION },
+        schema: Schema { name: SCHEMA_NAME.to_string(), version: SCHEMA_VERSION },
         op: Operation::Extract,
         ok: true,
         data: Some(ExtractData { extracted_fn, callsite }),
@@ -107,7 +107,7 @@ pub fn ok_extract(extracted_fn: String, callsite: String, timings: Vec<Timing>) 
 
 pub fn err_extract(error: RemError, diagnostics: Vec<Diagnostic>) -> Envelope<ExtractData> {
     Envelope {
-        schema: Schema { name: SCHEMA_NAME, version: SCHEMA_VERSION },
+        schema: Schema { name: SCHEMA_NAME.to_string(), version: SCHEMA_VERSION },
         op: Operation::Extract,
         ok: false,
         data: None,

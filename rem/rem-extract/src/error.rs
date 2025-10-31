@@ -47,3 +47,4 @@ impl From<SynError> for ExtractionError {
         ExtractionError::Parse(error)
     }
 }
+

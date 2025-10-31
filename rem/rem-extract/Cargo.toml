@@ -1,7 +1,3 @@
-[[bin]]
-name = "rem-extract"
-path = "src/main.rs"
-
 [package]
 name        = "rem-extract"
 version     = "0.1.3"
@@ -30,6 +26,7 @@ clap          = { workspace = true, features = ["derive"] }
 lazy_static   = { workspace = true }
 cov-mark      = { workspace = true }
 syn           = { workspace = true, features = ["full"] }
+serde_json    = { workspace = true }
 
 rem-utils     = { workspace = true }
 rem-interface = { workspace = true }
@@ -56,3 +53,7 @@ default = []
 [lib]
 name = "rem_extract"
 path = "src/lib.rs"
+
+[[bin]]
+name = "rem-extract"
+path = "src/main.rs"

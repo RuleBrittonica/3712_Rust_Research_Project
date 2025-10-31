@@ -186,6 +186,9 @@ pub fn extract_method(input: ExtractionInput) -> Result<(String, String), Extrac
         end_idx,
     );
 
+    // MARKER: Database Loaded
+    mx::mark("Database Loaded");
+
     // Before we go too far, lets do few more quick checks now that we have the
     // analysis
     // 1. Check if the function to extract is not just a comment
@@ -203,6 +206,9 @@ pub fn extract_method(input: ExtractionInput) -> Result<(String, String), Extrac
     mx::mark("Run the analysis");
 
     let analysis_host: AnalysisHost = AnalysisHost::with_database( db );
+
+    // MARKER: Get the analysis
+    mx::mark("Get the analysis");
     let analysis: Analysis = run_analysis( analysis_host );
 
     // MARKER: Get the assists and filter for extract function assist

@@ -23,6 +23,7 @@ struct Recorder {
 
 #[derive(Clone)]
 struct Marker {
+    #[allow(unused)]
     id: u32,
     name: String,
     t: Instant,
