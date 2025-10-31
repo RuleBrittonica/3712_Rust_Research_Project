@@ -19,24 +19,15 @@ pub struct EXTRACTArgs {
 pub enum EXTRACTCommands {
     /// Start or connect to the background analysis server
     Daemon {
-        #[arg(long)]
-        manifest_path: Option<PathBuf>,
-        #[arg(long, default_value_t = 1)]
-        workers: usize,
-        #[arg(long)]
-        socket: Option<PathBuf>, // unix domain socket / named pipe
+        manifest_path: PathBuf,
     },
 
     Close {
-        #[arg(long)]
-        socket: Option<PathBuf>, // unix domain socket / named pipe
+        manifest_path: PathBuf,
     },
 
     // Run the extraction process with specific arguments
     Extract {
-        #[arg(help = "The path to the Cargo.toml manifest file")]
-        manifest_path: PathBuf,
-
         #[arg(help = "The path to the file to refactor")]
         file_path: PathBuf,
 

@@ -1,9 +1,1 @@
-2025-10-31 20:15:53 [INFO] - Application Started
-2025-10-31 20:15:53 [INFO] - Running 'extract' subcommand
-2025-10-31 20:15:53 [INFO] - File Path: "examples/example1/src/main.rs"
-2025-10-31 20:15:53 [INFO] - New Function Name: extracted_function
-2025-10-31 20:15:53 [INFO] - Start Index: 39
-2025-10-31 20:15:53 [INFO] - End Index: 60
-2025-10-31 20:15:53 [INFO] - Verbose: no
-2025-10-31 20:15:53 [INFO] - Metrics: yes
-2025-10-31 20:15:53 [INFO] - JSON: no
+2025-10-31 22:40:56 [INFO] - Application Started

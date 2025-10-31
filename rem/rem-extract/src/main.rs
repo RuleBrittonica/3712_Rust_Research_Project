@@ -37,7 +37,7 @@ use serde_json;
 
 mod error;
 
-mod daemon; 
+mod daemon;
 
 use clap::Parser;
 
@@ -49,7 +49,20 @@ fn main() {
     let args: EXTRACTArgs = EXTRACTArgs::parse();
 
     match &args.command {
+        EXTRACTCommands::Daemon {
+            manifest_path
+        } => {
+            let _ = daemon::run_daemon(manifest_path.to_path_buf());
+        },
+
+        EXTRACTCommands::Close {
+            manifest_path
+        } => {
+            let _ = daemon::close_daemon(manifest_path.to_path_buf());
+        },
+
         EXTRACTCommands::Extract {
+
             file_path,
             new_fn_name,
             start_index,

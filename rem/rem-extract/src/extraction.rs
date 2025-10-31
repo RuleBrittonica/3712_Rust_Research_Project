@@ -206,9 +206,6 @@ pub fn extract_method(input: ExtractionInput) -> Result<(String, String), Extrac
     mx::mark("Run the analysis");
 
     let analysis_host: AnalysisHost = AnalysisHost::with_database( db );
-
-    // MARKER: Get the analysis
-    mx::mark("Get the analysis");
     let analysis: Analysis = run_analysis( analysis_host );
 
     // MARKER: Get the assists and filter for extract function assist

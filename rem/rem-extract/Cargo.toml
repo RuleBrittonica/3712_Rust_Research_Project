@@ -27,6 +27,11 @@ lazy_static   = { workspace = true }
 cov-mark      = { workspace = true }
 syn           = { workspace = true, features = ["full"] }
 serde_json    = { workspace = true }
+walkdir       = { workspace = true }
+notify        = { workspace = true }
+ctrlc         = { workspace = true }
+anyhow        = { workspace = true }
+sha2          = { workspace = true }
 
 rem-utils     = { workspace = true }
 rem-interface = { workspace = true }
@@ -41,6 +46,7 @@ ra_ap_project_model    = { workspace = true }
 ra_ap_vfs              = { workspace = true }
 ra_ap_parser           = { workspace = true }
 ra_ap_syntax           = { workspace = true }
+
 
 [build-dependencies]
 
