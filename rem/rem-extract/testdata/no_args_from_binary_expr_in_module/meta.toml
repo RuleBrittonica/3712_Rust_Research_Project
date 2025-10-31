@@ -1,0 +1,4 @@
+name = "no_args_from_binary_expr_in_module"
+start = 39
+end = 44
+new_fn_name = "fun_name"

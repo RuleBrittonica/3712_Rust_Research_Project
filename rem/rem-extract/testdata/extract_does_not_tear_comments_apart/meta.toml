@@ -1,0 +1,4 @@
+name = "extract_does_not_tear_comments_apart"
+start = 18
+end = 52
+new_fn_name = "fun_name"

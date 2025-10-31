@@ -1,0 +1,4 @@
+name = "extract_does_not_wrap_res_in_res"
+start = 35
+end = 74
+new_fn_name = "fun_name"

@@ -1,0 +1,7 @@
+[package]
+name = "two_arguments_form_expr"
+version = "0.1.0"
+
+[dependencies]
+
+[workspace]

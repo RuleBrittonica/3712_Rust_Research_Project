@@ -1,0 +1,4 @@
+name = "break_loop_nested_labeled"
+start = 58
+end = 69
+new_fn_name = "fun_name"

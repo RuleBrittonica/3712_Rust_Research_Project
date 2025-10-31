@@ -1,0 +1,4 @@
+name = "does_not_add_extra_whitespace"
+start = 27
+end = 39
+new_fn_name = "fun_name"

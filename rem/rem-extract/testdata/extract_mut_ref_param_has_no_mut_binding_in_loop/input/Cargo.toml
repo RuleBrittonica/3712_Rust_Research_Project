@@ -1,0 +1,7 @@
+[package]
+name = "extract_mut_ref_param_has_no_mut_binding_in_loop"
+version = "0.1.0"
+
+[dependencies]
+
+[workspace]

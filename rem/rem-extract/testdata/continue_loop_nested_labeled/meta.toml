@@ -1,0 +1,4 @@
+name = "continue_loop_nested_labeled"
+start = 58
+end = 72
+new_fn_name = "fun_name"

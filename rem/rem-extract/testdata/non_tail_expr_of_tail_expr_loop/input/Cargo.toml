@@ -1,0 +1,7 @@
+[package]
+name = "non_tail_expr_of_tail_expr_loop"
+version = "0.1.0"
+
+[dependencies]
+
+[workspace]

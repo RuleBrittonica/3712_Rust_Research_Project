@@ -1,0 +1,4 @@
+name = "no_args_while"
+start = 16
+end = 30
+new_fn_name = "fun_name"

@@ -1,0 +1,7 @@
+[package]
+name = "no_args_if_else"
+version = "0.1.0"
+
+[dependencies]
+
+[workspace]

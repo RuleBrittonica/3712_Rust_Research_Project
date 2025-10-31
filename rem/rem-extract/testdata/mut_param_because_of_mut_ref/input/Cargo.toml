@@ -1,0 +1,7 @@
+[package]
+name = "mut_param_because_of_mut_ref"
+version = "0.1.0"
+
+[dependencies]
+
+[workspace]

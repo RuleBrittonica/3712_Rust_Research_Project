@@ -1,0 +1,4 @@
+name = "no_args_from_binary_expr_indented"
+start = 16
+end = 25
+new_fn_name = "fun_name"

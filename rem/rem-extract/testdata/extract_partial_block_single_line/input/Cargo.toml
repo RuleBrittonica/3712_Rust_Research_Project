@@ -1,0 +1,7 @@
+[package]
+name = "extract_partial_block_single_line"
+version = "0.1.0"
+
+[dependencies]
+
+[workspace]

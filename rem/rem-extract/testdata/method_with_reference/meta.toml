@@ -1,0 +1,4 @@
+name = "method_with_reference"
+start = 70
+end = 83
+new_fn_name = "fun_name"

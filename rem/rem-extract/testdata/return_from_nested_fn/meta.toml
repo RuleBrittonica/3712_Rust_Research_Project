@@ -1,0 +1,4 @@
+name = "return_from_nested_fn"
+start = 52
+end = 139
+new_fn_name = "fun_name"

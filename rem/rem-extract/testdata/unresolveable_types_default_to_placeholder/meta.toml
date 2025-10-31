@@ -1,0 +1,4 @@
+name = "unresolveable_types_default_to_placeholder"
+start = 51
+end = 54
+new_fn_name = "fun_name"

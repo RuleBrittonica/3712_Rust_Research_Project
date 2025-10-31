@@ -1,0 +1,4 @@
+name = "nontrivial_patterns_define_variables"
+start = 38
+end = 66
+new_fn_name = "fun_name"

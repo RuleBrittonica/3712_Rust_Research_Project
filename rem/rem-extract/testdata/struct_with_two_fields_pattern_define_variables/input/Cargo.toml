@@ -1,0 +1,7 @@
+[package]
+name = "struct_with_two_fields_pattern_define_variables"
+version = "0.1.0"
+
+[dependencies]
+
+[workspace]

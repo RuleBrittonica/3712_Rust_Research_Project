@@ -1,0 +1,4 @@
+name = "empty_generic_param_list"
+start = 52
+end = 59
+new_fn_name = "fun_name"

@@ -1,0 +1,4 @@
+name = "extract_with_macro_arg"
+start = 22
+end = 30
+new_fn_name = "fun_name"

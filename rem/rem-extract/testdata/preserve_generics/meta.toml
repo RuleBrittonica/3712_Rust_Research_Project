@@ -1,0 +1,4 @@
+name = "preserve_generics"
+start = 31
+end = 38
+new_fn_name = "fun_name"

@@ -1,0 +1,7 @@
+[package]
+name = "extract_function_copies_comment_in_between"
+version = "0.1.0"
+
+[dependencies]
+
+[workspace]

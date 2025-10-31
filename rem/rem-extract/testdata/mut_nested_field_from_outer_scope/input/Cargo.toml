@@ -1,0 +1,7 @@
+[package]
+name = "mut_nested_field_from_outer_scope"
+version = "0.1.0"
+
+[dependencies]
+
+[workspace]

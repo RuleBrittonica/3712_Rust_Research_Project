@@ -1,0 +1,4 @@
+name = "extract_method_from_trait_with_multiple_existing_trait_impl_blocks"
+start = 441
+end = 451
+new_fn_name = "fun_name"

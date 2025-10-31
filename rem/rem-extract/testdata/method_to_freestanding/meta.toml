@@ -1,0 +1,4 @@
+name = "method_to_freestanding"
+start = 59
+end = 62
+new_fn_name = "fun_name"

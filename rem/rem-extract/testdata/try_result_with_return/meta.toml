@@ -1,0 +1,4 @@
+name = "try_result_with_return"
+start = 51
+end = 135
+new_fn_name = "fun_name"

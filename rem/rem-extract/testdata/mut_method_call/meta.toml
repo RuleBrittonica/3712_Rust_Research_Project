@@ -1,0 +1,4 @@
+name = "mut_method_call"
+start = 133
+end = 141
+new_fn_name = "fun_name"

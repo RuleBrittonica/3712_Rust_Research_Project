@@ -1,0 +1,4 @@
+name = "should_increment_suffix_until_it_finds_space"
+start = 60
+end = 70
+new_fn_name = "fun_name"

@@ -1,0 +1,7 @@
+[package]
+name = "non_tail_expr_of_tail_if_block"
+version = "0.1.0"
+
+[dependencies]
+
+[workspace]

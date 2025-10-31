@@ -1,0 +1,7 @@
+[package]
+name = "extract_function_copies_comment_at_start"
+version = "0.1.0"
+
+[dependencies]
+
+[workspace]

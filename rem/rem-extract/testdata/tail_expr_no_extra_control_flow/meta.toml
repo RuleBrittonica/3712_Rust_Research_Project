@@ -1,0 +1,4 @@
+name = "tail_expr_no_extra_control_flow"
+start = 39
+end = 92
+new_fn_name = "fun_name"

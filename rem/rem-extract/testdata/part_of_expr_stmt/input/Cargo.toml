@@ -1,0 +1,7 @@
+[package]
+name = "part_of_expr_stmt"
+version = "0.1.0"
+
+[dependencies]
+
+[workspace]

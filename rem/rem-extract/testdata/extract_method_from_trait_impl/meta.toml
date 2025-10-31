@@ -1,0 +1,4 @@
+name = "extract_method_from_trait_impl"
+start = 129
+end = 139
+new_fn_name = "fun_name"

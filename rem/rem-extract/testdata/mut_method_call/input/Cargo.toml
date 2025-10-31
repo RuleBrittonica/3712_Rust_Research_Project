@@ -1,0 +1,7 @@
+[package]
+name = "mut_method_call"
+version = "0.1.0"
+
+[dependencies]
+
+[workspace]

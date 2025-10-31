@@ -1,0 +1,4 @@
+name = "extract_mut_ref_param_has_no_mut_binding_in_loop"
+start = 140
+end = 148
+new_fn_name = "fun_name"

@@ -1,0 +1,4 @@
+name = "struct_with_two_fields_pattern_define_variables"
+start = 52
+end = 101
+new_fn_name = "fun_name"

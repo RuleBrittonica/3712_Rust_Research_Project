@@ -1,0 +1,4 @@
+name = "extract_function_copies_comment_indented"
+start = 33
+end = 95
+new_fn_name = "fun_name"

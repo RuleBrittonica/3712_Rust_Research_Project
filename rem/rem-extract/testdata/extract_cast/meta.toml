@@ -1,0 +1,4 @@
+name = "extract_cast"
+start = 25
+end = 36
+new_fn_name = "fun_name"

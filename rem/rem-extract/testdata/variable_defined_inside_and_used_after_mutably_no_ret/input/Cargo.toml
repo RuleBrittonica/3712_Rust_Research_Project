@@ -1,0 +1,7 @@
+[package]
+name = "variable_defined_inside_and_used_after_mutably_no_ret"
+version = "0.1.0"
+
+[dependencies]
+
+[workspace]

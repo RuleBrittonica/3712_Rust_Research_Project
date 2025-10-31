@@ -1,0 +1,4 @@
+name = "extract_with_await_and_result_producing_match_expr"
+start = 55
+end = 170
+new_fn_name = "fun_name"

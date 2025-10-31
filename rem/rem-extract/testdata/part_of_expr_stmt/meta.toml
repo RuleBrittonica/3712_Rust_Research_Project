@@ -1,0 +1,4 @@
+name = "part_of_expr_stmt"
+start = 16
+end = 17
+new_fn_name = "fun_name"

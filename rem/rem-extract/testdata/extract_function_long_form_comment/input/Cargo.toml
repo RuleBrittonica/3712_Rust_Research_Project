@@ -1,0 +1,7 @@
+[package]
+name = "extract_function_long_form_comment"
+version = "0.1.0"
+
+[dependencies]
+
+[workspace]

@@ -1,0 +1,7 @@
+[package]
+name = "reference_mutable_param_with_further_usages"
+version = "0.1.0"
+
+[dependencies]
+
+[workspace]

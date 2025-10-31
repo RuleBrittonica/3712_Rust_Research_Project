@@ -1,0 +1,4 @@
+name = "dont_emit_type_with_hidden_lifetime_parameter"
+start = 73
+end = 80
+new_fn_name = "fun_name"

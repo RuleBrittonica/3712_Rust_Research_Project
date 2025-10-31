@@ -1,0 +1,4 @@
+name = "extract_with_await_in_args"
+start = 17
+end = 59
+new_fn_name = "fun_name"

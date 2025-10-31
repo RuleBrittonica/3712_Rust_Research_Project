@@ -1,0 +1,4 @@
+name = "reference_mutable_param_without_further_usages"
+start = 76
+end = 90
+new_fn_name = "fun_name"

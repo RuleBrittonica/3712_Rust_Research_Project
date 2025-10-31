@@ -1,0 +1,4 @@
+name = "indented_stmts_inside_mod"
+start = 82
+end = 120
+new_fn_name = "fun_name"

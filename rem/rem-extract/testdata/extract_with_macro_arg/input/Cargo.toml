@@ -1,0 +1,7 @@
+[package]
+name = "extract_with_macro_arg"
+version = "0.1.0"
+
+[dependencies]
+
+[workspace]

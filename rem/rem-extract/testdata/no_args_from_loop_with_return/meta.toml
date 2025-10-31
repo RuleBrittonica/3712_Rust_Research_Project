@@ -1,0 +1,4 @@
+name = "no_args_from_loop_with_return"
+start = 24
+end = 75
+new_fn_name = "fun_name"

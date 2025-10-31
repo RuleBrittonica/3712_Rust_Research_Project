@@ -1,0 +1,4 @@
+name = "mut_param_because_of_mut_ref"
+start = 36
+end = 65
+new_fn_name = "fun_name"

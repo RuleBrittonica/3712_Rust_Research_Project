@@ -1,0 +1,4 @@
+name = "closure_arguments"
+start = 57
+end = 88
+new_fn_name = "fun_name"

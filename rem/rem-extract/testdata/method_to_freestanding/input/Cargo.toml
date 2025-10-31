@@ -1,0 +1,7 @@
+[package]
+name = "method_to_freestanding"
+version = "0.1.0"
+
+[dependencies]
+
+[workspace]

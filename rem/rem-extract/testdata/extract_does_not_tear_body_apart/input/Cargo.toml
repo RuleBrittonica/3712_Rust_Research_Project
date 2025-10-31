@@ -1,0 +1,7 @@
+[package]
+name = "extract_does_not_tear_body_apart"
+version = "0.1.0"
+
+[dependencies]
+
+[workspace]

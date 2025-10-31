@@ -1,0 +1,7 @@
+[package]
+name = "does_not_import_control_flow"
+version = "0.1.0"
+
+[dependencies]
+
+[workspace]

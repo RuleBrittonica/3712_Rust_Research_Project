@@ -1,0 +1,7 @@
+[package]
+name = "mut_param_many_usages_stmt"
+version = "0.1.0"
+
+[dependencies]
+
+[workspace]

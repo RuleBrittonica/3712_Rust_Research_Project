@@ -1,0 +1,7 @@
+[package]
+name = "extract_method_from_trait_impl"
+version = "0.1.0"
+
+[dependencies]
+
+[workspace]

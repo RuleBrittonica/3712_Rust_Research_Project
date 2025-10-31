@@ -1,0 +1,7 @@
+[package]
+name = "break_from_nested_and_outer_loops"
+version = "0.1.0"
+
+[dependencies]
+
+[workspace]

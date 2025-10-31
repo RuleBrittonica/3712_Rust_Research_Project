@@ -1,0 +1,4 @@
+name = "break_with_value_and_label"
+start = 65
+end = 159
+new_fn_name = "fun_name"

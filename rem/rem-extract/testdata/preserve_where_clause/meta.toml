@@ -1,0 +1,4 @@
+name = "preserve_where_clause"
+start = 39
+end = 46
+new_fn_name = "fun_name"

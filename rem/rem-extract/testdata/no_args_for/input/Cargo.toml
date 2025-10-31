@@ -1,0 +1,7 @@
+[package]
+name = "no_args_for"
+version = "0.1.0"
+
+[dependencies]
+
+[workspace]

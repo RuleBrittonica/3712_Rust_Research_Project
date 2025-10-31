@@ -1,0 +1,4 @@
+name = "no_args_from_stmt_with_last_expr"
+start = 39
+end = 60
+new_fn_name = "fun_name"

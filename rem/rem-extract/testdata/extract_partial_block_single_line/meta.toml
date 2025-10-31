@@ -1,0 +1,4 @@
+name = "extract_partial_block_single_line"
+start = 44
+end = 50
+new_fn_name = "fun_name"

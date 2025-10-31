@@ -1,0 +1,7 @@
+[package]
+name = "it_should_not_generate_duplicate_function_names"
+version = "0.1.0"
+
+[dependencies]
+
+[workspace]

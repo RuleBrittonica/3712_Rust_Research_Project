@@ -1,0 +1,4 @@
+name = "nested_generics"
+start = 155
+end = 174
+new_fn_name = "fun_name"

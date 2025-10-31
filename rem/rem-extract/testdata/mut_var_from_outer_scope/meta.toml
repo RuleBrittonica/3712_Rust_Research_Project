@@ -1,0 +1,4 @@
+name = "mut_var_from_outer_scope"
+start = 36
+end = 43
+new_fn_name = "fun_name"

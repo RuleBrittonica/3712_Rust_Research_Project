@@ -1,0 +1,4 @@
+name = "filter_unused_where_clause"
+start = 70
+end = 77
+new_fn_name = "fun_name"

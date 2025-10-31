@@ -1,0 +1,4 @@
+name = "param_usage_in_macro"
+start = 22
+end = 40
+new_fn_name = "fun_name"

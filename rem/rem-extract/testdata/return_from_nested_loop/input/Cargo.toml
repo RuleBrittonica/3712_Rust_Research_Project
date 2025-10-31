@@ -1,0 +1,7 @@
+[package]
+name = "return_from_nested_loop"
+version = "0.1.0"
+
+[dependencies]
+
+[workspace]

@@ -1,0 +1,4 @@
+name = "method_with_mut"
+start = 67
+end = 79
+new_fn_name = "fun_name"

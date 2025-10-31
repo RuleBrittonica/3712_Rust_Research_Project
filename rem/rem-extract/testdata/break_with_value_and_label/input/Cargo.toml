@@ -1,0 +1,7 @@
+[package]
+name = "break_with_value_and_label"
+version = "0.1.0"
+
+[dependencies]
+
+[workspace]

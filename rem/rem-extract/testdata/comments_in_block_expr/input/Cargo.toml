@@ -1,0 +1,7 @@
+[package]
+name = "comments_in_block_expr"
+version = "0.1.0"
+
+[dependencies]
+
+[workspace]

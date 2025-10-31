@@ -1,0 +1,7 @@
+[package]
+name = "dont_emit_type_with_hidden_lifetime_parameter"
+version = "0.1.0"
+
+[dependencies]
+
+[workspace]

@@ -1,0 +1,4 @@
+name = "extract_function_copies_comment_at_start"
+start = 33
+end = 65
+new_fn_name = "fun_name"

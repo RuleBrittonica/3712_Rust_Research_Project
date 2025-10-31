@@ -1,0 +1,4 @@
+name = "mut_nested_field_from_outer_scope"
+start = 165
+end = 205
+new_fn_name = "fun_name"

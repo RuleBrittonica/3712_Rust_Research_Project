@@ -1,0 +1,4 @@
+name = "extract_function_does_preserve_whitespace"
+start = 33
+end = 61
+new_fn_name = "fun_name"

@@ -1,0 +1,7 @@
+[package]
+name = "break_loop_nested_labeled"
+version = "0.1.0"
+
+[dependencies]
+
+[workspace]

@@ -1,0 +1,7 @@
+[package]
+name = "empty_generic_param_list"
+version = "0.1.0"
+
+[dependencies]
+
+[workspace]

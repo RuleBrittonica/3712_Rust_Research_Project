@@ -1,0 +1,4 @@
+name = "it_should_not_generate_duplicate_function_names"
+start = 21
+end = 31
+new_fn_name = "fun_name"

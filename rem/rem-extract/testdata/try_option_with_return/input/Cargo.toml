@@ -1,0 +1,7 @@
+[package]
+name = "try_option_with_return"
+version = "0.1.0"
+
+[dependencies]
+
+[workspace]

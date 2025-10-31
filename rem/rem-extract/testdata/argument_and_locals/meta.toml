@@ -1,0 +1,4 @@
+name = "argument_and_locals"
+start = 39
+end = 60
+new_fn_name = "fun_name"

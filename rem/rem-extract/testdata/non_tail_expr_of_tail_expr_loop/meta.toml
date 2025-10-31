@@ -1,0 +1,4 @@
+name = "non_tail_expr_of_tail_expr_loop"
+start = 34
+end = 77
+new_fn_name = "fun_name"

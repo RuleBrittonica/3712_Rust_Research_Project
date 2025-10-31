@@ -1,0 +1,7 @@
+[package]
+name = "extract_with_await_and_result_not_producing_match_expr"
+version = "0.1.0"
+
+[dependencies]
+
+[workspace]

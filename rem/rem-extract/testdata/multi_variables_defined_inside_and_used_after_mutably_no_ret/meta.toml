@@ -1,0 +1,4 @@
+name = "multi_variables_defined_inside_and_used_after_mutably_no_ret"
+start = 32
+end = 111
+new_fn_name = "fun_name"
