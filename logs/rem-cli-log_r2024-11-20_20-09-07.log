@@ -1,0 +1,7 @@
+2024-11-20 20:08:38 [INFO] - Application Started
+2024-11-20 20:08:38 [INFO] - Running 'run' subcommand
+2024-11-20 20:08:38 [INFO] - File Path: "./examples/example1.rs"
+2024-11-20 20:08:38 [INFO] - New Function Name: extracted_function
+2024-11-20 20:08:38 [INFO] - Start Index: 39
+2024-11-20 20:08:38 [INFO] - End Index: 60
+2024-11-20 20:08:38 [INFO] - Verbose: no

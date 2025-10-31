@@ -1,0 +1,9 @@
+2024-10-03 02:11:34 [INFO] - Application Started
+2024-10-03 02:11:34 [INFO] - Running 'test' subcommand
+2024-10-03 02:11:34 [INFO] - Verbose: yes
+2024-10-03 02:11:34 [INFO] - Starting tests...
+2024-10-03 02:11:36 [INFO] - Test 1 | PASSED | PASSED | PASSED: argument_and_locals in 1.33s
+2024-10-03 02:11:37 [INFO] - Test 2 | FAILED: No Extract Function Assist found for the given selection of assists [] | N/A | N/A: argument_form_expr in 1.19s
+2024-10-03 02:11:38 [INFO] - Test 3 | FAILED: No Extract Function Assist found for the given selection of assists [] | N/A | N/A: argument_used_twice_form_expr in 1.17s
+2024-10-03 02:11:40 [INFO] - Test 4 | PASSED | PASSED | PASSED: break_from_nested_and_outer_loops in 1.19s
+2024-10-03 02:11:41 [INFO] - Test 5 | PASSED | PASSED | PASSED: break_from_nested_loop in 1.22s

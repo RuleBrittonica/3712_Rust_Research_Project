@@ -1,0 +1,15 @@
+[package]
+name = "example1"
+version = "0.1.0"
+edition = "2021"
+
+authors = ["N/A"]
+
+license = "MIT"
+
+repository = "https://github.com/RuleBrittonica/rem-extract"
+
+description = ""
+
+[dependencies]
+

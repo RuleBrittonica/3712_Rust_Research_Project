@@ -1,0 +1,14 @@
+2024-10-03 02:12:10 [INFO] - Application Started
+2024-10-03 02:12:10 [INFO] - Running 'test' subcommand
+2024-10-03 02:12:10 [INFO] - Verbose: yes
+2024-10-03 02:12:10 [INFO] - Starting tests...
+2024-10-03 02:12:12 [INFO] - Test 15 | PASSED | FAILED | PASSED: comments_in_block_expr in 1.22s
+2024-10-03 02:12:12 [INFO] - ------------------------------------------------------------------
+2024-10-03 02:12:12 [INFO] - Total tests run: 114
+2024-10-03 02:12:12 [INFO] - Tests passed stage 1: 1
+2024-10-03 02:12:12 [INFO] - Tests passed: 0
+2024-10-03 02:12:12 [INFO] - Tests failed: 1
+2024-10-03 02:12:12 [INFO] - Total time: 1.42s
+2024-10-03 02:12:12 [INFO] - Average time per test: 10.72ms
+2024-10-03 02:12:12 [INFO] - Shortest test time: 1.22s
+2024-10-03 02:12:12 [INFO] - Longest test time: 1.22s

@@ -1,0 +1,127 @@
+2024-10-03 11:44:44 [INFO] - Application Started
+2024-10-03 11:44:44 [INFO] - Running 'test' subcommand
+2024-10-03 11:44:44 [INFO] - Verbose: yes
+2024-10-03 11:44:44 [INFO] - Starting tests...
+2024-10-03 11:44:46 [INFO] - Test 1 | PASSED | PASSED | PASSED: argument_and_locals in 1.43s
+2024-10-03 11:44:47 [INFO] - Test 2 | PASSED | PASSED | PASSED: argument_form_expr in 1.35s
+2024-10-03 11:44:49 [INFO] - Test 3 | PASSED | PASSED | PASSED: argument_used_twice_form_expr in 1.46s
+2024-10-03 11:44:51 [INFO] - Test 4 | PASSED | PASSED | PASSED: break_from_nested_and_outer_loops in 1.30s
+2024-10-03 11:44:52 [INFO] - Test 5 | PASSED | PASSED | PASSED: break_from_nested_loop in 1.42s
+2024-10-03 11:44:54 [INFO] - Test 6 | PASSED | PASSED | PASSED: break_loop in 1.39s
+2024-10-03 11:44:55 [INFO] - Test 7 | PASSED | PASSED | PASSED: break_loop_nested in 1.37s
+2024-10-03 11:44:57 [INFO] - Test 8 | PASSED | PASSED | PASSED: break_loop_nested_labeled in 1.61s
+2024-10-03 11:44:59 [INFO] - Test 9 | PASSED | PASSED | PASSED: break_loop_with_if in 1.52s
+2024-10-03 11:45:01 [INFO] - Test 10 | PASSED | PASSED | FAILED: break_stmt in 1.57s
+2024-10-03 11:45:03 [INFO] - Test 11 | PASSED | PASSED | PASSED: break_with_value in 1.63s
+2024-10-03 11:45:04 [INFO] - Test 12 | PASSED | PASSED | PASSED: break_with_value_and_label in 1.52s
+2024-10-03 11:45:06 [INFO] - Test 13 | PASSED | PASSED | PASSED: break_with_value_and_return in 1.52s
+2024-10-03 11:45:08 [INFO] - Test 14 | PASSED | PASSED | PASSED: closure_arguments in 1.64s
+2024-10-03 11:45:12 [INFO] - Test 15 | PASSED | PASSED | PASSED: comments_in_block_expr in 3.19s
+2024-10-03 11:45:14 [INFO] - Test 16 | PASSED | PASSED | PASSED: continue_loop_nested_labeled in 2.46s
+2024-10-03 11:45:18 [INFO] - Test 17 | PASSED | FAILED | PASSED: copy_custom_used_after in 2.98s
+2024-10-03 11:45:20 [INFO] - Test 18 | PASSED | FAILED | PASSED: copy_used_after in 2.32s
+2024-10-03 11:45:24 [INFO] - Test 19 | PASSED | PASSED | PASSED: does_not_add_extra_whitespace in 3.49s
+2024-10-03 11:45:27 [INFO] - Test 20 | PASSED | PASSED | PASSED: does_not_import_control_flow in 2.40s
+2024-10-03 11:45:30 [INFO] - Test 21 | PASSED | PASSED | FAILED: dont_emit_type_with_hidden_lifetime_parameter in 2.40s
+2024-10-03 11:45:34 [INFO] - Test 22 | PASSED | PASSED | FAILED: empty_generic_param_list in 3.55s
+2024-10-03 11:45:36 [INFO] - Test 23 | PASSED | PASSED | FAILED: extract_cast in 1.68s
+2024-10-03 11:45:37 [INFO] - Test 24 | PASSED | PASSED | PASSED: extract_does_not_tear_body_apart in 1.43s
+2024-10-03 11:45:39 [INFO] - Test 25 | PASSED | PASSED | PASSED: extract_does_not_tear_comments_apart in 1.40s
+2024-10-03 11:45:40 [INFO] - Test 26 | PASSED | FAILED | FAILED: extract_does_not_wrap_res_in_res in 1.44s
+2024-10-03 11:45:42 [INFO] - Test 27 | PASSED | Error: Parse error: expected `,` | FAILED: extract_from_nested in 1.30s
+2024-10-03 11:45:43 [INFO] - Test 28 | PASSED | PASSED | PASSED: extract_function_copies_comment_at_end in 1.30s
+2024-10-03 11:45:45 [INFO] - Test 29 | PASSED | PASSED | PASSED: extract_function_copies_comment_at_start in 1.36s
+2024-10-03 11:45:46 [INFO] - Test 30 | PASSED | PASSED | PASSED: extract_function_copies_comment_in_between in 1.29s
+2024-10-03 11:45:48 [INFO] - Test 31 | PASSED | PASSED | PASSED: extract_function_copies_comment_indented in 1.35s
+2024-10-03 11:45:50 [INFO] - Test 32 | PASSED | PASSED | PASSED: extract_function_does_preserve_whitespace in 1.44s
+2024-10-03 11:45:51 [INFO] - Test 33 | PASSED | PASSED | PASSED: extract_function_from_trait_with_existing_non_empty_impl_block in 1.49s
+2024-10-03 11:45:53 [INFO] - Test 34 | PASSED | PASSED | PASSED: extract_function_long_form_comment in 1.41s
+2024-10-03 11:45:54 [INFO] - Test 35 | PASSED | PASSED | PASSED: extract_method_from_trait_impl in 1.32s
+2024-10-03 11:45:56 [INFO] - Test 36 | PASSED | PASSED | PASSED: extract_method_from_trait_with_existing_non_empty_impl_block in 1.36s
+2024-10-03 11:45:58 [INFO] - Test 37 | PASSED | PASSED | PASSED: extract_method_from_trait_with_multiple_existing_impl_blocks in 1.37s
+2024-10-03 11:45:59 [INFO] - Test 38 | PASSED | PASSED | PASSED: extract_method_from_trait_with_multiple_existing_trait_impl_blocks in 1.30s
+2024-10-03 11:46:01 [INFO] - Test 39 | PASSED | PASSED | PASSED: extract_mut_ref_param_has_no_mut_binding_in_loop in 1.32s
+2024-10-03 11:46:02 [INFO] - Test 40 | PASSED | PASSED | PASSED: extract_partial_block in 1.56s
+2024-10-03 11:46:04 [INFO] - Test 41 | PASSED | PASSED | PASSED: extract_partial_block_single_line in 1.36s
+2024-10-03 11:46:05 [INFO] - Test 42 | PASSED | PASSED | PASSED: extract_return_stmt in 1.33s
+2024-10-03 11:46:07 [INFO] - Test 43 | PASSED | PASSED | FAILED: extract_with_await in 1.39s
+2024-10-03 11:46:08 [INFO] - Test 44 | FAILED: No Extract Function Assist found for the given selection of assists [Assist { id: AssistId("extract_variable", RefactorExtract), label: "Extract into variable", group: None, target: 40..54, source_change: None, command: None }] | N/A | N/A: extract_with_await_and_result_not_producing_match_expr in 1.31s
+2024-10-03 11:46:10 [INFO] - Test 45 | PASSED | PASSED | FAILED: extract_with_await_and_result_producing_match_expr in 1.36s
+2024-10-03 11:46:11 [INFO] - Test 46 | PASSED | PASSED | FAILED: extract_with_await_in_args in 1.34s
+2024-10-03 11:46:13 [INFO] - Test 47 | FAILED: No Extract Function Assist found for the given selection of assists [] | N/A | N/A: extract_with_macro_arg in 1.32s
+2024-10-03 11:46:14 [INFO] - Test 48 | PASSED | PASSED | FAILED: filter_unused_generics in 1.27s
+2024-10-03 11:46:15 [INFO] - Test 49 | PASSED | PASSED | FAILED: filter_unused_where_clause in 1.34s
+2024-10-03 11:46:17 [INFO] - Test 50 | PASSED | PASSED | FAILED: filters_unused_nested_generics in 1.34s
+2024-10-03 11:46:18 [INFO] - Test 51 | PASSED | PASSED | FAILED: filters_unused_nested_where_clauses in 1.27s
+2024-10-03 11:46:20 [INFO] - Test 52 | PASSED | PASSED | FAILED: function_expr in 1.36s
+2024-10-03 11:46:21 [INFO] - Test 53 | PASSED | PASSED | PASSED: indented_stmts in 1.56s
+2024-10-03 11:46:23 [INFO] - Test 54 | PASSED | PASSED | PASSED: indented_stmts_inside_mod in 1.45s
+2024-10-03 11:46:25 [INFO] - Test 55 | PASSED | PASSED | PASSED: it_should_not_generate_duplicate_function_names in 1.36s
+2024-10-03 11:46:26 [INFO] - Test 56 | PASSED | PASSED | PASSED: method_to_freestanding in 1.29s
+2024-10-03 11:46:28 [INFO] - Test 57 | PASSED | PASSED | PASSED: method_with_mut in 1.41s
+2024-10-03 11:46:29 [INFO] - Test 58 | PASSED | PASSED | PASSED: method_with_reference in 1.42s
+2024-10-03 11:46:31 [INFO] - Test 59 | PASSED | PASSED | PASSED: multi_variables_defined_inside_and_used_after_mutably_no_ret in 1.42s
+2024-10-03 11:46:33 [INFO] - Test 60 | PASSED | PASSED | PASSED: mut_field_from_outer_scope in 1.36s
+2024-10-03 11:46:34 [INFO] - Test 61 | PASSED | PASSED | PASSED: mut_method_call in 1.34s
+2024-10-03 11:46:36 [INFO] - Test 62 | PASSED | PASSED | PASSED: mut_nested_field_from_outer_scope in 1.31s
+2024-10-03 11:46:37 [INFO] - Test 63 | PASSED | PASSED | PASSED: mut_param_because_of_mut_ref in 1.33s
+2024-10-03 11:46:39 [INFO] - Test 64 | PASSED | PASSED | FAILED: mut_param_many_usages_expr in 1.33s
+2024-10-03 11:46:40 [INFO] - Test 65 | PASSED | PASSED | FAILED: mut_param_many_usages_stmt in 1.36s
+2024-10-03 11:46:42 [INFO] - Test 66 | PASSED | PASSED | PASSED: mut_var_from_outer_scope in 1.31s
+2024-10-03 11:46:43 [INFO] - Test 67 | PASSED | PASSED | PASSED: nested_generics in 1.37s
+2024-10-03 11:46:45 [INFO] - Test 68 | PASSED | PASSED | PASSED: nested_where_clauses in 1.35s
+2024-10-03 11:46:46 [INFO] - Test 69 | PASSED | PASSED | PASSED: no_args_for in 1.36s
+2024-10-03 11:46:48 [INFO] - Test 70 | PASSED | PASSED | FAILED: no_args_from_binary_expr in 1.32s
+2024-10-03 11:46:49 [INFO] - Test 71 | PASSED | PASSED | FAILED: no_args_from_binary_expr_in_module in 1.33s
+2024-10-03 11:46:51 [INFO] - Test 72 | PASSED | PASSED | PASSED: no_args_from_binary_expr_indented in 1.31s
+2024-10-03 11:46:52 [INFO] - Test 73 | PASSED | PASSED | PASSED: no_args_from_loop_unit in 1.33s
+2024-10-03 11:46:54 [INFO] - Test 74 | PASSED | PASSED | PASSED: no_args_from_loop_with_return in 1.35s
+2024-10-03 11:46:55 [INFO] - Test 75 | PASSED | PASSED | PASSED: no_args_from_match in 1.30s
+2024-10-03 11:46:57 [INFO] - Test 76 | PASSED | PASSED | PASSED: no_args_from_stmt_unit in 1.38s
+2024-10-03 11:46:59 [INFO] - Test 77 | PASSED | PASSED | PASSED: no_args_from_stmt_with_last_expr in 1.39s
+2024-10-03 11:47:00 [INFO] - Test 78 | PASSED | PASSED | PASSED: no_args_if in 1.32s
+2024-10-03 11:47:02 [INFO] - Test 79 | PASSED | PASSED | PASSED: no_args_if_else in 1.33s
+2024-10-03 11:47:03 [INFO] - Test 80 | PASSED | PASSED | PASSED: no_args_if_let_else in 1.35s
+2024-10-03 11:47:05 [INFO] - Test 81 | PASSED | PASSED | PASSED: no_args_match in 1.29s
+2024-10-03 11:47:07 [INFO] - Test 82 | PASSED | PASSED | PASSED: no_args_while in 1.58s
+2024-10-03 11:47:08 [INFO] - Test 83 | PASSED | FAILED | PASSED: non_tail_expr_of_tail_expr_loop in 1.72s
+2024-10-03 11:47:10 [INFO] - Test 84 | PASSED | FAILED | FAILED: non_tail_expr_of_tail_if_block in 1.59s
+2024-10-03 11:47:12 [INFO] - Test 85 | PASSED | FAILED | PASSED: non_tail_expr_with_comment_of_tail_expr_loop in 1.61s
+2024-10-03 11:47:14 [INFO] - Test 86 | PASSED | PASSED | PASSED: nontrivial_patterns_define_variables in 1.78s
+2024-10-03 11:47:16 [INFO] - Test 87 | PASSED | PASSED | FAILED: param_from_closure in 1.74s
+2024-10-03 11:47:18 [INFO] - Test 88 | FAILED: No Extract Function Assist found for the given selection of assists [] | N/A | N/A: param_usage_in_macro in 1.70s
+2024-10-03 11:47:19 [INFO] - Test 89 | FAILED: No Extract Function Assist found for the given selection of assists [] | N/A | N/A: param_usage_in_macro_with_nested_tt in 1.64s
+2024-10-03 11:47:21 [INFO] - Test 90 | FAILED: No Extract Function Assist found for the given selection of assists [Assist { id: AssistId("extract_variable", RefactorExtract), label: "Extract into variable", group: None, target: 116..117, source_change: None, command: None }] | N/A | N/A: param_usage_in_macro_with_nested_tt_2 in 1.58s
+2024-10-03 11:47:23 [INFO] - Test 91 | PASSED | PASSED | PASSED: part_of_expr_stmt in 1.61s
+2024-10-03 11:47:24 [INFO] - Test 92 | PASSED | PASSED | FAILED: preserve_generics in 1.56s
+2024-10-03 11:47:26 [INFO] - Test 93 | PASSED | PASSED | PASSED: preserve_generics_from_body in 1.66s
+2024-10-03 11:47:28 [INFO] - Test 94 | PASSED | PASSED | FAILED: preserve_where_clause in 1.57s
+2024-10-03 11:47:30 [INFO] - Test 95 | PASSED | PASSED | PASSED: reference_mutable_param_with_further_usages in 1.60s
+2024-10-03 11:47:32 [INFO] - Test 96 | PASSED | PASSED | PASSED: reference_mutable_param_without_further_usages in 1.67s
+2024-10-03 11:47:33 [INFO] - Test 97 | PASSED | PASSED | PASSED: return_from_nested_fn in 1.67s
+2024-10-03 11:47:35 [INFO] - Test 98 | PASSED | PASSED | PASSED: return_from_nested_loop in 1.57s
+2024-10-03 11:47:37 [INFO] - Test 99 | PASSED | FAILED | PASSED: return_to_parent in 1.73s
+2024-10-03 11:47:41 [INFO] - Test 100 | PASSED | PASSED | PASSED: should_increment_suffix_until_it_finds_space in 2.79s
+2024-10-03 11:47:44 [INFO] - Test 101 | PASSED | Error: Parse error: expected `;` | FAILED: struct_with_two_fields_pattern_define_variables in 3.38s
+2024-10-03 11:47:46 [INFO] - Test 102 | PASSED | FAILED | FAILED: tail_expr_no_extra_control_flow in 1.80s
+2024-10-03 11:47:48 [INFO] - Test 103 | PASSED | FAILED | FAILED: tail_expr_of_tail_block_nested in 1.60s
+2024-10-03 11:47:50 [INFO] - Test 104 | PASSED | FAILED | FAILED: try_and_return_ok in 1.51s
+2024-10-03 11:47:51 [INFO] - Test 105 | PASSED | FAILED | FAILED: try_option in 1.54s
+2024-10-03 11:47:53 [INFO] - Test 106 | PASSED | FAILED | FAILED: try_option_unit in 1.53s
+2024-10-03 11:47:55 [INFO] - Test 107 | PASSED | FAILED | FAILED: try_option_with_return in 1.56s
+2024-10-03 11:47:56 [INFO] - Test 108 | PASSED | FAILED | FAILED: try_result in 1.60s
+2024-10-03 11:47:58 [INFO] - Test 109 | PASSED | FAILED | FAILED: try_result_with_return in 1.74s
+2024-10-03 11:48:00 [INFO] - Test 110 | PASSED | PASSED | PASSED: two_arguments_form_expr in 1.64s
+2024-10-03 11:48:04 [INFO] - Test 111 | PASSED | PASSED | PASSED: two_variables_defined_inside_and_used_after_no_ret in 3.42s
+2024-10-03 11:48:07 [INFO] - Test 112 | PASSED | FAILED | FAILED: unresolveable_types_default_to_placeholder in 2.47s
+2024-10-03 11:48:08 [INFO] - Test 113 | PASSED | PASSED | PASSED: variable_defined_inside_and_used_after_mutably_no_ret in 1.43s
+2024-10-03 11:48:10 [INFO] - Test 114 | PASSED | PASSED | PASSED: variable_defined_inside_and_used_after_no_ret in 1.33s
+2024-10-03 11:48:10 [INFO] - ------------------------------------------------------------------
+2024-10-03 11:48:10 [INFO] - Total tests run: 114
+2024-10-03 11:48:10 [INFO] - Tests passed stage 1: 109
+2024-10-03 11:48:10 [INFO] - Tests passed: 91
+2024-10-03 11:48:10 [INFO] - Tests failed: 23
+2024-10-03 11:48:10 [INFO] - Total time: 205.51s
+2024-10-03 11:48:10 [INFO] - Average time per test: 1.60s
+2024-10-03 11:48:10 [INFO] - Shortest test time: 1.27s
+2024-10-03 11:48:10 [INFO] - Longest test time: 3.55s

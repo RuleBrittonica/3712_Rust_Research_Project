@@ -1,0 +1,1201 @@
+2024-10-03 01:18:02 [INFO] - Application Started
+2024-10-03 01:18:02 [INFO] - Running 'test' subcommand
+2024-10-03 01:18:02 [INFO] - Verbose: yes
+2024-10-03 01:18:02 [INFO] - Starting tests...
+2024-10-03 01:18:04 [INFO] - Test 1 | PASSED | PASSED | PASSED: argument_and_locals in 2.11s
+2024-10-03 01:18:06 [INFO] - Test 2 | FAILED: No Extract Function Assist found for the given selection of assists [] | N/A | N/A: argument_form_expr in 2.33s
+2024-10-03 01:18:08 [INFO] - Test 3 | FAILED: No Extract Function Assist found for the given selection of assists [] | N/A | N/A: argument_used_twice_form_expr in 1.98s
+2024-10-03 01:18:10 [INFO] - Test 4 | PASSED | PASSED | PASSED: break_from_nested_and_outer_loops in 1.73s
+2024-10-03 01:18:12 [INFO] - Test 5 | PASSED | PASSED | PASSED: break_from_nested_loop in 1.51s
+2024-10-03 01:18:14 [INFO] - Test 6 | PASSED | PASSED | PASSED: break_loop in 1.40s
+2024-10-03 01:18:15 [INFO] - Test 7 | PASSED | PASSED | PASSED: break_loop_nested in 1.45s
+2024-10-03 01:18:17 [INFO] - Test 8 | FAILED: No Extract Function Assist found for the given selection of assists [] | N/A | N/A: break_loop_nested_labeled in 1.33s
+2024-10-03 01:18:18 [INFO] - Test 9 | PASSED | PASSED | PASSED: break_loop_with_if in 1.24s
+2024-10-03 01:18:19 [INFO] - Test 10 | PASSED | PASSED | FAILED: error[E0428]: the name `main` is defined multiple times
+  --> output\break_stmt:11:1
+   |
+1  | fn main() {
+   | --------- previous definition of the value `main` here
+...
+11 | fn main() {
+   | ^^^^^^^^^ `main` redefined here
+   |
+   = note: `main` must be defined only once in the value namespace of this module
+
+warning: unused variable: `result`
+ --> output\break_stmt:2:9
+  |
+2 |     let result = loop {
+  |         ^^^^^^ help: if this is intentional, prefix it with an underscore: `_result`
+  |
+  = note: `#[warn(unused_variables)]` on by default
+
+error: aborting due to 1 previous error; 1 warning emitted
+
+For more information about this error, try `rustc --explain E0428`.
+: break_stmt in 1.23s
+2024-10-03 01:18:21 [INFO] - Test 11 | PASSED | PASSED | PASSED: break_with_value in 1.30s
+2024-10-03 01:18:22 [INFO] - Test 12 | PASSED | PASSED | PASSED: break_with_value_and_label in 1.30s
+2024-10-03 01:18:24 [INFO] - Test 13 | PASSED | FAILED | PASSED: break_with_value_and_return in 1.23s
+2024-10-03 01:18:25 [INFO] - Test 14 | PASSED | FAILED | FAILED: error[E0308]: mismatched types
+ --> output\closure_arguments:8:5
+  |
+8 |     v.iter().map(|it| it * factor)
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `()`, found `Map<Iter<'_, i32>, ...>`
+  |
+  = note: expected unit type `()`
+                found struct `Map<std::slice::Iter<'_, i32>, {closure@output\closure_arguments:8:18: 8:22}>`
+help: consider using a semicolon here
+  |
+8 |     v.iter().map(|it| it * factor);
+  |                                   +
+help: try adding a return type
+  |
+7 | fn fun_name(v: &[i32; 3], factor: i32) -> impl Iterator<Item = i32>  {
+  |                                        ++++++++++++++++++++++++++++
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0308`.
+: closure_arguments in 1.27s
+2024-10-03 01:18:27 [INFO] - Test 15 | PASSED | FAILED | PASSED: comments_in_block_expr in 1.23s
+2024-10-03 01:18:28 [INFO] - Test 16 | PASSED | FAILED | FAILED: error[E0426]: use of undeclared label `'bar`
+  --> output\continue_loop_nested_labeled:13:19
+   |
+13 |     Some(continue 'bar)
+   |                   ^^^^ undeclared label `'bar`
+
+error[E0658]: the `!` type is experimental
+  --> output\continue_loop_nested_labeled:12:25
+   |
+12 | fn fun_name() -> Option<!> {
+   |                         ^
+   |
+   = note: see issue #35121 <https://github.com/rust-lang/rust/issues/35121> for more information
+   = help: add `#![feature(never_type)]` to the crate attributes to enable
+   = note: this compiler was built on 2024-08-27; consider upgrading it if it is out of date
+
+error[E0268]: `continue` outside of a loop
+  --> output\continue_loop_nested_labeled:13:10
+   |
+13 |     Some(continue 'bar)
+   |          ^^^^^^^^^^^^^ cannot `continue` outside of a loop
+
+warning: unreachable pattern
+ --> output\continue_loop_nested_labeled:5:17
+  |
+5 |                 Some(value) => value,
+  |                 ^^^^^^^^^^^ matches no values because `!` is uninhabited
+  |
+  = note: to learn more about uninhabited types, see https://doc.rust-lang.org/nomicon/exotic-sizes.html#empty-types
+  = note: `#[warn(unreachable_patterns)]` on by default
+
+error: aborting due to 3 previous errors; 1 warning emitted
+
+Some errors have detailed explanations: E0268, E0426, E0658.
+For more information about an error, try `rustc --explain E0268`.
+: continue_loop_nested_labeled in 1.20s
+2024-10-03 01:18:29 [INFO] - Test 17 | PASSED | FAILED | PASSED: copy_custom_used_after in 1.24s
+2024-10-03 01:18:31 [INFO] - Test 18 | PASSED | FAILED | PASSED: copy_used_after in 1.26s
+2024-10-03 01:18:32 [INFO] - Test 19 | PASSED | PASSED | PASSED: does_not_add_extra_whitespace in 1.21s
+2024-10-03 01:18:34 [INFO] - Test 20 | PASSED | PASSED | PASSED: does_not_import_control_flow in 1.28s
+2024-10-03 01:18:35 [INFO] - Test 21 | PASSED | FAILED | FAILED: error[E0404]: expected trait, found derive macro `Debug`
+ --> output\dont_emit_type_with_hidden_lifetime_parameter:2:12
+  |
+2 | fn func<T: Debug>(i: Struct<'_, T>) {
+  |            ^^^^^ not a trait
+  |
+help: consider importing this trait instead
+  |
+1 + use std::fmt::Debug;
+  |
+
+error[E0412]: cannot find type `T` in this scope
+ --> output\dont_emit_type_with_hidden_lifetime_parameter:6:27
+  |
+6 | fn fun_name(i: Struct<'_, T>)  {
+  |                           ^ not found in this scope
+  |
+help: you might be missing a type parameter
+  |
+6 | fn fun_name<T>(i: Struct<'_, T>)  {
+  |            +++
+
+error[E0425]: cannot find function `foo` in this scope
+ --> output\dont_emit_type_with_hidden_lifetime_parameter:7:5
+  |
+7 |     foo(i)
+  |     ^^^ not found in this scope
+
+error: aborting due to 3 previous errors
+
+Some errors have detailed explanations: E0404, E0412, E0425.
+For more information about an error, try `rustc --explain E0404`.
+: dont_emit_type_with_hidden_lifetime_parameter in 1.26s
+2024-10-03 01:18:36 [INFO] - Test 22 | PASSED | FAILED | FAILED: error[E0404]: expected trait, found derive macro `Debug`
+ --> output\empty_generic_param_list:1:12
+  |
+1 | fn func<T: Debug>(t: T, i: u32) {
+  |            ^^^^^ not a trait
+  |
+help: consider importing this trait instead
+  |
+1 + use std::fmt::Debug;
+  |
+
+error[E0425]: cannot find function `bar` in this scope
+ --> output\empty_generic_param_list:2:5
+  |
+2 |     bar(t);
+  |     ^^^ not found in this scope
+
+error[E0425]: cannot find function `foo` in this scope
+ --> output\empty_generic_param_list:7:5
+  |
+7 |     foo(i)
+  |     ^^^ not found in this scope
+
+error: aborting due to 3 previous errors
+
+Some errors have detailed explanations: E0404, E0425.
+For more information about an error, try `rustc --explain E0404`.
+: empty_generic_param_list in 1.17s
+2024-10-03 01:18:38 [INFO] - Test 23 | PASSED | PASSED | FAILED: error[E0428]: the name `main` is defined multiple times
+ --> output\extract_cast:9:1
+  |
+1 | fn main() {
+  | --------- previous definition of the value `main` here
+...
+9 | fn main() {
+  | ^^^^^^^^^ `main` redefined here
+  |
+  = note: `main` must be defined only once in the value namespace of this module
+
+warning: unused variable: `v`
+ --> output\extract_cast:2:9
+  |
+2 |     let v = fun_name();
+  |         ^ help: if this is intentional, prefix it with an underscore: `_v`
+  |
+  = note: `#[warn(unused_variables)]` on by default
+
+error: aborting due to 1 previous error; 1 warning emitted
+
+For more information about this error, try `rustc --explain E0428`.
+: extract_cast in 1.21s
+2024-10-03 01:18:39 [INFO] - Test 24 | PASSED | PASSED | PASSED: extract_does_not_tear_body_apart in 1.23s
+2024-10-03 01:18:41 [INFO] - Test 25 | PASSED | PASSED | PASSED: extract_does_not_tear_comments_apart in 1.26s
+2024-10-03 01:18:42 [INFO] - Test 26 | PASSED | FAILED | FAILED: error[E0308]: mismatched types
+ --> output\extract_does_not_wrap_res_in_res:2:5
+  |
+1 | fn foo() -> Result<(), i64> {
+  |             --------------- expected `Result<(), i64>` because of return type
+2 |     fun_name()
+  |     ^^^^^^^^^^ expected `Result<(), i64>`, found `()`
+  |
+  = note:   expected enum `Result<(), i64>`
+          found unit type `()`
+help: try adding an expression at the end of the block
+  |
+2 ~     fun_name();
+3 +     Ok(())
+  |
+
+error[E0277]: the `?` operator can only be used in a function that returns `Result` or `Option` (or another type that implements `FromResidual`)
+ --> output\extract_does_not_wrap_res_in_res:6:30
+  |
+5 | fn fun_name()  {
+  | ------------- this function should return `Result` or `Option` to accept `?`
+6 |     Result::<i32, i64>::Ok(0)?;
+  |                              ^ cannot use the `?` operator in a function that returns `()`
+  |
+  = help: the trait `FromResidual<Result<Infallible, i64>>` is not implemented for `()`
+help: consider adding return type
+  |
+5 | fn fun_name() -> Result<(), Box<dyn std::error::Error>>  {
+  |               +++++++++++++++++++++++++++++++++++++++++
+
+error[E0308]: mismatched types
+ --> output\extract_does_not_wrap_res_in_res:7:5
+  |
+5 | fn fun_name()  {
+  |              - help: a return type might be missing here: `-> _`
+6 |     Result::<i32, i64>::Ok(0)?;
+7 |     Ok(())
+  |     ^^^^^^ expected `()`, found `Result<(), _>`
+  |
+  = note: expected unit type `()`
+                  found enum `Result<(), _>`
+
+error: aborting due to 3 previous errors
+
+Some errors have detailed explanations: E0277, E0308.
+For more information about an error, try `rustc --explain E0277`.
+: extract_does_not_wrap_res_in_res in 1.25s
+2024-10-03 01:18:43 [INFO] - Test 27 | FAILED: No Extract Function Assist found for the given selection of assists [Assist { id: AssistId("extract_variable", RefactorExtract), label: "Extract into variable", group: None, target: 67..71, source_change: None, command: None }] | N/A | N/A: extract_from_nested in 1.16s
+2024-10-03 01:18:45 [INFO] - Test 28 | PASSED | PASSED | PASSED: extract_function_copies_comment_at_end in 1.30s
+2024-10-03 01:18:46 [INFO] - Test 29 | PASSED | PASSED | PASSED: extract_function_copies_comment_at_start in 1.34s
+2024-10-03 01:18:47 [INFO] - Test 30 | PASSED | FAILED | PASSED: extract_function_copies_comment_in_between in 1.20s
+2024-10-03 01:18:49 [INFO] - Test 31 | PASSED | PASSED | PASSED: extract_function_copies_comment_indented in 1.26s
+2024-10-03 01:18:50 [INFO] - Test 32 | PASSED | PASSED | PASSED: extract_function_does_preserve_whitespace in 1.28s
+2024-10-03 01:18:52 [INFO] - Test 33 | FAILED: No Extract Function Assist found for the given selection of assists [] | N/A | N/A: extract_function_from_trait_with_existing_non_empty_impl_block in 1.28s
+2024-10-03 01:18:53 [INFO] - Test 34 | PASSED | PASSED | PASSED: extract_function_long_form_comment in 1.15s
+2024-10-03 01:18:54 [INFO] - Test 35 | FAILED: No Extract Function Assist found for the given selection of assists [] | N/A | N/A: extract_method_from_trait_impl in 1.18s
+2024-10-03 01:18:55 [INFO] - Test 36 | FAILED: No Extract Function Assist found for the given selection of assists [Assist { id: AssistId("extract_variable", RefactorExtract), label: "Extract into variable", group: None, target: 166..176, source_change: None, command: None }] | N/A | N/A: extract_method_from_trait_with_existing_non_empty_impl_block in 1.18s
+2024-10-03 01:18:57 [INFO] - Test 37 | FAILED: No Extract Function Assist found for the given selection of assists [Assist { id: AssistId("extract_module", RefactorExtract), label: "Extract Module", group: None, target: 280..289, source_change: None, command: None }, Assist { id: AssistId("extract_variable", RefactorExtract), label: "Extract into variable", group: None, target: 301..311, source_change: None, command: None }] | N/A | N/A: extract_method_from_trait_with_multiple_existing_impl_blocks in 1.16s
+2024-10-03 01:18:58 [INFO] - Test 38 | FAILED: No Extract Function Assist found for the given selection of assists [Assist { id: AssistId("extract_variable", RefactorExtract), label: "Extract into variable", group: None, target: 441..451, source_change: None, command: None }, Assist { id: AssistId("extract_module", RefactorExtract), label: "Extract Module", group: None, target: 412..422, source_change: None, command: None }] | N/A | N/A: extract_method_from_trait_with_multiple_existing_trait_impl_blocks in 1.24s
+2024-10-03 01:18:59 [INFO] - Test 39 | FAILED: No Extract Function Assist found for the given selection of assists [Assist { id: AssistId("extract_variable", RefactorExtract), label: "Extract into variable", group: None, target: 123..129, source_change: None, command: None }] | N/A | N/A: extract_mut_ref_param_has_no_mut_binding_in_loop in 1.16s
+2024-10-03 01:19:00 [INFO] - Test 40 | PASSED | PASSED | PASSED: extract_partial_block in 1.27s
+2024-10-03 01:19:02 [INFO] - Test 41 | PASSED | PASSED | PASSED: extract_partial_block_single_line in 1.22s
+2024-10-03 01:19:03 [INFO] - Test 42 | PASSED | PASSED | PASSED: extract_return_stmt in 1.22s
+2024-10-03 01:19:05 [INFO] - Test 43 | PASSED | FAILED | FAILED: error[E0670]: `async fn` is not permitted in Rust 2015
+ --> output\extract_with_await:5:1
+  |
+5 | async fn fun_name()  {
+  | ^^^^^ to use `async fn`, switch to Rust 2018 or later
+  |
+  = help: pass `--edition 2021` to `rustc`
+  = note: for more on editions, read https://doc.rust-lang.org/edition-guide
+
+error[E0670]: `async fn` is not permitted in Rust 2015
+ --> output\extract_with_await:9:1
+  |
+9 | async fn some_function() {
+  | ^^^^^ to use `async fn`, switch to Rust 2018 or later
+  |
+  = help: pass `--edition 2021` to `rustc`
+  = note: for more on editions, read https://doc.rust-lang.org/edition-guide
+
+error[E0428]: the name `main` is defined multiple times
+  --> output\extract_with_await:13:1
+   |
+1  | fn main() {
+   | --------- previous definition of the value `main` here
+...
+13 | fn main() {
+   | ^^^^^^^^^ `main` redefined here
+   |
+   = note: `main` must be defined only once in the value namespace of this module
+
+error[E0609]: no field `await` on type `impl Future<Output = ()>`
+ --> output\extract_with_await:6:21
+  |
+6 |     some_function().await
+  |                     ^^^^^ unknown field
+  |
+  = note: to `.await` a `Future`, switch to Rust 2018 or later
+  = help: pass `--edition 2021` to `rustc`
+  = note: for more on editions, read https://doc.rust-lang.org/edition-guide
+
+error[E0609]: no field `await` on type `impl Future<Output = ()>`
+ --> output\extract_with_await:2:16
+  |
+2 |     fun_name().await;
+  |                ^^^^^ unknown field
+  |
+  = note: to `.await` a `Future`, switch to Rust 2018 or later
+  = help: pass `--edition 2021` to `rustc`
+  = note: for more on editions, read https://doc.rust-lang.org/edition-guide
+
+error: aborting due to 5 previous errors
+
+Some errors have detailed explanations: E0428, E0609, E0670.
+For more information about an error, try `rustc --explain E0428`.
+: extract_with_await in 1.31s
+2024-10-03 01:19:06 [INFO] - Test 44 | FAILED: No Extract Function Assist found for the given selection of assists [Assist { id: AssistId("extract_variable", RefactorExtract), label: "Extract into variable", group: None, target: 40..54, source_change: None, command: None }] | N/A | N/A: extract_with_await_and_result_not_producing_match_expr in 1.20s
+2024-10-03 01:19:07 [INFO] - Test 45 | PASSED | FAILED | FAILED: error[E0670]: `async fn` is not permitted in Rust 2015
+ --> output\extract_with_await_and_result_producing_match_expr:1:1
+  |
+1 | async fn foo() -> i32 {
+  | ^^^^^ to use `async fn`, switch to Rust 2018 or later
+  |
+  = help: pass `--edition 2021` to `rustc`
+  = note: for more on editions, read https://doc.rust-lang.org/edition-guide
+
+error[E0670]: `async fn` is not permitted in Rust 2015
+  --> output\extract_with_await_and_result_producing_match_expr:11:1
+   |
+11 | async fn fun_name() -> Result<i32, i32> {
+   | ^^^^^ to use `async fn`, switch to Rust 2018 or later
+   |
+   = help: pass `--edition 2021` to `rustc`
+   = note: for more on editions, read https://doc.rust-lang.org/edition-guide
+
+error: expected identifier, found `1`
+  --> output\extract_with_await_and_result_producing_match_expr:13:21
+   |
+13 |     let k = async { 1 }.await;
+   |             -----   ^ expected identifier
+   |             |
+   |             `async` blocks are only allowed in Rust 2018 or later
+   |
+   = help: pass `--edition 2021` to `rustc`
+   = note: for more on editions, read https://doc.rust-lang.org/edition-guide
+
+error[E0609]: no field `await` on type `impl Future<Output = Result<i32, i32>>`
+ --> output\extract_with_await_and_result_producing_match_expr:3:34
+  |
+3 |         let m = match fun_name().await {
+  |                                  ^^^^^ unknown field
+  |
+  = note: to `.await` a `Future`, switch to Rust 2018 or later
+  = help: pass `--edition 2021` to `rustc`
+  = note: for more on editions, read https://doc.rust-lang.org/edition-guide
+
+error: aborting due to 4 previous errors
+
+Some errors have detailed explanations: E0609, E0670.
+For more information about an error, try `rustc --explain E0609`.
+: extract_with_await_and_result_producing_match_expr in 1.17s
+2024-10-03 01:19:08 [INFO] - Test 46 | PASSED | FAILED | FAILED: error[E0670]: `async fn` is not permitted in Rust 2015
+ --> output\extract_with_await_in_args:5:1
+  |
+5 | async fn fun_name()  {
+  | ^^^^^ to use `async fn`, switch to Rust 2018 or later
+  |
+  = help: pass `--edition 2021` to `rustc`
+  = note: for more on editions, read https://doc.rust-lang.org/edition-guide
+
+error[E0670]: `async fn` is not permitted in Rust 2015
+ --> output\extract_with_await_in_args:9:1
+  |
+9 | async fn some_function() {
+  | ^^^^^ to use `async fn`, switch to Rust 2018 or later
+  |
+  = help: pass `--edition 2021` to `rustc`
+  = note: for more on editions, read https://doc.rust-lang.org/edition-guide
+
+error[E0428]: the name `main` is defined multiple times
+  --> output\extract_with_await_in_args:13:1
+   |
+1  | fn main() {
+   | --------- previous definition of the value `main` here
+...
+13 | fn main() {
+   | ^^^^^^^^^ `main` redefined here
+   |
+   = note: `main` must be defined only once in the value namespace of this module
+
+error[E0609]: no field `await` on type `impl Future<Output = ()>`
+ --> output\extract_with_await_in_args:6:40
+  |
+6 |     function_call("a", some_function().await)
+  |                                        ^^^^^ unknown field
+  |
+  = note: to `.await` a `Future`, switch to Rust 2018 or later
+  = help: pass `--edition 2021` to `rustc`
+  = note: for more on editions, read https://doc.rust-lang.org/edition-guide
+
+error[E0425]: cannot find function `function_call` in this scope
+ --> output\extract_with_await_in_args:6:5
+  |
+6 |     function_call("a", some_function().await)
+  |     ^^^^^^^^^^^^^ not found in this scope
+
+error[E0609]: no field `await` on type `impl Future<Output = ()>`
+ --> output\extract_with_await_in_args:2:16
+  |
+2 |     fun_name().await;
+  |                ^^^^^ unknown field
+  |
+  = note: to `.await` a `Future`, switch to Rust 2018 or later
+  = help: pass `--edition 2021` to `rustc`
+  = note: for more on editions, read https://doc.rust-lang.org/edition-guide
+
+error: aborting due to 6 previous errors
+
+Some errors have detailed explanations: E0425, E0428, E0609, E0670.
+For more information about an error, try `rustc --explain E0425`.
+: extract_with_await_in_args in 1.26s
+2024-10-03 01:19:10 [INFO] - Test 47 | FAILED: No Extract Function Assist found for the given selection of assists [Assist { id: AssistId("extract_module", RefactorExtract), label: "Extract Module", group: None, target: 90..93, source_change: None, command: None }, Assist { id: AssistId("extract_variable", RefactorExtract), label: "Extract into variable", group: None, target: 90..97, source_change: None, command: None }] | N/A | N/A: extract_with_macro_arg in 1.18s
+2024-10-03 01:19:11 [INFO] - Test 48 | PASSED | FAILED | FAILED: error[E0404]: expected trait, found derive macro `Debug`
+ --> output\filter_unused_generics:1:12
+  |
+1 | fn func<T: Debug, U: Copy>(i: T, u: U) {
+  |            ^^^^^ not a trait
+  |
+help: consider importing this trait instead
+  |
+1 + use std::fmt::Debug;
+  |
+
+error[E0404]: expected trait, found derive macro `Debug`
+ --> output\filter_unused_generics:6:16
+  |
+6 | fn fun_name<T: Debug>(i: T)  {
+  |                ^^^^^ not a trait
+  |
+help: consider importing this trait instead
+  |
+1 + use std::fmt::Debug;
+  |
+
+error[E0425]: cannot find function `bar` in this scope
+ --> output\filter_unused_generics:2:5
+  |
+2 |     bar(u);
+  |     ^^^ not found in this scope
+
+error[E0425]: cannot find function `foo` in this scope
+ --> output\filter_unused_generics:7:5
+  |
+7 |     foo(i)
+  |     ^^^ not found in this scope
+
+error: aborting due to 4 previous errors
+
+Some errors have detailed explanations: E0404, E0425.
+For more information about an error, try `rustc --explain E0404`.
+: filter_unused_generics in 1.15s
+2024-10-03 01:19:12 [INFO] - Test 49 | PASSED | FAILED | FAILED: error[E0404]: expected trait, found derive macro `Debug`
+ --> output\filter_unused_where_clause:1:36
+  |
+1 | fn func<T, U>(i: T, u: U) where T: Debug, U: Copy {
+  |                                    ^^^^^ not a trait
+  |
+help: consider importing this trait instead
+  |
+1 + use std::fmt::Debug;
+  |
+
+error[E0404]: expected trait, found derive macro `Debug`
+ --> output\filter_unused_where_clause:6:32
+  |
+6 | fn fun_name<T>(i: T)  where T: Debug {
+  |                                ^^^^^ not a trait
+  |
+help: consider importing this trait instead
+  |
+1 + use std::fmt::Debug;
+  |
+
+error[E0425]: cannot find function `bar` in this scope
+ --> output\filter_unused_where_clause:2:5
+  |
+2 |     bar(u);
+  |     ^^^ not found in this scope
+
+error[E0425]: cannot find function `foo` in this scope
+ --> output\filter_unused_where_clause:7:5
+  |
+7 |     foo(i)
+  |     ^^^ not found in this scope
+
+error: aborting due to 4 previous errors
+
+Some errors have detailed explanations: E0404, E0425.
+For more information about an error, try `rustc --explain E0404`.
+: filter_unused_where_clause in 1.16s
+2024-10-03 01:19:13 [INFO] - Test 50 | PASSED | PASSED | FAILED: error[E0404]: expected trait, found derive macro `Debug`
+ --> output\filters_unused_nested_generics:1:32
+  |
+1 | struct Struct<T: Into<i32>, U: Debug>(T, U);
+  |                                ^^^^^ not a trait
+  |
+help: consider importing this trait instead
+  |
+1 + use std::fmt::Debug;
+  |
+
+error[E0404]: expected trait, found derive macro `Debug`
+ --> output\filters_unused_nested_generics:2:31
+  |
+2 | impl <T: Into<i32> + Copy, U: Debug> Struct<T, U> {
+  |                               ^^^^^ not a trait
+  |
+help: consider importing this trait instead
+  |
+1 + use std::fmt::Debug;
+  |
+
+error: aborting due to 2 previous errors
+
+For more information about this error, try `rustc --explain E0404`.
+: filters_unused_nested_generics in 1.21s
+2024-10-03 01:19:15 [INFO] - Test 51 | PASSED | PASSED | FAILED: error[E0404]: expected trait, found derive macro `Debug`
+ --> output\filters_unused_nested_where_clauses:1:50
+  |
+1 | struct Struct<T, U>(T, U) where T: Into<i32>, U: Debug;
+  |                                                  ^^^^^ not a trait
+  |
+help: consider importing this trait instead
+  |
+1 + use std::fmt::Debug;
+  |
+
+error[E0404]: expected trait, found derive macro `Debug`
+ --> output\filters_unused_nested_where_clauses:2:56
+  |
+2 | impl <T, U> Struct<T, U> where T: Into<i32> + Copy, U: Debug {
+  |                                                        ^^^^^ not a trait
+  |
+help: consider importing this trait instead
+  |
+1 + use std::fmt::Debug;
+  |
+
+error: aborting due to 2 previous errors
+
+For more information about this error, try `rustc --explain E0404`.
+: filters_unused_nested_where_clauses in 1.26s
+2024-10-03 01:19:16 [INFO] - Test 52 | PASSED | PASSED | FAILED: error[E0425]: cannot find function `bar` in this scope
+ --> output\function_expr:6:5
+  |
+6 |     bar(1 + 1)
+  |     ^^^ not found in this scope
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0425`.
+: function_expr in 1.33s
+2024-10-03 01:19:18 [INFO] - Test 53 | PASSED | PASSED | PASSED: indented_stmts in 1.28s
+2024-10-03 01:19:19 [INFO] - Test 54 | PASSED | PASSED | PASSED: indented_stmts_inside_mod in 1.22s
+2024-10-03 01:19:21 [INFO] - Test 55 | PASSED | PASSED | PASSED: it_should_not_generate_duplicate_function_names in 1.24s
+2024-10-03 01:19:22 [INFO] - Test 56 | FAILED: No Extract Function Assist found for the given selection of assists [Assist { id: AssistId("extract_variable", RefactorExtract), label: "Extract into variable", group: None, target: 59..62, source_change: None, command: None }] | N/A | N/A: method_to_freestanding in 1.23s
+2024-10-03 01:19:23 [INFO] - Test 57 | PASSED | FAILED | PASSED: method_with_mut in 1.19s
+2024-10-03 01:19:25 [INFO] - Test 58 | PASSED | PASSED | PASSED: method_with_reference in 1.22s
+2024-10-03 01:19:26 [INFO] - Test 59 | PASSED | PASSED | PASSED: multi_variables_defined_inside_and_used_after_mutably_no_ret in 1.26s
+2024-10-03 01:19:27 [INFO] - Test 60 | PASSED | FAILED | PASSED: mut_field_from_outer_scope in 1.23s
+2024-10-03 01:19:29 [INFO] - Test 61 | PASSED | FAILED | PASSED: mut_method_call in 1.27s
+2024-10-03 01:19:30 [INFO] - Test 62 | PASSED | PASSED | PASSED: mut_nested_field_from_outer_scope in 1.26s
+2024-10-03 01:19:32 [INFO] - Test 63 | PASSED | PASSED | PASSED: mut_param_because_of_mut_ref in 1.21s
+2024-10-03 01:19:33 [INFO] - Test 64 | PASSED | FAILED | FAILED: error[E0308]: mismatched types
+  --> output\mut_param_many_usages_expr:21:13
+   |
+21 |         bar(&n);
+   |         --- ^^ expected `i32`, found `&i32`
+   |         |
+   |         arguments to this function are incorrect
+   |
+note: function defined here
+  --> output\mut_param_many_usages_expr:1:4
+   |
+1  | fn bar(k: i32) {}
+   |    ^^^ ------
+help: consider removing the borrow
+   |
+21 -         bar(&n);
+21 +         bar(n);
+   |
+
+warning: unused variable: `k`
+ --> output\mut_param_many_usages_expr:1:8
+  |
+1 | fn bar(k: i32) {}
+  |        ^ help: if this is intentional, prefix it with an underscore: `_k`
+  |
+  = note: `#[warn(unused_variables)]` on by default
+
+warning: unused variable: `m`
+  --> output\mut_param_many_usages_expr:11:9
+   |
+11 |     let m = n + 1;
+   |         ^ help: if this is intentional, prefix it with an underscore: `_m`
+
+error: aborting due to 1 previous error; 2 warnings emitted
+
+For more information about this error, try `rustc --explain E0308`.
+: mut_param_many_usages_expr in 1.21s
+2024-10-03 01:19:34 [INFO] - Test 65 | PASSED | FAILED | FAILED: error[E0308]: mismatched types
+  --> output\mut_param_many_usages_stmt:21:9
+   |
+21 |     bar(&n);
+   |     --- ^^ expected `i32`, found `&i32`
+   |     |
+   |     arguments to this function are incorrect
+   |
+note: function defined here
+  --> output\mut_param_many_usages_stmt:1:4
+   |
+1  | fn bar(k: i32) {}
+   |    ^^^ ------
+help: consider removing the borrow
+   |
+21 -     bar(&n);
+21 +     bar(n);
+   |
+
+warning: unused variable: `k`
+ --> output\mut_param_many_usages_stmt:1:8
+  |
+1 | fn bar(k: i32) {}
+  |        ^ help: if this is intentional, prefix it with an underscore: `_k`
+  |
+  = note: `#[warn(unused_variables)]` on by default
+
+warning: unused variable: `m`
+  --> output\mut_param_many_usages_stmt:12:9
+   |
+12 |     let m = n + 1;
+   |         ^ help: if this is intentional, prefix it with an underscore: `_m`
+
+error: aborting due to 1 previous error; 2 warnings emitted
+
+For more information about this error, try `rustc --explain E0308`.
+: mut_param_many_usages_stmt in 1.27s
+2024-10-03 01:19:36 [INFO] - Test 66 | PASSED | FAILED | PASSED: mut_var_from_outer_scope in 1.16s
+2024-10-03 01:19:37 [INFO] - Test 67 | PASSED | PASSED | PASSED: nested_generics in 1.31s
+2024-10-03 01:19:39 [INFO] - Test 68 | PASSED | PASSED | PASSED: nested_where_clauses in 1.25s
+2024-10-03 01:19:40 [INFO] - Test 69 | PASSED | PASSED | PASSED: no_args_for in 1.31s
+2024-10-03 01:19:41 [INFO] - Test 70 | FAILED: No Extract Function Assist found for the given selection of assists [Assist { id: AssistId("extract_variable", RefactorExtract), label: "Extract into variable", group: None, target: 20..25, source_change: None, command: None }] | N/A | N/A: no_args_from_binary_expr in 1.28s
+2024-10-03 01:19:43 [INFO] - Test 71 | PASSED | FAILED | FAILED: warning: unnecessary trailing semicolon
+ --> output\no_args_from_binary_expr_in_module:3:20
+  |
+3 |         fun_name();;
+  |                    ^ help: remove this semicolon
+  |
+  = note: `#[warn(redundant_semicolons)]` on by default
+
+error[E0061]: this function takes 0 arguments but 1 argument was supplied
+ --> output\no_args_from_binary_expr_in_module:7:9
+  |
+7 |         foo(1 + 1)
+  |         ^^^ ----- unexpected argument of type `{integer}`
+  |
+note: function defined here
+ --> output\no_args_from_binary_expr_in_module:2:8
+  |
+2 |     fn foo() {
+  |        ^^^
+help: remove the extra argument
+  |
+7 -         foo(1 + 1)
+7 +         foo()
+  |
+
+error: aborting due to 1 previous error; 1 warning emitted
+
+For more information about this error, try `rustc --explain E0061`.
+: no_args_from_binary_expr_in_module in 1.26s
+2024-10-03 01:19:44 [INFO] - Test 72 | FAILED: No Extract Function Assist found for the given selection of assists [Assist { id: AssistId("extract_variable", RefactorExtract), label: "Extract into variable", group: None, target: 16..25, source_change: None, command: None }] | N/A | N/A: no_args_from_binary_expr_indented in 1.34s
+2024-10-03 01:19:46 [INFO] - Test 73 | PASSED | PASSED | PASSED: no_args_from_loop_unit in 1.32s
+2024-10-03 01:19:47 [INFO] - Test 74 | PASSED | PASSED | PASSED: no_args_from_loop_with_return in 1.29s
+2024-10-03 01:19:49 [INFO] - Test 75 | PASSED | PASSED | PASSED: no_args_from_match in 1.27s
+2024-10-03 01:19:50 [INFO] - Test 76 | PASSED | PASSED | PASSED: no_args_from_stmt_unit in 1.29s
+2024-10-03 01:19:52 [INFO] - Test 77 | PASSED | PASSED | PASSED: no_args_from_stmt_with_last_expr in 1.24s
+2024-10-03 01:19:53 [INFO] - Test 78 | PASSED | PASSED | PASSED: no_args_if in 1.29s
+2024-10-03 01:19:54 [INFO] - Test 79 | PASSED | PASSED | PASSED: no_args_if_else in 1.27s
+2024-10-03 01:19:56 [INFO] - Test 80 | PASSED | PASSED | PASSED: no_args_if_let_else in 1.35s
+2024-10-03 01:19:57 [INFO] - Test 81 | PASSED | PASSED | PASSED: no_args_match in 1.27s
+2024-10-03 01:19:59 [INFO] - Test 82 | PASSED | PASSED | PASSED: no_args_while in 1.25s
+2024-10-03 01:20:00 [INFO] - Test 83 | PASSED | FAILED | PASSED: non_tail_expr_of_tail_expr_loop in 1.29s
+2024-10-03 01:20:02 [INFO] - Test 84 | PASSED | FAILED | FAILED: error[E0277]: the `?` operator can only be used on `Result`s, not `Option`s, in a function that returns `Result`
+  --> output\non_tail_expr_of_tail_if_block:12:17
+   |
+10 | fn fun_name() -> Result<(), _> {
+   | ------------------------------ this function returns a `Result`
+11 |     let a = if true {
+12 |         Some(())?
+   |                 ^ use `.ok_or(...)?` to provide an error compatible with `Result<(), _>`
+   |
+   = help: the trait `FromResidual<Option<Infallible>>` is not implemented for `Result<(), _>`
+   = help: the trait `FromResidual<Result<Infallible, E>>` is implemented for `Result<T, F>`
+
+error[E0121]: the placeholder `_` is not allowed within types on item signatures for return types
+  --> output\non_tail_expr_of_tail_if_block:10:29
+   |
+10 | fn fun_name() -> Result<(), _> {
+   |                             ^ not allowed in type signatures
+
+error: aborting due to 2 previous errors
+
+Some errors have detailed explanations: E0121, E0277.
+For more information about an error, try `rustc --explain E0121`.
+: non_tail_expr_of_tail_if_block in 1.26s
+2024-10-03 01:20:03 [INFO] - Test 85 | PASSED | FAILED | PASSED: non_tail_expr_with_comment_of_tail_expr_loop in 1.29s
+2024-10-03 01:20:05 [INFO] - Test 86 | PASSED | PASSED | PASSED: nontrivial_patterns_define_variables in 1.23s
+2024-10-03 01:20:06 [INFO] - Test 87 | PASSED | PASSED | FAILED: error[E0428]: the name `main` is defined multiple times
+ --> output\param_from_closure:9:1
+  |
+1 | fn main() {
+  | --------- previous definition of the value `main` here
+...
+9 | fn main() {
+  | ^^^^^^^^^ `main` redefined here
+  |
+  = note: `main` must be defined only once in the value namespace of this module
+
+warning: unused variable: `lambda`
+ --> output\param_from_closure:2:9
+  |
+2 |     let lambda = |x: u32| fun_name(x);
+  |         ^^^^^^ help: if this is intentional, prefix it with an underscore: `_lambda`
+  |
+  = note: `#[warn(unused_variables)]` on by default
+
+error: aborting due to 1 previous error; 1 warning emitted
+
+For more information about this error, try `rustc --explain E0428`.
+: param_from_closure in 1.23s
+2024-10-03 01:20:07 [INFO] - Test 88 | PASSED | PASSED | PASSED: param_usage_in_macro in 1.20s
+2024-10-03 01:20:09 [INFO] - Test 89 | PASSED | FAILED | PASSED: param_usage_in_macro_with_nested_tt in 1.23s
+2024-10-03 01:20:10 [INFO] - Test 90 | PASSED | PASSED | PASSED: param_usage_in_macro_with_nested_tt_2 in 1.34s
+2024-10-03 01:20:12 [INFO] - Test 91 | FAILED: No Extract Function Assist found for the given selection of assists [Assist { id: AssistId("extract_variable", RefactorExtract), label: "Extract into variable", group: None, target: 16..21, source_change: None, command: None }] | N/A | N/A: part_of_expr_stmt in 1.22s
+2024-10-03 01:20:13 [INFO] - Test 92 | PASSED | FAILED | FAILED: error[E0404]: expected trait, found derive macro `Debug`
+ --> output\preserve_generics:1:12
+  |
+1 | fn func<T: Debug>(i: T) {
+  |            ^^^^^ not a trait
+  |
+help: consider importing this trait instead
+  |
+1 + use std::fmt::Debug;
+  |
+
+error[E0404]: expected trait, found derive macro `Debug`
+ --> output\preserve_generics:5:16
+  |
+5 | fn fun_name<T: Debug>(i: T)  {
+  |                ^^^^^ not a trait
+  |
+help: consider importing this trait instead
+  |
+1 + use std::fmt::Debug;
+  |
+
+error[E0425]: cannot find function `foo` in this scope
+ --> output\preserve_generics:6:5
+  |
+6 |     foo(i)
+  |     ^^^ not found in this scope
+
+error: aborting due to 3 previous errors
+
+Some errors have detailed explanations: E0404, E0425.
+For more information about an error, try `rustc --explain E0404`.
+: preserve_generics in 1.29s
+2024-10-03 01:20:14 [INFO] - Test 93 | PASSED | PASSED | PASSED: preserve_generics_from_body in 1.36s
+2024-10-03 01:20:16 [INFO] - Test 94 | PASSED | FAILED | FAILED: error[E0404]: expected trait, found derive macro `Debug`
+ --> output\preserve_where_clause:1:27
+  |
+1 | fn func<T>(i: T) where T: Debug {
+  |                           ^^^^^ not a trait
+  |
+help: consider importing this trait instead
+  |
+1 + use std::fmt::Debug;
+  |
+
+error[E0404]: expected trait, found derive macro `Debug`
+ --> output\preserve_where_clause:5:32
+  |
+5 | fn fun_name<T>(i: T)  where T: Debug {
+  |                                ^^^^^ not a trait
+  |
+help: consider importing this trait instead
+  |
+1 + use std::fmt::Debug;
+  |
+
+error[E0425]: cannot find function `foo` in this scope
+ --> output\preserve_where_clause:6:5
+  |
+6 |     foo(i)
+  |     ^^^ not found in this scope
+
+error: aborting due to 3 previous errors
+
+Some errors have detailed explanations: E0404, E0425.
+For more information about an error, try `rustc --explain E0404`.
+: preserve_where_clause in 1.40s
+2024-10-03 01:20:17 [INFO] - Test 95 | PASSED | FAILED | FAILED: error[E0070]: invalid left-hand side of assignment
+ --> output\reference_mutable_param_with_further_usages:6:19
+  |
+6 |     fun_name(arg) = 8;
+  |     ------------- ^
+  |     |
+  |     cannot assign to this expression
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0070`.
+: reference_mutable_param_with_further_usages in 1.18s
+2024-10-03 01:20:19 [INFO] - Test 96 | PASSED | FAILED | FAILED: error[E0070]: invalid left-hand side of assignment
+ --> output\reference_mutable_param_without_further_usages:6:19
+  |
+6 |     fun_name(arg) = 8;
+  |     ------------- ^
+  |     |
+  |     cannot assign to this expression
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0070`.
+: reference_mutable_param_without_further_usages in 1.30s
+2024-10-03 01:20:20 [INFO] - Test 97 | PASSED | PASSED | PASSED: return_from_nested_fn in 1.35s
+2024-10-03 01:20:22 [INFO] - Test 98 | PASSED | FAILED | PASSED: return_from_nested_loop in 1.27s
+2024-10-03 01:20:23 [INFO] - Test 99 | PASSED | FAILED | PASSED: return_to_parent in 1.32s
+2024-10-03 01:20:25 [INFO] - Test 100 | PASSED | PASSED | PASSED: should_increment_suffix_until_it_finds_space in 1.28s
+2024-10-03 01:20:26 [INFO] - Test 101 | PASSED | Error: Parse error: expected `;` | FAILED: error: expected `;`, found `}`
+  --> output\struct_with_two_fields_pattern_define_variables:9:11
+   |
+9  |     (n, k)
+   |           ^ help: add `;` here
+10 | }
+   | - unexpected token
+
+error[E0425]: cannot find value `n` in this scope
+ --> output\struct_with_two_fields_pattern_define_variables:9:6
+  |
+9 |     (n, k)
+  |      ^ not found in this scope
+
+error[E0425]: cannot find value `k` in this scope
+   --> output\struct_with_two_fields_pattern_define_variables:9:9
+    |
+9   |     (n, k)
+    |         ^ help: a tuple variant with a similar name exists: `Ok`
+    |
+   ::: C:\Users\Matthew\.rustup\toolchains\nightly-2024-08-28-x86_64-pc-windows-msvc\lib/rustlib/src/rust\library\core\src\result.rs:531:5
+    |
+531 |     Ok(#[stable(feature = "rust1", since = "1.0.0")] T),
+    |     -- similarly named tuple variant `Ok` defined here
+
+error[E0618]: expected function, found `Counter`
+ --> output\struct_with_two_fields_pattern_define_variables:8:31
+  |
+8 |       let Counter { n, m: k } = Counter { n: 1, m: 2 }
+  |                                 -^^^^^^^^^^^^^^^^^^^^^- help: consider using a semicolon here to finish the statement: `;`
+  |  _______________________________|
+  | |
+9 | |     (n, k)
+  | |__________- call expression requires function
+
+error[E0308]: mismatched types
+ --> output\struct_with_two_fields_pattern_define_variables:7:18
+  |
+7 | fn fun_name() -> (i32, i32) {
+  |    --------      ^^^^^^^^^^ expected `(i32, i32)`, found `()`
+  |    |
+  |    implicitly returns `()` as its body has no tail or `return` expression
+  |
+  = note:  expected tuple `(i32, i32)`
+          found unit type `()`
+
+warning: unused variable: `h`
+ --> output\struct_with_two_fields_pattern_define_variables:4:9
+  |
+4 |     let h = n + k;
+  |         ^ help: if this is intentional, prefix it with an underscore: `_h`
+  |
+  = note: `#[warn(unused_variables)]` on by default
+
+error: aborting due to 5 previous errors; 1 warning emitted
+
+Some errors have detailed explanations: E0308, E0425, E0618.
+For more information about an error, try `rustc --explain E0308`.
+: struct_with_two_fields_pattern_define_variables in 1.26s
+2024-10-03 01:20:27 [INFO] - Test 102 | PASSED | FAILED | FAILED: error[E0308]: mismatched types
+ --> output\tail_expr_no_extra_control_flow:2:5
+  |
+1 | fn fallible() -> Result<(), ()> {
+  |                  -------------- expected `Result<(), ()>` because of return type
+2 |     fun_name()
+  |     ^^^^^^^^^^ expected `Result<(), ()>`, found `()`
+  |
+  = note:   expected enum `Result<(), ()>`
+          found unit type `()`
+help: try adding an expression at the end of the block
+  |
+2 ~     fun_name();
+3 +     Ok(())
+  |
+
+error[E0308]: mismatched types
+ --> output\tail_expr_no_extra_control_flow:7:16
+  |
+5 | fn fun_name()  {
+  |              - help: a return type might be missing here: `-> _`
+6 |     if true {
+7 |         return Err(());
+  |                ^^^^^^^ expected `()`, found `Result<_, ()>`
+  |
+  = note: expected unit type `()`
+                  found enum `Result<_, ()>`
+
+error[E0308]: mismatched types
+ --> output\tail_expr_no_extra_control_flow:9:5
+  |
+5 | fn fun_name()  {
+  |              - help: a return type might be missing here: `-> _`
+...
+9 |     Ok(())
+  |     ^^^^^^ expected `()`, found `Result<(), _>`
+  |
+  = note: expected unit type `()`
+                  found enum `Result<(), _>`
+
+error: aborting due to 3 previous errors
+
+For more information about this error, try `rustc --explain E0308`.
+: tail_expr_no_extra_control_flow in 1.30s
+2024-10-03 01:20:29 [INFO] - Test 103 | PASSED | FAILED | FAILED: error[E0308]: mismatched types
+ --> output\tail_expr_of_tail_block_nested:4:13
+  |
+1 | fn f() -> Option<()> {
+  |           ---------- expected `Option<()>` because of return type
+...
+4 |             fun_name()
+  |             ^^^^^^^^^^ expected `Option<()>`, found `()`
+  |
+  = note:   expected enum `Option<()>`
+          found unit type `()`
+help: try adding an expression at the end of the block
+  |
+4 ~             fun_name();
+5 +             None
+  |
+4 ~             fun_name();
+5 +             Some(())
+  |
+
+error[E0277]: the `?` operator can only be used in a function that returns `Result` or `Option` (or another type that implements `FromResidual`)
+  --> output\tail_expr_of_tail_block_nested:13:17
+   |
+11 | fn fun_name()  {
+   | ------------- this function should return `Result` or `Option` to accept `?`
+12 |     let a = if true {
+13 |         Some(())?
+   |                 ^ cannot use the `?` operator in a function that returns `()`
+   |
+   = help: the trait `FromResidual<Option<Infallible>>` is not implemented for `()`
+
+error[E0308]: mismatched types
+  --> output\tail_expr_of_tail_block_nested:17:5
+   |
+11 | fn fun_name()  {
+   |              - help: try adding a return type: `-> Option<()>`
+...
+17 |     Some(a)
+   |     ^^^^^^^ expected `()`, found `Option<()>`
+   |
+   = note: expected unit type `()`
+                   found enum `Option<()>`
+
+error: aborting due to 3 previous errors
+
+Some errors have detailed explanations: E0277, E0308.
+For more information about an error, try `rustc --explain E0277`.
+: tail_expr_of_tail_block_nested in 1.29s
+2024-10-03 01:20:30 [INFO] - Test 104 | PASSED | FAILED | FAILED: error[E0308]: mismatched types
+  --> output\try_and_return_ok:10:13
+   |
+10 |     if k == 42 {
+   |        -    ^^ expected `()`, found integer
+   |        |
+   |        expected because this is `()`
+
+error[E0369]: cannot add `{integer}` to `()`
+  --> output\try_and_return_ok:13:15
+   |
+13 |     let m = k + 1;
+   |             - ^ - {integer}
+   |             |
+   |             ()
+
+error[E0121]: the placeholder `_` is not allowed within types on item signatures for return types
+ --> output\try_and_return_ok:8:30
+  |
+8 | fn fun_name() -> Result<i32, _> {
+  |                              ^ not allowed in type signatures
+
+error: aborting due to 3 previous errors
+
+Some errors have detailed explanations: E0121, E0308, E0369.
+For more information about an error, try `rustc --explain E0121`.
+: try_and_return_ok in 1.35s
+2024-10-03 01:20:32 [INFO] - Test 105 | PASSED | FAILED | FAILED: error[E0277]: the `?` operator can only be used on `Result`s, not `Option`s, in a function that returns `Result`
+  --> output\try_option:10:18
+   |
+9  | fn fun_name() -> Result<i32, _> {
+   | ------------------------------- this function returns a `Result`
+10 |     let k = foo()?;
+   |                  ^ use `.ok_or(...)?` to provide an error compatible with `Result<i32, _>`
+   |
+   = help: the trait `FromResidual<Option<Infallible>>` is not implemented for `Result<i32, _>`
+   = help: the trait `FromResidual<Result<Infallible, E>>` is implemented for `Result<T, F>`
+
+error[E0369]: cannot add `{integer}` to `()`
+  --> output\try_option:11:15
+   |
+11 |     let m = k + 1;
+   |             - ^ - {integer}
+   |             |
+   |             ()
+
+error[E0121]: the placeholder `_` is not allowed within types on item signatures for return types
+ --> output\try_option:9:30
+  |
+9 | fn fun_name() -> Result<i32, _> {
+  |                              ^ not allowed in type signatures
+
+error: aborting due to 3 previous errors
+
+Some errors have detailed explanations: E0121, E0277, E0369.
+For more information about an error, try `rustc --explain E0121`.
+: try_option in 1.26s
+2024-10-03 01:20:33 [INFO] - Test 106 | PASSED | FAILED | FAILED: error[E0277]: the `?` operator can only be used on `Result`s, not `Option`s, in a function that returns `Result`
+ --> output\try_option_unit:9:18
+  |
+8 | fn fun_name() -> Result<(), _> {
+  | ------------------------------ this function returns a `Result`
+9 |     let k = foo()?;
+  |                  ^ use `.ok_or(...)?` to provide an error compatible with `Result<(), _>`
+  |
+  = help: the trait `FromResidual<Option<Infallible>>` is not implemented for `Result<(), _>`
+  = help: the trait `FromResidual<Result<Infallible, E>>` is implemented for `Result<T, F>`
+
+error[E0369]: cannot add `{integer}` to `()`
+  --> output\try_option_unit:10:15
+   |
+10 |     let m = k + 1;
+   |             - ^ - {integer}
+   |             |
+   |             ()
+
+error[E0121]: the placeholder `_` is not allowed within types on item signatures for return types
+ --> output\try_option_unit:8:29
+  |
+8 | fn fun_name() -> Result<(), _> {
+  |                             ^ not allowed in type signatures
+
+error: aborting due to 3 previous errors
+
+Some errors have detailed explanations: E0121, E0277, E0369.
+For more information about an error, try `rustc --explain E0121`.
+: try_option_unit in 1.27s
+2024-10-03 01:20:34 [INFO] - Test 107 | PASSED | FAILED | FAILED: error[E0277]: the `?` operator can only be used on `Result`s, not `Option`s, in a function that returns `Result`
+ --> output\try_option_with_return:9:18
+  |
+8 | fn fun_name() -> Result<i32, _> {
+  | ------------------------------- this function returns a `Result`
+9 |     let k = foo()?;
+  |                  ^ use `.ok_or(...)?` to provide an error compatible with `Result<i32, _>`
+  |
+  = help: the trait `FromResidual<Option<Infallible>>` is not implemented for `Result<i32, _>`
+  = help: the trait `FromResidual<Result<Infallible, E>>` is implemented for `Result<T, F>`
+
+error[E0308]: mismatched types
+  --> output\try_option_with_return:10:13
+   |
+10 |     if k == 42 {
+   |        -    ^^ expected `()`, found integer
+   |        |
+   |        expected because this is `()`
+
+error[E0308]: mismatched types
+  --> output\try_option_with_return:11:16
+   |
+8  | fn fun_name() -> Result<i32, _> {
+   |                  -------------- expected `Result<i32, _>` because of return type
+...
+11 |         return None;
+   |                ^^^^ expected `Result<i32, _>`, found `Option<_>`
+   |
+   = note: expected enum `Result<i32, _>`
+              found enum `Option<_>`
+help: try wrapping the expression in `Err`
+   |
+11 |         return Err(None);
+   |                ++++    +
+
+error[E0369]: cannot add `{integer}` to `()`
+  --> output\try_option_with_return:13:15
+   |
+13 |     let m = k + 1;
+   |             - ^ - {integer}
+   |             |
+   |             ()
+
+error[E0121]: the placeholder `_` is not allowed within types on item signatures for return types
+ --> output\try_option_with_return:8:30
+  |
+8 | fn fun_name() -> Result<i32, _> {
+  |                              ^ not allowed in type signatures
+
+error: aborting due to 5 previous errors
+
+Some errors have detailed explanations: E0121, E0277, E0308, E0369.
+For more information about an error, try `rustc --explain E0121`.
+: try_option_with_return in 1.22s
+2024-10-03 01:20:36 [INFO] - Test 108 | PASSED | FAILED | FAILED: error[E0369]: cannot add `{integer}` to `()`
+  --> output\try_result:10:15
+   |
+10 |     let m = k + 1;
+   |             - ^ - {integer}
+   |             |
+   |             ()
+
+error[E0121]: the placeholder `_` is not allowed within types on item signatures for return types
+ --> output\try_result:8:30
+  |
+8 | fn fun_name() -> Result<i32, _> {
+  |                              ^ not allowed in type signatures
+
+error: aborting due to 2 previous errors
+
+Some errors have detailed explanations: E0121, E0369.
+For more information about an error, try `rustc --explain E0121`.
+: try_result in 1.41s
+2024-10-03 01:20:37 [INFO] - Test 109 | PASSED | FAILED | FAILED: error[E0308]: mismatched types
+  --> output\try_result_with_return:10:13
+   |
+10 |     if k == 42 {
+   |        -    ^^ expected `()`, found integer
+   |        |
+   |        expected because this is `()`
+
+error[E0369]: cannot add `{integer}` to `()`
+  --> output\try_result_with_return:13:15
+   |
+13 |     let m = k + 1;
+   |             - ^ - {integer}
+   |             |
+   |             ()
+
+error[E0121]: the placeholder `_` is not allowed within types on item signatures for return types
+ --> output\try_result_with_return:8:30
+  |
+8 | fn fun_name() -> Result<i32, _> {
+  |                              ^ not allowed in type signatures
+
+error: aborting due to 3 previous errors
+
+Some errors have detailed explanations: E0121, E0308, E0369.
+For more information about an error, try `rustc --explain E0121`.
+: try_result_with_return in 1.28s
+2024-10-03 01:20:39 [INFO] - Test 110 | PASSED | PASSED | PASSED: two_arguments_form_expr in 1.21s
+2024-10-03 01:20:40 [INFO] - Test 111 | PASSED | PASSED | PASSED: two_variables_defined_inside_and_used_after_no_ret in 1.27s
+2024-10-03 01:20:42 [INFO] - Test 112 | PASSED | FAILED | FAILED: error[E0425]: cannot find value `__unresolved` in this scope
+ --> output\unresolveable_types_default_to_placeholder:2:13
+  |
+2 |     let a = __unresolved;
+  |             ^^^^^^^^^^^^ not found in this scope
+
+error[E0121]: the placeholder `_` is not allowed within types on item signatures for functions
+ --> output\unresolveable_types_default_to_placeholder:6:16
+  |
+6 | fn fun_name(a: _) {
+  |                ^ not allowed in type signatures
+  |
+help: use type parameters instead
+  |
+6 | fn fun_name<T>(a: T) {
+  |            +++    ~
+
+error: aborting due to 2 previous errors
+
+Some errors have detailed explanations: E0121, E0425.
+For more information about an error, try `rustc --explain E0121`.
+: unresolveable_types_default_to_placeholder in 1.40s
+2024-10-03 01:20:44 [INFO] - Test 113 | PASSED | PASSED | PASSED: variable_defined_inside_and_used_after_mutably_no_ret in 2.30s
+2024-10-03 01:20:46 [INFO] - Test 114 | PASSED | PASSED | PASSED: variable_defined_inside_and_used_after_no_ret in 1.76s
+2024-10-03 01:20:47 [INFO] - ------------------------------------------------------------------
+2024-10-03 01:20:47 [INFO] - Total tests run: 114
+2024-10-03 01:20:47 [INFO] - Tests passed stage 1: 98
+2024-10-03 01:20:47 [INFO] - Tests passed: 56
+2024-10-03 01:20:47 [INFO] - Tests failed: 92
+2024-10-03 01:20:47 [INFO] - Total time: 164.66s
+2024-10-03 01:20:47 [INFO] - Average time per test: 1.30s
+2024-10-03 01:20:47 [INFO] - Shortest test time: 1.15s
+2024-10-03 01:20:47 [INFO] - Longest test time: 2.33s
