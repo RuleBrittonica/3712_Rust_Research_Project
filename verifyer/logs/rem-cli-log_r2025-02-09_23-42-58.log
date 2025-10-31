@@ -1,0 +1,7 @@
+2025-02-09 23:42:58 [INFO] - Application Started
+2025-02-09 23:42:58 [INFO] - AENEAS path: /home/matt/rem-matt/rem-verification/programs/aeneas
+2025-02-09 23:42:58 [INFO] - Primitives.v path: /home/matt/rem-matt/rem-verification/verifyer/src/Primitives.v
+2025-02-09 23:42:58 [INFO] - Original Coq path: /home/matt/rem-matt/rem-verification/coq/SampleProject.v
+2025-02-09 23:42:58 [INFO] - Refactored Coq path: /home/matt/rem-matt/rem-verification/coq/SampleProjectRef.v
+2025-02-09 23:42:58 [INFO] - Original LLBC path: /home/matt/rem-matt/rem-verification/llbc/sample_project.llbc
+2025-02-09 23:42:58 [INFO] - Refactored LLBC path: /home/matt/rem-matt/rem-verification/llbc/sample_project_ref.llbc

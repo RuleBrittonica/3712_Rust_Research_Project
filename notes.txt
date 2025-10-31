@@ -1,0 +1,46 @@
+The goal here is to allow for an automated verification process.
+
+I think that the main controller will provide the LLBC from CHARON initially +
+at the end of the refactoring process. This is because we need the whole crate
+to produce the LLBC, and also the whole crate to do the refactoring.
+
+From there this verfication crate will take in the two LLBC files. It will then
+convert them to CoQ / F# / LEAN / whichever works. This will be used to perform
+the verification.
+
+To start with on this I need:
+- A CLI that I can interface with using the two LLBC files - Done!
+- And also provide options to what verification I want to run
+- Fuzzing
+- Program analysis
+- ETC
+
+The first stage of the CLI is to take the the path to the two .LLBC files, and
+create us two coq (.v) files. The Primitives.v file needs to be pasted into the
+same directory as the .v files.
+
+Separately:
+- Update rem-cli to produce the LLBC at the start and end
+- Have a pipeline in rem-cli to take Path to the crate:
+    - Create the LLBC
+    - Run REM-extract
+    - Create the New LLBC
+    - Pass both LLBCs to REM-verfication
+    - Go from there!
+
+Getting Automated CoQ Running!
+    - Create a _CoQProject File
+    - Ensure it contains all of the required information about the directory
+        - - R . AutoEquiv
+        - Primitives.v
+        - <OriginalFile>.v
+        - <RefactoredFile>.v
+        - EquivCheck.v (Which we need to autogenerate)
+    - Run coqc on the files
+    - coqc Primitives.v && coqc SampleProject.v && coqc SampleProjectRef.v && coqc EquivCheck.v
+    - check the result of coqc EquivCheck.v to understand if we have the same
+    functions!
+
+Separately, Cleanup the target directory!
+    - Remove *.glob *.vo *.vok *.vos *.aux *.lia.cache
+    - rm -f *.glob *.vo *.vok *.vos *.aux .*.aux .*.cache

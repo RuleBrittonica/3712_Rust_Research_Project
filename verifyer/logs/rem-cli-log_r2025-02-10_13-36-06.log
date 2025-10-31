@@ -1,0 +1,32 @@
+2025-02-10 13:36:06 [INFO] - Application Started
+2025-02-10 13:36:06 [INFO] - AENEAS path: /home/matt/rem-matt/rem-verification/programs/aeneas
+2025-02-10 13:36:06 [INFO] - Primitives.v path: /home/matt/rem-matt/rem-verification/verifyer/src/Primitives.v
+2025-02-10 13:36:06 [INFO] - Original Coq path: /home/matt/rem-matt/rem-verification/coq/SampleProject.v
+2025-02-10 13:36:06 [INFO] - Refactored Coq path: /home/matt/rem-matt/rem-verification/coq/SampleProjectRef.v
+2025-02-10 13:36:06 [INFO] - Original LLBC path: /home/matt/rem-matt/rem-verification/llbc/sample_project.llbc
+2025-02-10 13:36:06 [INFO] - Refactored LLBC path: /home/matt/rem-matt/rem-verification/llbc/sample_project_ref.llbc
+2025-02-10 13:36:06 [INFO] - Converting LLBC files to CoQ files
+2025-02-10 13:36:06 [INFO] - Settings: Settings { programs: Programs { aeneas: "/home/matt/rem-matt/rem-verification/programs/aeneas", primitives: "/home/matt/rem-matt/rem-verification/verifyer/src/Primitives.v" }, coq: Coq { original: "/home/matt/rem-matt/rem-verification/coq/SampleProject.v", refactored: "/home/matt/rem-matt/rem-verification/coq/SampleProjectRef.v" }, llbc: Llbc { original: "/home/matt/rem-matt/rem-verification/llbc/sample_project.llbc", refactored: "/home/matt/rem-matt/rem-verification/llbc/sample_project_ref.llbc" } }
+2025-02-10 13:36:06 [INFO] - AENEAS path: "/home/matt/rem-matt/rem-verification/programs/aeneas"
+2025-02-10 13:36:06 [INFO] - Output directory: "/home/matt/rem-matt/rem-verification/coq"
+2025-02-10 13:36:06 [INFO] - Output directory: "/home/matt/rem-matt/rem-verification/coq"
+2025-02-10 13:36:06 [INFO] - LLBC to CoQ conversion completed successfully.
+2025-02-10 13:36:06 [INFO] - Created _CoqProject file
+2025-02-10 13:36:06 [INFO] - Directory: "/home/matt/rem-matt/rem-verification/coq"
+2025-02-10 13:36:06 [INFO] - Proof script:
+Lemma ref_incr_equiv_check : forall (x : i32),
+  Main.ref_incr x = MainRef.ref_incr x.
+Proof.
+  intros x.
+  unfold Main.ref_incr.
+  unfold MainRef.ref_incr.
+  reflexivity.
+Qed.
+2025-02-10 13:36:06 [INFO] - Proof generated successfully
+2025-02-10 13:36:06 [INFO] - Created EquivCheck.v file
+2025-02-10 13:36:06 [INFO] - Directory: /home/matt/rem-matt/rem-verification/coq
+2025-02-10 13:36:07 [INFO] - Primitives.v compiled successfully
+2025-02-10 13:36:07 [INFO] - Original Coq file compiled successfully
+2025-02-10 13:36:07 [INFO] - Refactored Coq file compiled successfully
+2025-02-10 13:36:08 [INFO] - EquivCheck.v compiled successfully
+2025-02-10 13:36:08 [INFO] - CoQ verification completed successfully
