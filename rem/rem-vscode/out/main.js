@@ -26,77 +26,103 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.activate = activate;
 exports.deactivate = deactivate;
 const vscode = __importStar(require("vscode"));
-const child_process_1 = require("child_process");
-const setup_1 = require("./linux/setup");
-const aeneas_1 = require("./linux/aeneas");
-const cli_1 = require("./linux/cli");
+const client_1 = require("./client");
+const checkEnv_1 = require("./check/checkEnv");
+const interface_1 = require("./interface");
+const extract_1 = require("./extract");
+const INSTALL_BASE = 'https://github.com/RuleBrittonica/rem-vscode/scripts';
 async function activate(context) {
-    // Run environment setup on extension activation. This won't do anything once
-    // the environment is set up, but it's a good practice to ensure the environment
-    // is ready when the extension is activated.
-    if (vscode.window.activeTextEditor &&
-        vscode.window.activeTextEditor.document.languageId === 'rust') {
-        try {
-            await (0, setup_1.setupEnvironment)();
-            await (0, aeneas_1.setupAeneasAndCharon)(context);
-            await (0, cli_1.ensureRemCommandLineInstalled)();
-        }
-        catch (error) {
-            vscode.window.showErrorMessage(`Setup failed: ${error}`);
-        }
+    // Only run on a rust file!
+    // if (!(vscode.window.activeTextEditor?.document.languageId === 'rust')) {
+    //   return;
+    // }
+    // 1) Check dependencies
+    try {
+        await (0, checkEnv_1.checkAll)();
     }
-    // Have a message that displays the paths to the binaries
-    const binDirDisplay = vscode.workspace.getConfiguration('remvscode').get('aeneasBinariesPath', '');
-    vscode.window.showInformationMessage(`Aeneas and Charon binaries are located at: ${binDirDisplay}`);
-    let disposable = vscode.commands.registerCommand('remvscode.refactor', async () => {
-        // Get the active editor
-        const editor = vscode.window.activeTextEditor;
-        if (!editor) {
-            vscode.window.showErrorMessage('No active editor found!');
-            return;
+    catch (err) {
+        const missingMsg = err instanceof Error ? err.message : String(err);
+        const platformKey = process.platform === 'win32' ? 'windows'
+            : process.platform === 'darwin' ? 'mac'
+                : 'linux';
+        const url = `${INSTALL_BASE}/${platformKey}/`;
+        const choice = await vscode.window.showErrorMessage(`Missing dependencies: ${missingMsg}`, 'Open install guide');
+        if (choice === 'Open install guide') {
+            vscode.env.openExternal(vscode.Uri.parse(url));
         }
-        const document = editor.document;
-        const selection = editor.selection;
-        // Determine the start and end indices based on the selection
-        const startIndex = document.offsetAt(selection.start);
-        const endIndex = document.offsetAt(selection.end);
-        // Get the full file path
-        const filePath = document.uri.fsPath;
-        // Prompt the user for the new function name
-        const newFnName = await vscode.window.showInputBox({
-            prompt: 'Enter the new function name',
-            placeHolder: 'new_function'
-        });
-        if (!newFnName) {
-            vscode.window.showErrorMessage('A function name is required.');
-            return;
+        return;
+    }
+    // 2) Inform user where the binaries live
+    // 2) Paths / output channel
+    const output = vscode.window.createOutputChannel('REM');
+    context.subscriptions.push(output);
+    const config = vscode.workspace.getConfiguration('remvscode');
+    const binDir = config.get('aeneasBinariesPath') || defaultBinPath();
+    const daemonPath = config.get(interface_1.DEFAULT_DAEMON_SETTING_KEY) || 'rem-extract'; // <- switch to 'rem-server' later
+    const charonPath = `${binDir}/charon`;
+    const aeneasPath = `${binDir}/aeneas`;
+    const client = new client_1.RemDaemonClient(daemonPath, output);
+    vscode.window.showInformationMessage(`All dependencies found. \n - Binaries at ${binDir} \n - Using REM daemon: ${daemonPath}`);
+    // 3) Reinit command (Command Palette): reinitialize database for current file
+    // Command: Reinitialize DB for current file
+    const cmdReinit = vscode.commands.registerCommand('remvscode.reinit', async () => {
+        const doc = vscode.window.activeTextEditor?.document;
+        if (!doc) {
+            return vscode.window.showErrorMessage('No active editor');
         }
-        // Get the configuration
-        const config = vscode.workspace.getConfiguration('remvscode');
-        const configuredBinDir = config.get('aeneasBinariesPath', '');
-        // Use the configured directory if present, otherwise default to $HOME/.local/bin.
-        const homeDir = process.env.HOME;
-        const binDir = (configuredBinDir && configuredBinDir.trim() !== '')
-            ? configuredBinDir.trim()
-            : `${homeDir}/.local/bin`;
-        // Build full paths to the charon and aeneas binaries.
-        const charonPath = `${binDir}/charon`;
-        const aeneasPath = `${binDir}/aeneas`;
-        // Build the CLI command string.
-        const command = `rem-cli run-short "${filePath}" ${newFnName} ${startIndex} ${endIndex} -c --charon-path ${charonPath} --aeneas-path ${aeneasPath}`;
-        console.log(`EXECUTING rem-cli command: ${command}`);
-        // Execute the CLI command
-        (0, child_process_1.exec)(command, (error, stdout, stderr) => {
-            if (error) {
-                vscode.window.showErrorMessage(`Error: ${stderr || error.message}`);
-                return;
-            }
-            // Optionally save the document after refactoring
-            document.save();
-            vscode.window.showInformationMessage('Refactoring completed successfully!');
-        });
+        try {
+            await (0, extract_1.reinitDaemonForPath)(client, doc.uri.fsPath);
+            vscode.window.showInformationMessage('REM database reinitialized');
+        }
+        catch (e) {
+            vscode.window.showErrorMessage(`Init failed: ${e.message || e}`);
+        }
     });
-    context.subscriptions.push(disposable);
+    // Register normal user commands
+    // 1) Extract and Apply Immediately
+    const cmdExtract = vscode.commands.registerCommand('remvscode.extract', async () => {
+        await (0, extract_1.extractFromActiveEditor)(client, { preview: true });
+    });
+    // 2) Repair
+    const cmdRepair = vscode.commands.registerCommand('remvscode.repair', async () => {
+        vscode.window.showInformationMessage('Repair command not implemented yet.');
+    });
+    // 3) Extract and Repair
+    const cmdExtractRepair = vscode.commands.registerCommand('remvscode.extractRepair', async () => {
+        vscode.window.showInformationMessage('Extract & Repair command not implemented yet.');
+    });
+    // 4) Extract and Verify
+    const cmdExtractVerify = vscode.commands.registerCommand('remvscode.extractVerify', async () => {
+        vscode.window.showInformationMessage('Extract & Verify command not implemented yet.');
+    });
+    // 5) Extract, Repair, and Verify
+    const cmdExtractRepairVerify = vscode.commands.registerCommand('remvscode.extractRepairVerify', async () => {
+        vscode.window.showInformationMessage('Extract, Repair & Verify command not implemented yet.');
+    });
+    context.subscriptions.push(cmdReinit, cmdExtract, cmdRepair, cmdExtractRepair, cmdExtractVerify, cmdExtractRepairVerify);
 }
 function deactivate() { }
+// fallback for default ~/.local/bin on *nix, ~/bin on Windows
+function defaultBinPath() {
+    if (process.platform === 'win32') {
+        return `${process.env.USERPROFILE}\\bin`;
+    }
+    else {
+        return `${process.env.HOME}/.local/bin`;
+    }
+}
+// Apply a full-file replacement via WorkspaceEdit
+async function applyWorkspaceEdit(absFilePath, newContent) {
+    const uri = vscode.Uri.file(absFilePath);
+    const doc = await vscode.workspace.openTextDocument(uri);
+    const fullRange = new vscode.Range(doc.positionAt(0), doc.positionAt(doc.getText().length));
+    const edit = new vscode.WorkspaceEdit();
+    edit.replace(uri, fullRange, newContent);
+    const ok = await vscode.workspace.applyEdit(edit);
+    if (!ok) {
+        throw new Error('Failed to apply workspace edit');
+    }
+    // Immediately save the document
+    await doc.save();
+}
 //# sourceMappingURL=main.js.map

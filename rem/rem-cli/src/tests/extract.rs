@@ -1,4 +1,4 @@
-use rem_extract::{
+use rem_extract::extract::{
     extraction::{
         ExtractionInput,
         extract_method,

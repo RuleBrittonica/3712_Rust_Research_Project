@@ -3,16 +3,9 @@
   "displayName": "REM VSCode",
   "description": "VSCode extension utilizing the REM toolchain and Rust Analyzer to allow for comprehensive refactoring of Rust Code",
   "version": "0.1.2",
-  "engines": {
-    "vscode": "^1.92.0"
-  },
-  "categories": [
-    "Other"
-  ],
-  "activationEvents": [
-    "onCommand:remvscode.refactor",
-    "onLanguage:rust"
-  ],
+  "engines": { "vscode": "^1.92.0" },
+  "categories": ["Other"],
+  "activationEvents": ["onLanguage:rust"],
   "main": "./out/main.js",
   "contributes": {
     "configuration": {
@@ -23,31 +16,60 @@
           "type": "string",
           "default": "",
           "description": "Path to the folder where Aeneas/CHARON binaries are stored. Leave empty to use $HOME/.local/bin."
+        },
+        "remvscode.daemonPath": {
+          "type": "string",
+          "default": "rem-extract",
+          "description": "Path to the rem-extract stdio daemon binary (used for live refactoring and workspace updates)."
         }
       }
     },
+
     "commands": [
-      {
-        "command": "remvscode.refactor",
-        "title": "Refactor with REM"
-      }
+      { "command": "remvscode.reinit", "title": "REM: Reinitialize Database" },
+      { "command": "remvscode.extract", "title": "REM: Extract Method" },
+      { "command": "remvscode.repair", "title": "REM: Repair Code" },
+      { "command": "remvscode.extractRepair", "title": "REM: Extract Method & Repair" },
+      { "command": "remvscode.extractVerify", "title": "REM: Extract Method & Verify" },
+      { "command": "remvscode.extractRepairVerify", "title": "REM: Extract, Repair & Verify" }
     ],
+
     "menus": {
+      "commandPalette": [
+        { "command": "remvscode.reinit", "when": "editorLangId == rust" }
+      ],
       "editor/context": [
         {
-          "command": "remvscode.refactor",
-          "group": "navigation"
+          "command": "remvscode.extract",
+          "group": "navigation@10",
+          "when": "editorHasSelection && editorLangId == rust"
+        },
+        {
+          "command": "remvscode.repair",
+          "group": "navigation@11",
+          "when": "editorHasSelection && editorLangId == rust"
+        },
+        {
+          "command": "remvscode.extractRepair",
+          "group": "navigation@12",
+          "when": "editorHasSelection && editorLangId == rust"
+        },
+        {
+          "command": "remvscode.extractVerify",
+          "group": "navigation@13",
+          "when": "editorHasSelection && editorLangId == rust"
+        },
+        {
+          "command": "remvscode.extractRepairVerify",
+          "group": "navigation@14",
+          "when": "editorHasSelection && editorLangId == rust"
         }
       ]
     },
-    "keybindings": [
-      {
-        "command": "remvscode.refactor",
-        "key": "ctrl+alt+f",
-        "when": "editorTextFocus && editorLangId == rust"
-      }
-    ]
+
+    "keybindings": []
   },
+
   "scripts": {
     "vscode:prepublish": "npm run compile",
     "compile": "npm run check-types && node esbuild.js",
@@ -60,8 +82,9 @@
     "lint": "eslint src --ext ts",
     "test": "vscode-test"
   },
+
   "devDependencies": {
-    "@types/mocha": "^10.0.7",
+    "@types/mocha": "^10.0.10",
     "@types/node": "20.x",
     "@types/vscode": "^1.92.0",
     "@typescript-eslint/eslint-plugin": "^7.14.1",
@@ -72,10 +95,8 @@
     "eslint": "^8.57.0",
     "typescript": "^5.4.5"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/RuleBrittonica/rem-vscode"
-  },
+
+  "repository": { "type": "git", "url": "https://github.com/RuleBrittonica/rem-vscode" },
   "publish": {
     "baseContentUrl": "https://github.com/RuleBrittonica/rem-vscode/blob/main/",
     "baseImagesUrl": "https://github.com/RuleBrittonica/rem-vscode/raw/main/images/"

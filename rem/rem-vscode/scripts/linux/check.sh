@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# list your binaries here
 deps=( rustup opam coqc aeneas charon rem-cli )
 
 missing=()
