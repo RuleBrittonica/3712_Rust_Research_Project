@@ -6,10 +6,11 @@ members = [
     "rem-verification",
     "rem-utils",
     "rem-interface",
+    "rem-server",
 ]
 
 resolver = "3"
-default-members = ["rem-cli"]
+default-members = ["rem-cli", "rem-server"]
 
 [workspace.package]
 edition      = "2021"

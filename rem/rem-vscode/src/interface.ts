@@ -8,13 +8,15 @@ export type Op =
   | 'repair'
   | 'verify';
 
-/** Generic JSON response envelope returned by the daemon. */
-export interface JsonResp<T = unknown> {
-  ok: boolean;
-  data?: T;
-  error?: string;
-}
+/** Generic JSON response envelope returned by the daemon (discriminated union). */
+export type JsonResp<T = unknown> =
+  | { ok: true; data: T }
+  | { ok: false; error: string };
 
+/** Type guard for convenient narrowing when you want a function call. */
+export function isOk<T>(r: JsonResp<T>): r is { ok: true; data: T } {
+  return r.ok === true;
+}
 /** Requests: payloads  */
 
 export interface InitPayload {
@@ -78,18 +80,7 @@ export interface VerifyData {
   // results/artifacts/log summaries
 }
 
-/** ===== Type guards (handy for narrowing) ===== */
-export function isExtractData(d: unknown): d is ExtractData {
-  const x = d as any;
-  return !!x && typeof x.output === 'string' && typeof x.callsite === 'string';
-}
-
-export function isApplyData(d: unknown): d is ApplyData {
-  const x = d as any;
-  return !!x && (x.status === 'applied' || x.status === 'no-op' || x.status === 'no-change');
-}
-
-/** ===== Small helpers to build request payloads (optional sugar) ===== */
+/**  Small helpers to build request payloads */
 export const buildInit = (manifest_path: string): InitPayload => ({ manifest_path });
 export const buildCreate = (path: string, text?: string): CreatePayload => ({ path, text });
 export const buildChange = (path: string, text?: string): ChangePayload => ({ path, text });

@@ -1,18 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DEFAULT_DAEMON_SETTING_KEY = exports.buildExtract = exports.buildDelete = exports.buildChange = exports.buildCreate = exports.buildInit = void 0;
-exports.isExtractData = isExtractData;
-exports.isApplyData = isApplyData;
-/** ===== Type guards (handy for narrowing) ===== */
-function isExtractData(d) {
-    const x = d;
-    return !!x && typeof x.output === 'string' && typeof x.callsite === 'string';
+exports.isOk = isOk;
+/** Type guard for convenient narrowing when you want a function call. */
+function isOk(r) {
+    return r.ok === true;
 }
-function isApplyData(d) {
-    const x = d;
-    return !!x && (x.status === 'applied' || x.status === 'no-op' || x.status === 'no-change');
-}
-/** ===== Small helpers to build request payloads (optional sugar) ===== */
+/**  Small helpers to build request payloads */
 const buildInit = (manifest_path) => ({ manifest_path });
 exports.buildInit = buildInit;
 const buildCreate = (path, text) => ({ path, text });

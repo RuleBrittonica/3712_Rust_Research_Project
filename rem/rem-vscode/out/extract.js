@@ -27,28 +27,28 @@ exports.reinitDaemonForPath = reinitDaemonForPath;
 exports.sendChange = sendChange;
 exports.runExtract = runExtract;
 exports.extractFromActiveEditor = extractFromActiveEditor;
-// src/extract.ts
 const vscode = __importStar(require("vscode"));
 const interface_1 = require("./interface");
+const utils_1 = require("./utils");
 /** Re-initialize the daemon DB using a path (Cargo.toml or .rs). */
 async function reinitDaemonForPath(client, manifestOrFile) {
     const payload = (0, interface_1.buildInit)(manifestOrFile);
-    const resp = (await client.send('init', payload));
-    // client returns resp.data (because server wraps); handle both shapes just in case
-    const data = resp.ok !== undefined ? resp.data : resp;
-    if (!data) {
-        throw new Error('Init returned no data');
+    const resp = await client.send('init', payload);
+    if (!resp.ok) {
+        throw new Error(resp.error);
     }
-    return data;
+    return resp.data;
 }
 /** Push the active buffer contents to daemon (or let server read from disk if text omitted). */
 async function sendChange(client, filePath, text) {
     const payload = (0, interface_1.buildChange)(filePath, text);
-    const data = await client.send('change', payload);
-    if (!(0, interface_1.isApplyData)(data)) {
-        throw new Error(`Unexpected change response shape: ${JSON.stringify(data)}`);
+    const resp = await client.send('change', payload);
+    if (!resp.ok) {
+        // Surface but do not throw, so the caller can decide to continue.
+        vscode.window.showErrorMessage(`Change failed: ${resp.error}`);
+        return { status: 'no-op' };
     }
-    return data;
+    return resp.data;
 }
 /** Perform extraction; returns the modified source and callsite snippet. */
 async function runExtract(client, filePath, newFnName, start, end, 
@@ -57,19 +57,23 @@ currentText) {
     if (currentText !== undefined) {
         await sendChange(client, filePath, currentText);
     }
-    const payload = (0, interface_1.buildExtract)(filePath, newFnName, start, end);
-    const data = await client.send('extract', payload);
-    if (!(0, interface_1.isExtractData)(data)) {
-        throw new Error(`Unexpected extract response shape: ${JSON.stringify(data)}`);
+    // Filepaths returned by VSCode might be URLs - if so we need to convert them
+    // to local paths (applicable to the OS)
+    const localPath = (0, utils_1.toLocalFsPath)(filePath);
+    const payload = (0, interface_1.buildExtract)(localPath, newFnName, start, end);
+    const resp = await client.send('extract', payload);
+    if (!(0, interface_1.isOk)(resp)) {
+        vscode.window.showErrorMessage(`Extract failed: ${resp.error}`);
+        return { output: '', callsite: '' };
     }
-    return data;
+    return resp.data;
 }
 /** Convenience: extract from current editor selection, prompting for a name. */
 async function extractFromActiveEditor(client, options) {
     const editor = vscode.window.activeTextEditor;
     if (!editor) {
         vscode.window.showErrorMessage('No active editor');
-        return;
+        return null;
     }
     const doc = editor.document;
     const sel = editor.selection;
@@ -81,24 +85,21 @@ async function extractFromActiveEditor(client, options) {
         placeHolder: options?.defaultName ?? 'extracted_function',
     });
     if (!name) {
-        return;
+        return null;
     }
     try {
-        // init on first use (idempotent on server side)
-        await reinitDaemonForPath(client, file);
         // push current buffer (even if unsaved)
         const data = await runExtract(client, file, name, start, end, doc.getText());
-        // show result (preview tab)
-        if (options?.preview !== false) {
-            const preview = await vscode.workspace.openTextDocument({ language: 'rust', content: data.output });
-            vscode.window.showTextDocument(preview, { preview: true });
+        if (!data) {
+            vscode.window.showErrorMessage('Extract failed: received no data');
+            return null;
         }
-        else {
-            vscode.window.showInformationMessage('Extraction completed.');
-        }
+        // Return ExtractData for caller to handle (e.g. updating source file)
+        return data;
     }
     catch (e) {
         vscode.window.showErrorMessage(`Extract failed: ${e.message || e}`);
+        return null;
     }
 }
 //# sourceMappingURL=extract.js.map

@@ -10,6 +10,7 @@ use crate::messages::{about::ABOUT, author::AUTHOR, version::VERSION};
     about = ABOUT,
     author = AUTHOR,
 )]
+
 pub struct EXTRACTArgs {
     #[command(subcommand)]
     pub command: EXTRACTCommands,

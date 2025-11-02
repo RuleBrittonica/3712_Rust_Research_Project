@@ -19,8 +19,8 @@
         },
         "remvscode.daemonPath": {
           "type": "string",
-          "default": "rem-extract",
-          "description": "Path to the rem-extract stdio daemon binary (used for live refactoring and workspace updates)."
+          "default": "rem-server",
+          "description": "Path to the rem-server stdio daemon binary (used for live refactoring and workspace updates). Expected to be installed using Cargo"
         }
       }
     },

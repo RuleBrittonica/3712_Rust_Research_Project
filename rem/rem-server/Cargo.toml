@@ -1,0 +1,25 @@
+[package]
+name = "rem-server"
+version = "0.1.0"
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+anyhow.workspace = true
+ra_ap_hir.workspace = true
+ra_ap_ide.workspace = true
+ra_ap_ide_assists.workspace = true
+ra_ap_ide_db.workspace = true
+ra_ap_project_model.workspace = true
+ra_ap_syntax.workspace = true
+ra_ap_vfs.workspace = true
+rem-extract.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+sha2.workspace = true
+walkdir.workspace = true
+
+[lints]
+workspace = true

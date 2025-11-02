@@ -58,7 +58,7 @@ async function activate(context) {
     context.subscriptions.push(output);
     const config = vscode.workspace.getConfiguration('remvscode');
     const binDir = config.get('aeneasBinariesPath') || defaultBinPath();
-    const daemonPath = config.get(interface_1.DEFAULT_DAEMON_SETTING_KEY) || 'rem-extract'; // <- switch to 'rem-server' later
+    const daemonPath = config.get(interface_1.DEFAULT_DAEMON_SETTING_KEY) || '/home/matt/3712_Rust_Research_Project/rem/target/release/rem-server';
     const charonPath = `${binDir}/charon`;
     const aeneasPath = `${binDir}/aeneas`;
     const client = new client_1.RemDaemonClient(daemonPath, output);

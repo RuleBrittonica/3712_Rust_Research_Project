@@ -2559,6 +2559,25 @@ dependencies = [
 ]
 
 [[package]]
+name = "rem-server"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "ra_ap_hir",
+ "ra_ap_ide",
+ "ra_ap_ide_assists",
+ "ra_ap_ide_db",
+ "ra_ap_project_model",
+ "ra_ap_syntax",
+ "ra_ap_vfs",
+ "rem-extract",
+ "serde",
+ "serde_json",
+ "sha2",
+ "walkdir",
+]
+
+[[package]]
 name = "rem-utils"
 version = "0.2.0"
 dependencies = [

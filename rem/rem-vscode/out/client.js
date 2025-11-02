@@ -14,15 +14,17 @@ class RemDaemonClient {
         this.output = output;
     }
     ensureRunning() {
-        if (this.proc)
+        if (this.proc) {
             return;
+        }
         this.proc = (0, node_child_process_1.spawn)(this.binPath, [], { stdio: ['pipe', 'pipe', 'pipe'] });
-        this.proc.stderr.on('data', d => this.output.append(`[rem-extract] ${d.toString()}`));
+        this.proc.stderr.on('data', d => this.output.append(`[rem-server] ${d.toString()}`));
         this.proc.on('exit', (code, signal) => {
-            this.output.appendLine(`[rem-extract] exited (code=${code}, signal=${signal})`);
+            this.output.appendLine(`[rem-server] exited (code=${code}, signal=${signal})`);
             // Reject all in-flight
-            for (const [, p] of this.pending)
+            for (const [, p] of this.pending) {
                 p.reject(new Error('daemon exited'));
+            }
             this.pending.clear();
             this.proc = null;
         });
@@ -34,35 +36,45 @@ class RemDaemonClient {
         while ((idx = this.buf.indexOf('\n')) >= 0) {
             const line = this.buf.slice(0, idx).trim();
             this.buf = this.buf.slice(idx + 1);
-            if (!line)
+            if (!line) {
                 continue;
+            }
             try {
+                // Expect the daemon to emit one JSON object per line.
+                // Shape: { ok: true, data: ... , id?: number } | { ok: false, error: "...", id?: number }
                 const resp = JSON.parse(line);
                 const id = resp.id ?? null;
+                const resolvePending = (r) => {
+                    // Resolve (do not reject) so callers can discriminate by r.ok
+                    const firstKey = this.pending.keys().next().value;
+                    if (!firstKey) {
+                        return;
+                    }
+                    const p = this.pending.get(firstKey);
+                    this.pending.delete(firstKey);
+                    p.resolve(r);
+                };
                 if (id && this.pending.has(id)) {
                     const p = this.pending.get(id);
                     this.pending.delete(id);
-                    resp.ok ? p.resolve(resp.data) : p.reject(new Error(resp.error || 'unknown error'));
+                    p.resolve(resp);
                 }
                 else {
-                    // Fallback: no ids => resolve the oldest pending (simple mode)
-                    const firstKey = this.pending.keys().next().value;
-                    if (firstKey) {
-                        const p = this.pending.get(firstKey);
-                        this.pending.delete(firstKey);
-                        resp.ok ? p.resolve(resp.data) : p.reject(new Error(resp.error || 'unknown error'));
-                    }
+                    // Fallback: resolve the oldest pending when no id is present
+                    resolvePending(resp);
                 }
             }
             catch (e) {
-                this.output.appendLine(`[rem-extract] bad JSON line: ${line}`);
+                this.output.appendLine(`[rem-server] bad JSON line: ${line}`);
             }
         }
     }
+    // Make send<T> generic and return the full union to callers
     async send(op, payload) {
         this.ensureRunning();
-        if (!this.proc)
+        if (!this.proc) {
             throw new Error('daemon not running');
+        }
         const id = this.nextId++;
         const req = JSON.stringify({ id, op, ...payload }) + '\n';
         this.proc.stdin.write(req);

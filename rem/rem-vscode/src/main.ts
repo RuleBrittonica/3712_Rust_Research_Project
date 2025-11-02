@@ -43,7 +43,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
   const config = vscode.workspace.getConfiguration('remvscode');
   const binDir = config.get<string>('aeneasBinariesPath') || defaultBinPath();
-  const daemonPath = config.get<string>(DEFAULT_DAEMON_SETTING_KEY) || 'rem-extract'; // <- switch to 'rem-server' later
+  const daemonPath = config.get<string>(DEFAULT_DAEMON_SETTING_KEY) || '/home/matt/3712_Rust_Research_Project/rem/target/release/rem-server';
   const charonPath = `${binDir}/charon`;
   const aeneasPath = `${binDir}/aeneas`;
 
