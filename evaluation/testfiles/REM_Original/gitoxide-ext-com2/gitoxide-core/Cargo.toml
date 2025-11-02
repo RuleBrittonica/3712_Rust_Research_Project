@@ -1,0 +1,72 @@
+[package]
+name = "gitoxide-core"
+description = "The library implementating all capabilities of the gitoxide CLI"
+repository = "https://github.com/Byron/gitoxide"
+version = "0.15.0"
+authors = ["Sebastian Thiel <sebastian.thiel@icloud.com>"]
+license = "MIT/Apache-2.0"
+edition = "2018"
+
+[lib]
+doctest = false
+test = false
+
+[features]
+default = []
+
+#! ### Tools
+## Discover all git repositories within a directory. Particularly useful with [skim](https://github.com/lotabout/skim).
+organize = ["git-url", "jwalk"]
+## Derive the amount of time invested into a git repository akin to [git-hours](https://github.com/kimmobrunfeldt/git-hours).
+estimate-hours = ["itertools", "rayon", "fs-err"]
+
+#! ### Mutually Exclusive Networking
+#! If both are set, _blocking-client_ will take precedence, allowing `--all-features` to be used.
+
+## If set, the client used to connect to git servers will use a blocking API. It supports more transports and is what most would want.
+blocking-client = ["git-repository/blocking-network-client"]
+## The client to connect to git servers will be async, while supporting only the 'git' transport itself.
+## It's the most limited and can be seen as example on how to use custom transports for custom servers.
+async-client = ["git-repository/async-network-client", "async-trait", "futures-io", "async-net", "async-io", "futures-lite", "blocking"]
+
+#! ### Other
+## Data structures implement `serde::Serialize` and `serde::Deserialize`.
+serde1 = ["git-commitgraph/serde1", "git-repository/serde1", "serde_json", "serde"]
+## Functions dealing with time may include the local timezone offset, not just UTC with the offset being zero.
+local-time-support = ["git-repository/local-time-support"]
+
+
+[dependencies]
+# deselect everything else (like "performance") as this should be controllable by the parent application.
+git-repository = { version = "^0.18.1", path = "../git-repository", default-features = false, features = ["local", "unstable"]} # TODO: eventually 'unstable' shouldn't be needed anymore
+git-pack-for-configuration-only = { package = "git-pack", version = "^0.19.1", path = "../git-pack", default-features = false, features = ["pack-cache-lru-dynamic", "pack-cache-lru-static"] }
+git-commitgraph = { version = "^0.8.0", path = "../git-commitgraph" }
+git-config = { version = "^0.4.0", path = "../git-config" }
+git-features = { version = "^0.21.0", path = "../git-features" }
+serde = { version = "1.0.114", optional = true, default-features = false, features = ["derive"] }
+anyhow = "1.0.42"
+quick-error = "2.0.0"
+bytesize = "1.0.1"
+serde_json = { version = "1.0.65", optional = true }
+tempfile = "3.1.0"
+
+# for async-client
+async-trait = { version = "0.1.51", optional = true }
+async-net = { version = "1.6", optional = true }
+futures-lite = { version  = "1.12.0", optional = true }
+async-io = { version = "1.6", optional = true }
+futures-io = { version = "0.3.16", optional = true }
+blocking = { version = "1.0.2", optional = true }
+
+# for 'organize' functionality
+git-url = { version = "^0.5.0", path = "../git-url", optional = true }
+jwalk = { version = "0.6.0", optional = true }
+
+rayon = { version = "1.5.0", optional = true }
+itertools = { version = "0.10.1", optional = true }
+fs-err = { version = "2.6.0", optional = true }
+
+document-features = { version = "0.2.0", optional = true }
+
+[package.metadata.docs.rs]
+features = ["document-features", "blocking-client", "organize", "estimate-hours", "serde1"]

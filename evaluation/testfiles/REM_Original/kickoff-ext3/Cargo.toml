@@ -1,0 +1,56 @@
+[package]
+name = "kickoff"
+version = "0.7.0"
+authors = ["Folke Gleumes <folke-kickoff@gleumes.org>"]
+edition = "2021"
+description = "Fast and minimal program launcher"
+license = "GPL-3.0-or-later"
+homepage = "https://github.com/j0ru/kickoff"
+repository = "https://github.com/j0ru/kickoff"
+readme = "README.md"
+keywords = ["wayland", "launcher", "wlroots"]
+
+[dependencies]
+smithay-client-toolkit = "0.15"
+fontdue = "0.7"
+image = { version = "0.24", default-features = false }
+fuzzy-matcher = "0.3"
+nix = { version = "0.26", default_features = false, features = ["process"] }
+css-color = "0.2"
+exec = "0.3"
+xdg = "2.4"
+toml = "0.7"
+serde = { version = "1.0", features = ["derive"] }
+hex = "0.4"
+smithay-clipboard = "0.6"
+log = "0.4"
+env_logger = "0.10"
+x11-keysymdef = "0.2.0"
+fontconfig = "0.6"
+notify-rust = "4.8"
+clap = { version = "4.1", features = ["derive"] }
+csv = "1.2"
+futures = "0.3"
+
+[dependencies.tokio]
+version = "1.25"
+features = [
+    "fs",
+    "rt-multi-thread",
+    "io-util",
+    "time",
+    "rt",
+    "macros",
+    "io-std",
+]
+default-features = false
+
+[profile.release]
+lto = true
+
+[dev-dependencies]
+criterion = { version = "0.4", features = ["async_tokio"] }
+
+[[bench]]
+name = "selection"
+harness = false
