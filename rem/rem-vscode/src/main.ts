@@ -3,8 +3,8 @@ import { exec, execSync } from 'node:child_process';
 import * as os from 'os';
 import { RemDaemonClient } from './client';
 import { checkAll } from './check/checkEnv';
-import { DEFAULT_DAEMON_SETTING_KEY } from './interface';
-import { extractFromActiveEditor, reinitDaemonForPath } from './extract';
+import { DEFAULT_DAEMON_SETTING_KEY, isOk } from './interface';
+import { extractFromActiveEditor, initDaemonForPath, reinitDaemonForPath } from './extract';
 
 const INSTALL_BASE = 'https://github.com/RuleBrittonica/rem-vscode/scripts'
 
@@ -47,29 +47,38 @@ export async function activate(context: vscode.ExtensionContext) {
   const charonPath = `${binDir}/charon`;
   const aeneasPath = `${binDir}/aeneas`;
 
-  const client = new RemDaemonClient(daemonPath, output);
 
   vscode.window.showInformationMessage(
     `All dependencies found. \n - Binaries at ${binDir} \n - Using REM daemon: ${daemonPath}`
   );
 
-  // 3) Reinit command (Command Palette): reinitialize database for current file
-  // Command: Reinitialize DB for current file
-  const cmdReinit = vscode.commands.registerCommand('remvscode.reinit', async () => {
-    const doc = vscode.window.activeTextEditor?.document;
-    if (!doc) {return vscode.window.showErrorMessage('No active editor');}
-    try {
-      await reinitDaemonForPath(client, doc.uri.fsPath);
-      vscode.window.showInformationMessage('REM database reinitialized');
-    } catch (e: any) {
-      vscode.window.showErrorMessage(`Init failed: ${e.message || e}`);
-    }
-  });
+  // 3) Start the daemon client and initialise the database
+  const client = new RemDaemonClient(daemonPath, output);
+  const doc = vscode.window.activeTextEditor?.document;
+  if (!doc) {
+    vscode.window.showErrorMessage('No active editor');
+  }
+  client.ensureRunning();
+  await initDaemonForPath(client, doc!.uri.fsPath);
 
   // Register normal user commands
   // 1) Extract and Apply Immediately
   const cmdExtract = vscode.commands.registerCommand('remvscode.extract', async () => {
-    await extractFromActiveEditor(client, { preview: true });
+    const extract_data = await extractFromActiveEditor(client, { preview: true });
+    // We just need the src from the extract data
+    // if extract_data is null, we do nothing
+    if (extract_data) {
+      const new_src = extract_data.output;
+      const file_path = extract_data.file;
+      try {
+        await applyWorkspaceEdit(file_path, new_src);
+        vscode.window.showInformationMessage('Extract applied successfully.');
+      } catch (e: any) {
+        vscode.window.showErrorMessage(`Failed to apply extract: ${e.message || e}`);
+      }
+    } else {
+      vscode.window.showInformationMessage('Extract cancelled or failed.');
+    }
   });
 
   // 2) Repair
@@ -90,6 +99,19 @@ export async function activate(context: vscode.ExtensionContext) {
   // 5) Extract, Repair, and Verify
   const cmdExtractRepairVerify = vscode.commands.registerCommand('remvscode.extractRepairVerify', async () => {
     vscode.window.showInformationMessage('Extract, Repair & Verify command not implemented yet.');
+  });
+
+  // 6) Reinit command (Command Palette): reinitialize database for current file
+  // Command: Reinitialize DB for current file
+  const cmdReinit = vscode.commands.registerCommand('remvscode.reinit', async () => {
+    const doc = vscode.window.activeTextEditor?.document;
+    if (!doc) {return vscode.window.showErrorMessage('No active editor');}
+    try {
+      await reinitDaemonForPath(client, doc.uri.fsPath);
+      vscode.window.showInformationMessage('REM database reinitialized');
+    } catch (e: any) {
+      vscode.window.showErrorMessage(`Init failed: ${e.message || e}`);
+    }
   });
 
   context.subscriptions.push(

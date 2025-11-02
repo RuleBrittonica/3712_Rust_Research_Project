@@ -1,7 +1,6 @@
 import * as vscode from 'vscode';
 import { RemDaemonClient } from './client';
 import {
-  JsonResp,
   InitData, ExtractData, ApplyData,
   buildInit, buildChange, buildExtract,
   isOk,
@@ -9,13 +8,29 @@ import {
 
 import { toLocalFsPath } from './utils';
 
-/** Re-initialize the daemon DB using a path (Cargo.toml or .rs). */
-export async function reinitDaemonForPath(client: RemDaemonClient, manifestOrFile: string): Promise<InitData> {
-  const payload = buildInit(manifestOrFile);
+/** Initialise the daemon DB using a path (Cargo.toml or .rs) */
+export async function initDaemonForPath(client: RemDaemonClient, manifestOrFile: string): Promise<InitData> {
+  const localPath = toLocalFsPath(manifestOrFile);
+  const payload = buildInit(localPath);
   const resp = await client.send<InitData>('init', payload);
-  if (!resp.ok) {
+  if (!isOk(resp)) {
+    vscode.window.showErrorMessage(`Init failed: ${resp.error}`);
     throw new Error(resp.error);
   }
+  vscode.window.showInformationMessage(`Init succeeded for ${localPath}`);
+  return resp.data;
+}
+
+/** Re-initialize the daemon DB using a path (Cargo.toml or .rs). */
+export async function reinitDaemonForPath(client: RemDaemonClient, manifestOrFile: string): Promise<InitData> {
+  const localPath = toLocalFsPath(manifestOrFile);
+  const payload = buildInit(localPath);
+  const resp = await client.send<InitData>('init', payload);
+  if (!isOk(resp)) {
+    vscode.window.showErrorMessage(`Reinit failed: ${resp.error}`);
+    throw new Error(resp.error);
+  }
+  vscode.window.showInformationMessage(`Reinit succeeded for ${localPath}`);
   return resp.data;
 }
 
@@ -27,7 +42,7 @@ export async function sendChange(
 ): Promise<ApplyData> {
   const payload = buildChange(filePath, text);
   const resp = await client.send<ApplyData>('change', payload);
-  if (!resp.ok) {
+  if (!isOk(resp)) {
     // Surface but do not throw, so the caller can decide to continue.
     vscode.window.showErrorMessage(`Change failed: ${resp.error}`);
     return { status: 'no-op' };
@@ -45,14 +60,13 @@ export async function runExtract(
   /** Optional current buffer text (unsaved). If given, we send a change first. */
   currentText?: string,
 ): Promise<ExtractData> {
-  if (currentText !== undefined) {
-    await sendChange(client, filePath, currentText);
-  }
-
   // Filepaths returned by VSCode might be URLs - if so we need to convert them
   // to local paths (applicable to the OS)
   const localPath = toLocalFsPath(filePath);
 
+  // if (currentText !== undefined) {
+  //   await sendChange(client, localPath, currentText);
+  // }
   const payload = buildExtract(localPath, newFnName, start, end);
   const resp = await client.send<ExtractData>('extract', payload);
 
@@ -64,11 +78,13 @@ export async function runExtract(
   return resp.data;
 }
 
+type ExtractDataWithFile = ExtractData & { file: string };
+
 /** Convenience: extract from current editor selection, prompting for a name. */
 export async function extractFromActiveEditor(
   client: RemDaemonClient,
   options?: { prompt?: string; defaultName?: string; preview?: boolean }
-): Promise<ExtractData | null> {
+): Promise<ExtractDataWithFile | null> {
   const editor = vscode.window.activeTextEditor;
   if (!editor) {
     vscode.window.showErrorMessage('No active editor');
@@ -98,8 +114,8 @@ export async function extractFromActiveEditor(
       return null;
     }
 
-    // Return ExtractData for caller to handle (e.g. updating source file)
-    return data;
+    // Return ExtractData along with the file path
+    return { ...data, file };
 
   } catch (e: any) {
     vscode.window.showErrorMessage(`Extract failed: ${e.message || e}`);
