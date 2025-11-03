@@ -69,11 +69,11 @@ async function activate(context) {
         vscode.window.showErrorMessage('No active editor');
     }
     client.ensureRunning();
-    await (0, extract_1.initDaemonForPath)(client, doc.uri.fsPath);
+    // await initDaemonForPath(client, doc!.uri.fsPath);
     // Register normal user commands
     // 1) Extract and Apply Immediately
     const cmdExtract = vscode.commands.registerCommand('remvscode.extract', async () => {
-        const extract_data = await (0, extract_1.extractFromActiveEditor)(client, { preview: true });
+        const extract_data = await (0, extract_1.runExtractFile)(client);
         // We just need the src from the extract data
         // if extract_data is null, we do nothing
         if (extract_data) {
@@ -139,6 +139,11 @@ async function applyWorkspaceEdit(absFilePath, newContent) {
     const uri = vscode.Uri.file(absFilePath);
     const doc = await vscode.workspace.openTextDocument(uri);
     const fullRange = new vscode.Range(doc.positionAt(0), doc.positionAt(doc.getText().length));
+    // make sure that we have content changes (otherwise we have probably errored
+    // earlier up the line and don't want to do anything here)
+    if (newContent === "") {
+        throw new Error('New content is empty, aborting edit');
+    }
     const edit = new vscode.WorkspaceEdit();
     edit.replace(uri, fullRange, newContent);
     const ok = await vscode.workspace.applyEdit(edit);

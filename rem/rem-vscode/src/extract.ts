@@ -4,9 +4,11 @@ import {
   InitData, ExtractData, ApplyData,
   buildInit, buildChange, buildExtract,
   isOk,
+  ExtractPayload,
 } from './interface';
 
 import { toLocalFsPath } from './utils';
+import { ClientRequest } from 'node:http';
 
 /** Initialise the daemon DB using a path (Cargo.toml or .rs) */
 export async function initDaemonForPath(client: RemDaemonClient, manifestOrFile: string): Promise<InitData> {
@@ -121,4 +123,68 @@ export async function extractFromActiveEditor(
     vscode.window.showErrorMessage(`Extract failed: ${e.message || e}`);
     return null;
   }
+}
+
+/** Faster no daemon pathway */
+export async function runExtractFile(
+  client: RemDaemonClient,
+): Promise<ExtractDataWithFile | null> {
+  const editor = vscode.window.activeTextEditor;
+  if (!editor) {
+    vscode.window.showErrorMessage('No active editor');
+    return null;
+  }
+
+  const doc = editor.document;
+  const sel = editor.selection;
+  const start = doc.offsetAt(sel.start);
+  const end = doc.offsetAt(sel.end);
+  const file = doc.uri.fsPath;
+
+  const name = await vscode.window.showInputBox({
+    prompt: 'Enter the new function name',
+    placeHolder: 'extracted_function',
+  });
+
+  if (!name) {
+    return null;
+  }
+
+  try {
+    const data = await extractFileServer(client, file, name, start, end);
+
+    if (!data) {
+      vscode.window.showErrorMessage('Extract failed: received no data');
+      return null;
+    }
+
+    // Return ExtractData along with the file path
+    return { ...data, file };
+  } catch (e: any) {
+    vscode.window.showErrorMessage(`Extract failed: ${e.message || e}`);
+    return null;
+  }
+}
+
+async function extractFileServer(
+  client: RemDaemonClient,
+  path: string,
+  newFnName: string,
+  start: number,
+  end: number,
+): Promise<ExtractData> {
+  // Filepaths returned by VSCode might be URLs - if so we need to convert them
+  // to local paths (applicable to the OS)
+  const localPath = toLocalFsPath(path);
+
+  // Directly read from file system
+  const payload: ExtractPayload = buildExtract(localPath, newFnName, start, end);
+  const resp = await client.send<ExtractData>('extract_file', payload);
+
+  if (!isOk(resp)) {
+    vscode.window.showErrorMessage(`Extract failed: ${resp.error}`);
+    return { output: '', callsite: '' };
+  }
+
+  return resp.data;
 }

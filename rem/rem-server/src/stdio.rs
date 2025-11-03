@@ -9,6 +9,7 @@ use ra_ap_vfs::Vfs;
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value as JsonValue};
 
+use crate::extract::extract_file::handle_extract_file;
 // handlers & utils
 use crate::init::{init_daemon, FileRepr};
 use crate::extract::create::handle_create;
@@ -33,6 +34,9 @@ pub enum Request {
 
     #[serde(rename = "extract")]
     Extract { file: PathBuf, new_fn_name: String, start: u32, end: u32 },
+
+    #[serde(rename = "extract_file")]
+    ExtractFile { file: PathBuf, new_fn_name: String, start: u32, end: u32 },
 }
 
 #[derive(Serialize, Deserialize)]
@@ -127,6 +131,10 @@ fn handle_request(req: Request, state: &mut Option<State>) -> JsonResp {
         Request::Extract { file, new_fn_name, start, end } => with_state(state, |st| {
             handle_extract(&st.host, &st.vfs, file, new_fn_name, start, end)
         }),
+
+        Request::ExtractFile { file, new_fn_name, start, end } => {
+            handle_extract_file(file, new_fn_name, start, end)
+        },
     }
 }
 

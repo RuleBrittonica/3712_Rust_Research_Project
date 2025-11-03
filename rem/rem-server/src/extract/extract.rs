@@ -20,7 +20,6 @@ use rem_extract::extract::extraction::{
     parent_method,
 };
 
-use crate::stdio::Response;
 use crate::stdio::JsonResp;
 
 /// Thin stdio wrapper: uses persistent AnalysisHost & Workspace & Vfs.
@@ -42,7 +41,7 @@ pub fn handle_extract(
         end
     ) {
         Ok((modified_code, caller_method)) => {
-            JsonResp::ok(json!({ "output": modified_code, "callsite": caller_method }))
+            JsonResp::ok(json!({"output": modified_code, "callsite": caller_method }))
         }
         Err(e) => JsonResp::err(format!("{e:#}")),
     }
@@ -79,10 +78,7 @@ pub(crate) fn extract_via_host(
     check_comment(&source_file, &range)?;
     check_braces(&source_file, &range)?;
 
-    // Analysis & assists
-    let analysis = host.analysis();
-
-    let assists: Vec<Assist> = get_assists(&analysis, vfs, &input_abs_path, range);
+    let assists: Vec<Assist> = get_assists(db, vfs, &input_abs_path, range);
     let assist: Assist = filter_extract_function_assist(assists)?;
 
     let callee_name= new_fn_name;

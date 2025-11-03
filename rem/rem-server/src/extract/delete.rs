@@ -4,7 +4,6 @@ use ra_ap_ide::AnalysisHost;
 use ra_ap_vfs::Vfs;
 
 use crate::utils::{to_vfs_path, flush_vfs_into_host};
-use crate::stdio::Response;
 use crate::stdio::JsonResp;
 
 // TODO

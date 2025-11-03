@@ -28,6 +28,7 @@ exports.reinitDaemonForPath = reinitDaemonForPath;
 exports.sendChange = sendChange;
 exports.runExtract = runExtract;
 exports.extractFromActiveEditor = extractFromActiveEditor;
+exports.runExtractFile = runExtractFile;
 const vscode = __importStar(require("vscode"));
 const interface_1 = require("./interface");
 const utils_1 = require("./utils");
@@ -117,5 +118,51 @@ async function extractFromActiveEditor(client, options) {
         vscode.window.showErrorMessage(`Extract failed: ${e.message || e}`);
         return null;
     }
+}
+/** Faster no daemon pathway */
+async function runExtractFile(client) {
+    const editor = vscode.window.activeTextEditor;
+    if (!editor) {
+        vscode.window.showErrorMessage('No active editor');
+        return null;
+    }
+    const doc = editor.document;
+    const sel = editor.selection;
+    const start = doc.offsetAt(sel.start);
+    const end = doc.offsetAt(sel.end);
+    const file = doc.uri.fsPath;
+    const name = await vscode.window.showInputBox({
+        prompt: 'Enter the new function name',
+        placeHolder: 'extracted_function',
+    });
+    if (!name) {
+        return null;
+    }
+    try {
+        const data = await extractFileServer(client, file, name, start, end);
+        if (!data) {
+            vscode.window.showErrorMessage('Extract failed: received no data');
+            return null;
+        }
+        // Return ExtractData along with the file path
+        return { ...data, file };
+    }
+    catch (e) {
+        vscode.window.showErrorMessage(`Extract failed: ${e.message || e}`);
+        return null;
+    }
+}
+async function extractFileServer(client, path, newFnName, start, end) {
+    // Filepaths returned by VSCode might be URLs - if so we need to convert them
+    // to local paths (applicable to the OS)
+    const localPath = (0, utils_1.toLocalFsPath)(path);
+    // Directly read from file system
+    const payload = (0, interface_1.buildExtract)(localPath, newFnName, start, end);
+    const resp = await client.send('extract_file', payload);
+    if (!(0, interface_1.isOk)(resp)) {
+        vscode.window.showErrorMessage(`Extract failed: ${resp.error}`);
+        return { output: '', callsite: '' };
+    }
+    return resp.data;
 }
 //# sourceMappingURL=extract.js.map

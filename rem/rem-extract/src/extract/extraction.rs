@@ -122,8 +122,6 @@ pub fn extract_method_file(input: ExtractionInput) -> Result<(String, String), E
     let start_idx: u32 = input.start_idx;
     let end_idx: u32 = input.end_idx;
 
-    // Convert the input and output path to an `AbsPathBuf`
-    let input_abs_path: AbsPathBuf = convert_to_abs_path_buf(input_path).unwrap();
     let text: String = fs::read_to_string(&input.file_path).unwrap();
 
     // Verify the input data
@@ -141,6 +139,8 @@ pub fn extract_method_file(input: ExtractionInput) -> Result<(String, String), E
     let range: (u32, u32) = (start_idx, end_idx);
 
     let frange = generate_frange_from_fileid(file_id, range);
+
+    mx::mark("Get the assists");
 
     let assists: Vec<Assist> = analysis.assists_with_fixes(
         &assist_config,
@@ -163,10 +163,10 @@ pub fn extract_method_file(input: ExtractionInput) -> Result<(String, String), E
     let (text_edit, maybe_snippet_edit) =
         src_change.get_source_and_snippet_edit(
             file_id,
-            ).unwrap();
+        ).unwrap();
 
     let edited_text: String = apply_edits(
-        text,
+        text.clone(),
         text_edit.clone(),
         maybe_snippet_edit.clone(),
     );
@@ -183,7 +183,7 @@ pub fn extract_method_file(input: ExtractionInput) -> Result<(String, String), E
     mx::mark("Extraction End");
 
     let parent_method: String = parent_method_from_text(
-        fixed_cf_text.clone(),
+        text,
         &range,
     );
 

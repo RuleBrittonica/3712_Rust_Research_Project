@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import { RemDaemonClient } from './client';
 import { checkAll } from './check/checkEnv';
 import { DEFAULT_DAEMON_SETTING_KEY } from './interface';
-import { extractFromActiveEditor, initDaemonForPath, reinitDaemonForPath } from './extract';
+import { extractFromActiveEditor, initDaemonForPath, reinitDaemonForPath, runExtractFile } from './extract';
 
 const INSTALL_BASE = 'https://github.com/RuleBrittonica/rem-vscode/scripts'
 
@@ -57,12 +57,12 @@ export async function activate(context: vscode.ExtensionContext) {
     vscode.window.showErrorMessage('No active editor');
   }
   client.ensureRunning();
-  await initDaemonForPath(client, doc!.uri.fsPath);
+  // await initDaemonForPath(client, doc!.uri.fsPath);
 
   // Register normal user commands
   // 1) Extract and Apply Immediately
   const cmdExtract = vscode.commands.registerCommand('remvscode.extract', async () => {
-    const extract_data = await extractFromActiveEditor(client, { preview: true });
+    const extract_data = await runExtractFile(client);
     // We just need the src from the extract data
     // if extract_data is null, we do nothing
     if (extract_data) {
@@ -141,6 +141,12 @@ async function applyWorkspaceEdit(absFilePath: string, newContent: string): Prom
     doc.positionAt(0),
     doc.positionAt(doc.getText().length)
   );
+
+  // make sure that we have content changes (otherwise we have probably errored
+  // earlier up the line and don't want to do anything here)
+  if (newContent === "") {
+    throw new Error('New content is empty, aborting edit');
+  }
 
   const edit = new vscode.WorkspaceEdit();
   edit.replace(uri, fullRange, newContent);
