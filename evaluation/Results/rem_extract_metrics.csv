@@ -18,7 +18,6 @@ timestamp_iso,file_path,start_index,end_index,exit_code,extraction_start__to__lo
 2025-11-03T20:50:29,/home/matt/3712_Rust_Research_Project/evaluation/testfiles/REM_Original/gitoxide-inline-ext5/gix-lock/src/acquire.rs,4089,4281,0,495051,112329,2474,2657133,2991,12808
 2025-11-03T20:50:29,/home/matt/3712_Rust_Research_Project/evaluation/testfiles/REM_Original/gitoxide-inline-ext6/gix-discover/src/is.rs,5614,6173,0,622550,107609,2873,4480736,3848,22912
 2025-11-03T20:50:29,/home/matt/3712_Rust_Research_Project/evaluation/testfiles/REM_Original/gitoxide-inline-ext7/gix-glob/src/parse.rs,1282,1318,0,403207,96122,2356,2769977,2617,8734
-2025-11-03T20:50:29,/home/matt/3712_Rust_Research_Project/evaluation/testfiles/REM_Original/gitoxide-inline-ext8/gix-diff/src/tree/changes.rs,8536,8981,0,644857,113862,2226,4631719,3362,34001
 2025-11-03T20:50:29,/home/matt/3712_Rust_Research_Project/evaluation/testfiles/REM_Original/kickoff-ext1/src/font.rs,3206,3398,0,494546,112377,3619,2768148,2671,14533
 2025-11-03T20:50:29,/home/matt/3712_Rust_Research_Project/evaluation/testfiles/REM_Original/kickoff-ext2/src/history.rs,1319,1872,0,398752,124576,2850,2443569,2733,11091
 2025-11-03T20:50:29,/home/matt/3712_Rust_Research_Project/evaluation/testfiles/REM_Original/kickoff-ext3/src/font.rs,855,1018,0,492629,110374,2586,2531962,2069,13516
