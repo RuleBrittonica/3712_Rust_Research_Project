@@ -23,6 +23,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.initDaemonForPath = initDaemonForPath;
 exports.reinitDaemonForPath = reinitDaemonForPath;
 exports.sendChange = sendChange;
 exports.runExtract = runExtract;
@@ -30,20 +31,35 @@ exports.extractFromActiveEditor = extractFromActiveEditor;
 const vscode = __importStar(require("vscode"));
 const interface_1 = require("./interface");
 const utils_1 = require("./utils");
-/** Re-initialize the daemon DB using a path (Cargo.toml or .rs). */
-async function reinitDaemonForPath(client, manifestOrFile) {
-    const payload = (0, interface_1.buildInit)(manifestOrFile);
+/** Initialise the daemon DB using a path (Cargo.toml or .rs) */
+async function initDaemonForPath(client, manifestOrFile) {
+    const localPath = (0, utils_1.toLocalFsPath)(manifestOrFile);
+    const payload = (0, interface_1.buildInit)(localPath);
     const resp = await client.send('init', payload);
-    if (!resp.ok) {
+    if (!(0, interface_1.isOk)(resp)) {
+        vscode.window.showErrorMessage(`Init failed: ${resp.error}`);
         throw new Error(resp.error);
     }
+    vscode.window.showInformationMessage(`Init succeeded for ${localPath}`);
+    return resp.data;
+}
+/** Re-initialize the daemon DB using a path (Cargo.toml or .rs). */
+async function reinitDaemonForPath(client, manifestOrFile) {
+    const localPath = (0, utils_1.toLocalFsPath)(manifestOrFile);
+    const payload = (0, interface_1.buildInit)(localPath);
+    const resp = await client.send('init', payload);
+    if (!(0, interface_1.isOk)(resp)) {
+        vscode.window.showErrorMessage(`Reinit failed: ${resp.error}`);
+        throw new Error(resp.error);
+    }
+    vscode.window.showInformationMessage(`Reinit succeeded for ${localPath}`);
     return resp.data;
 }
 /** Push the active buffer contents to daemon (or let server read from disk if text omitted). */
 async function sendChange(client, filePath, text) {
     const payload = (0, interface_1.buildChange)(filePath, text);
     const resp = await client.send('change', payload);
-    if (!resp.ok) {
+    if (!(0, interface_1.isOk)(resp)) {
         // Surface but do not throw, so the caller can decide to continue.
         vscode.window.showErrorMessage(`Change failed: ${resp.error}`);
         return { status: 'no-op' };
@@ -54,12 +70,12 @@ async function sendChange(client, filePath, text) {
 async function runExtract(client, filePath, newFnName, start, end, 
 /** Optional current buffer text (unsaved). If given, we send a change first. */
 currentText) {
-    if (currentText !== undefined) {
-        await sendChange(client, filePath, currentText);
-    }
     // Filepaths returned by VSCode might be URLs - if so we need to convert them
     // to local paths (applicable to the OS)
     const localPath = (0, utils_1.toLocalFsPath)(filePath);
+    // if (currentText !== undefined) {
+    //   await sendChange(client, localPath, currentText);
+    // }
     const payload = (0, interface_1.buildExtract)(localPath, newFnName, start, end);
     const resp = await client.send('extract', payload);
     if (!(0, interface_1.isOk)(resp)) {
@@ -94,8 +110,8 @@ async function extractFromActiveEditor(client, options) {
             vscode.window.showErrorMessage('Extract failed: received no data');
             return null;
         }
-        // Return ExtractData for caller to handle (e.g. updating source file)
-        return data;
+        // Return ExtractData along with the file path
+        return { ...data, file };
     }
     catch (e) {
         vscode.window.showErrorMessage(`Extract failed: ${e.message || e}`);

@@ -251,35 +251,37 @@ pub fn run_analysis( host: AnalysisHost ) -> Analysis {
 ///
 /// # Returns
 /// - Ok(()) if the input is valid
-/// - Err(ExtractioError::CommentNotApplicable) if the selection is a comment
-/// - Err(ExtractioError::BracesNotApplicable) if the selection is braces
+/// - Err(ExtractionError::CommentNotApplicable) if the selection is a comment
+/// - Err(ExtractionError::BracesNotApplicable) if the selection is braces
 
 /// Gets a list of available assists for a given file and range
 pub fn get_assists (
-    analysis: &Analysis,
+    // analysis: &Analysis,
+    db: &RootDatabase,
     vfs: &Vfs,
     input_path: &AbsPathBuf,
     range: (u32, u32), // Tuple of start and end offsets
 ) -> Vec<Assist> {
-
     let assist_config: AssistConfig = generate_assist_config();
-    let diagnostics_config: DiagnosticsConfig = generate_diagnostics_config();
+    // let diagnostics_config: DiagnosticsConfig = generate_diagnostics_config();
     let resolve: AssistResolveStrategy = generate_resolve_strategy();
     let frange: FileRange = generate_frange(input_path, vfs, range);
 
     // Call the assists_with_fixes method
-    let assists: Vec<Assist> = analysis.assists_with_fixes(
-        &assist_config,
-        &diagnostics_config,
-        resolve,
-        frange
-    ).unwrap();
+    // let assists: Vec<Assist> = analysis.assists_with_fixes(
+    //     &assist_config,
+    //     &diagnostics_config,
+    //     resolve,
+    //     frange
+    // ).unwrap();
+
+    let assists: Vec<Assist> = ra_ap_ide_assists::assists(db, &assist_config, resolve, frange);
 
     assists
 }
 
 // Build out the AssistConfig Object
-fn generate_assist_config() -> AssistConfig {
+pub fn generate_assist_config() -> AssistConfig {
     let snippet_cap_: Option<SnippetCap> = None;
     let allowed_assists: Vec<AssistKind> = vec![
         // AssistKind::QuickFix,
@@ -313,12 +315,12 @@ fn generate_assist_config() -> AssistConfig {
 }
 
 // Build out the DiagnosticsConfig
-fn generate_diagnostics_config() -> DiagnosticsConfig {
+pub fn generate_diagnostics_config() -> DiagnosticsConfig {
     DiagnosticsConfig::test_sample()
 }
 
 // Build out the ResolveStrategy
-fn generate_resolve_strategy() -> AssistResolveStrategy {
+pub fn generate_resolve_strategy() -> AssistResolveStrategy {
     // FIXME: This is currently bugged it seems - Both extract_variable and extract_function are being returned
     let single_resolve: SingleResolve = SingleResolve {
         assist_id: "extract_function".to_string(),
@@ -423,7 +425,7 @@ pub fn apply_extract_function(
 }
 
 /// Applies the edits to a given set of source code (as a String)
-fn apply_edits(
+pub fn apply_edits(
     text: String,
     text_edit: TextEdit,
     maybe_snippet_edit: Option<SnippetEdit>,
@@ -440,7 +442,7 @@ fn apply_edits(
 }
 
 // Rename a function in a file using a search and replace
-fn rename_function(
+pub fn rename_function(
     text: String,
     old_name: &str,
     new_name: &str,
@@ -543,7 +545,7 @@ pub fn trim_range(
 /// Checks if a file contains a reference to ControlFlow::, and if so, adds  use
 /// std::ops::ControlFlow;\n\n to the start of the file, saving it back to the input path
 /// Returns the new text with the ControlFlow:: reference fixed up
-fn fixup_controlflow( text: String, ) -> String {
+pub fn fixup_controlflow( text: String, ) -> String {
     let mut text: String = text; // Make the text mutable
     let controlflow_ref: &str = "ControlFlow::";
     if text.contains( controlflow_ref ) {

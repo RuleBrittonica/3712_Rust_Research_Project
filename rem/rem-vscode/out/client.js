@@ -39,6 +39,7 @@ class RemDaemonClient {
             if (!line) {
                 continue;
             }
+            this.output.appendLine(`[recv] ${line}`);
             try {
                 // Expect the daemon to emit one JSON object per line.
                 // Shape: { ok: true, data: ... , id?: number } | { ok: false, error: "...", id?: number }
@@ -77,6 +78,7 @@ class RemDaemonClient {
         }
         const id = this.nextId++;
         const req = JSON.stringify({ id, op, ...payload }) + '\n';
+        this.output.appendLine(`[send] ${req.trim()}`);
         this.proc.stdin.write(req);
         return new Promise((resolve, reject) => {
             this.pending.set(id, { resolve, reject });

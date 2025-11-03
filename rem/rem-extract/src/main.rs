@@ -36,9 +36,9 @@ use serde_json;
 
 mod error;
 
-mod server; 
-
 use clap::Parser;
+
+use crate::extract::extraction::extract_method_file;
 
 fn main() {
     logging::init_logging();
@@ -74,7 +74,9 @@ fn main() {
             );
 
             // Run extraction
-            let extraction_output: Result<(String, String), error::ExtractionError> = extract_method(input);
+            let extraction_output: Result<(String, String), error::ExtractionError> =
+                // extract_method(input);
+                extract_method_file(input);
 
             match extraction_output {
                 Ok((output_code, caller_method)) => {

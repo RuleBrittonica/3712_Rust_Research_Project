@@ -1,9 +1,7 @@
 import * as vscode from 'vscode';
-import { exec, execSync } from 'node:child_process';
-import * as os from 'os';
 import { RemDaemonClient } from './client';
 import { checkAll } from './check/checkEnv';
-import { DEFAULT_DAEMON_SETTING_KEY, isOk } from './interface';
+import { DEFAULT_DAEMON_SETTING_KEY } from './interface';
 import { extractFromActiveEditor, initDaemonForPath, reinitDaemonForPath } from './extract';
 
 const INSTALL_BASE = 'https://github.com/RuleBrittonica/rem-vscode/scripts'
