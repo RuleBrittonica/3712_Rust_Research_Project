@@ -31,7 +31,7 @@ use ra_ap_vfs::{AbsPathBuf, FileId, Vfs};
 use crate::{
     error::ExtractionError,
     extract::extraction_utils::{
-        apply_edits, apply_extract_function, check_braces, check_comment, convert_to_abs_path_buf, filter_extract_function_assist, fixup_controlflow, generate_frange, get_assists, get_cargo_config, get_cargo_toml, get_manifest_dir, load_project_manifest, load_project_workspace, load_workspace_data, rename_function, run_analysis, trim_range
+        apply_edits, apply_extract_function, check_braces, check_comment, convert_to_abs_path_buf, filter_extract_function_assist, fixup_controlflow, generate_frange, generate_frange_from_fileid, get_assists, get_cargo_config, get_cargo_toml, get_manifest_dir, load_project_manifest, load_project_workspace, load_workspace_data, rename_function, run_analysis, trim_range
     },
 };
 
@@ -139,12 +139,8 @@ pub fn extract_method_file(input: ExtractionInput) -> Result<(String, String), E
     let diagnostics_config = super::extraction_utils::generate_diagnostics_config();
     let resolve: AssistResolveStrategy = super::extraction_utils::generate_resolve_strategy();
     let range: (u32, u32) = (start_idx, end_idx);
-    let vfs: Vfs = Vfs::default();
 
-    let frange: FileRange = generate_frange(
-        &input_abs_path,
-        &vfs,
-        range);
+    let frange = generate_frange_from_fileid(file_id, range);
 
     let assists: Vec<Assist> = analysis.assists_with_fixes(
         &assist_config,

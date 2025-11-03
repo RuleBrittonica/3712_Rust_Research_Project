@@ -356,6 +356,22 @@ pub fn generate_frange(
     frange
 }
 
+pub fn generate_frange_from_fileid(
+    file_id: FileId,
+    range: (u32, u32)
+) -> FileRange {
+    let range_: TextRange = TextRange::new(
+        TextSize::try_from( range.0 ).unwrap(),
+        TextSize::try_from( range.1 ).unwrap(),
+    );
+
+    let frange: FileRange = FileRange {
+        file_id: file_id,
+        range: range_,
+    };
+    frange
+}
+
 /// Filter the list of assists to only be the extract_function assist
 /// FIXME This is a hack to get around the fact that the resolve strategy is bugged
 /// and is returning both extract_variable and extract_function
