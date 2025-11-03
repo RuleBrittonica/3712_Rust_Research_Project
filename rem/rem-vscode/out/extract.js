@@ -120,7 +120,7 @@ async function extractFromActiveEditor(client, options) {
     }
 }
 /** Faster no daemon pathway */
-async function runExtractFile(client) {
+async function runExtractFile(client, name) {
     const editor = vscode.window.activeTextEditor;
     if (!editor) {
         vscode.window.showErrorMessage('No active editor');
@@ -131,13 +131,6 @@ async function runExtractFile(client) {
     const start = doc.offsetAt(sel.start);
     const end = doc.offsetAt(sel.end);
     const file = doc.uri.fsPath;
-    const name = await vscode.window.showInputBox({
-        prompt: 'Enter the new function name',
-        placeHolder: 'extracted_function',
-    });
-    if (!name) {
-        return null;
-    }
     try {
         const data = await extractFileServer(client, file, name, start, end);
         if (!data) {

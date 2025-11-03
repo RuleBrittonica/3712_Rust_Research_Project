@@ -73,21 +73,34 @@ async function activate(context) {
     // Register normal user commands
     // 1) Extract and Apply Immediately
     const cmdExtract = vscode.commands.registerCommand('remvscode.extract', async () => {
-        const extract_data = await (0, extract_1.runExtractFile)(client);
-        // We just need the src from the extract data
-        // if extract_data is null, we do nothing
+        let name = await vscode.window.showInputBox({
+            prompt: 'Enter the new function name',
+            placeHolder: 'extracted_function',
+        });
+        // Simple timing metrics for results
+        // const tStart = performance.now();
+        if (!name) {
+            name = "extracted_function";
+        }
+        const extract_data = await (0, extract_1.runExtractFile)(client, name);
         if (extract_data) {
             const new_src = extract_data.output;
             const file_path = extract_data.file;
             try {
                 await applyWorkspaceEdit(file_path, new_src);
+                // const totalMs = performance.now() - tStart;
+                // output.appendLine(`[Metrics] Extract: ${totalMs.toFixed(2)} ms`);
                 vscode.window.showInformationMessage('Extract applied successfully.');
             }
             catch (e) {
+                // const totalMs = performance.now() - tStart;
+                // output.appendLine(`[Metrics] Extract failed after ${totalMs.toFixed(2)} ms`);
                 vscode.window.showErrorMessage(`Failed to apply extract: ${e.message || e}`);
             }
         }
         else {
+            // const totalMs = performance.now() - tStart;
+            // output.appendLine(`[Metrics] Extract cancelled or failed: ${totalMs.toFixed(2)} ms`);
             vscode.window.showInformationMessage('Extract cancelled or failed.');
         }
     });

@@ -194,12 +194,7 @@ fn catchup_rhs_with_lhs<R: tree::Visit>(
         match rhs_entries.peek() {
             Some(Ok(rhs)) => {
                 /* START SELECTION */
-                let common = lhs.filename.len().min(rhs.filename.len());
-                let comparison = lhs.filename[..common].cmp(&rhs.filename[..common]).then_with(|| {
-                    let a = lhs.filename.get(common).or_else(|| lhs.mode.is_tree().then_some(&b'/'));
-                    let b = rhs.filename.get(common).or_else(|| rhs.mode.is_tree().then_some(&b'/'));
-                    a.cmp(&b)
-                });
+                let comparison = extracted_function(&lhs, rhs);
                 /* END SELECTION */
                 match comparison {
                     Equal => {
@@ -229,6 +224,16 @@ fn catchup_rhs_with_lhs<R: tree::Visit>(
         }
     }
     Ok(())
+}
+
+fn extracted_function(lhs: &_, rhs: _) -> _ {
+    let common = lhs.filename.len().min(rhs.filename.len());
+    let comparison = lhs.filename[..common].cmp(&rhs.filename[..common]).then_with(|| {
+        let a = lhs.filename.get(common).or_else(|| lhs.mode.is_tree().then_some(&b'/'));
+        let b = rhs.filename.get(common).or_else(|| rhs.mode.is_tree().then_some(&b'/'));
+        a.cmp(&b)
+    });
+    comparison
 }
 
 fn catchup_lhs_with_rhs<R: tree::Visit>(

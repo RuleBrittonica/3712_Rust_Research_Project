@@ -128,6 +128,7 @@ export async function extractFromActiveEditor(
 /** Faster no daemon pathway */
 export async function runExtractFile(
   client: RemDaemonClient,
+  name: string,
 ): Promise<ExtractDataWithFile | null> {
   const editor = vscode.window.activeTextEditor;
   if (!editor) {
@@ -140,15 +141,6 @@ export async function runExtractFile(
   const start = doc.offsetAt(sel.start);
   const end = doc.offsetAt(sel.end);
   const file = doc.uri.fsPath;
-
-  const name = await vscode.window.showInputBox({
-    prompt: 'Enter the new function name',
-    placeHolder: 'extracted_function',
-  });
-
-  if (!name) {
-    return null;
-  }
 
   try {
     const data = await extractFileServer(client, file, name, start, end);
