@@ -1,4 +1,4 @@
-\chapter[Chapter 4]{Evaluation and Experimental Results}
+\chapter{Evaluation and Experimental Results}
 \label{chap:evaluation_experimental_results}
 
 % No more than 1 page
@@ -8,6 +8,10 @@
 % Describe how I scraped the repositories from github.
 % Describe how I selected the files / functions that would be analysed
 % Describe how I interface the repositories with the tool
+
+% Two experiments for the extraction toolchain
+% Ensure we are at least as capable as REM 
+% Determine what else we can do (r.e. generics, async, etc)
 
 
 \section{Evaluation Criteria}
@@ -20,77 +24,58 @@
 \label{subsec:extraction_results_table}
 
 \newpage
-\begin{table}[ht]
+\begin{table}[]
     \centering
-    \begin{tabular}{c|lllll}
+    \begin{tabular}{|c|c|cc|lll|ll|}
     \hline
-    \multicolumn{1}{|c|}{\#} & \multicolumn{1}{l|}{\textbf{Repository}} & \multicolumn{1}{l|}{\textbf{Orignal SHA}} & \multicolumn{1}{l|}{\textbf{Post Extract SHA}} & \multicolumn{1}{l|}{\textbf{Date}} & \multicolumn{1}{l|}{\textbf{Author}} \\ \hline
-    1                        &                                          & \textbf{}                                 &                                                &                                    &                                      \\
-    2                        &                                          &                                           &                                                &                                    &                                      \\
-    3                        &                                          &                                           &                                                &                                    &                                      \\
-    4                        &                                          &                                           &                                                &                                    &                                      \\
-    5                        &                                          &                                           &                                                &                                    &                                      \\
-    6                        &                                          &                                           &                                                &                                    &                                      \\
-    7                        &                                          &                                           &                                                &                                    &                                      \\
-    8                        &                                          &                                           &                                                &                                    &                                      \\
-    9                        &                                          &                                           &                                                &                                    &                                      \\
-    10                       &                                          &                                           &                                                &                                    &                                      \\
-    11                       &                                          &                                           &                                                &                                    &                                      \\
-    12                       &                                          &                                           &                                                &                                    &                                      \\
-    13                       &                                          &                                           &                                                &                                    &                                      \\
-    14                       &                                          &                                           &                                                &                                    &                                      \\
-    15                       &                                          &                                           &                                                &                                    &                                      \\
-    16                       &                                          &                                           &                                                &                                    &                                      \\
-    17                       &                                          &                                           &                                                &                                    &                                      \\
-    18                       &                                          &                                           &                                                &                                    &                                      \\
-    19                       &                                          &                                           &                                                &                                    &                                      \\
-    20                       &                                          &                                           &                                                &                                    &                                      \\
-    21                       &                                          &                                           &                                                &                                    &                                      \\
-    22                       &                                          &                                           &                                                &                                    &                                      \\
-    23                       &                                          &                                           &                                                &                                    &                                      \\
-    24                       &                                          &                                           &                                                &                                    &                                      \\
-    25                       &                                          &                                           &                                                &                                    &                                      \\
-    26                       &                                          &                                           &                                                &                                    &                                      \\
-    27                       &                                          &                                           &                                                &                                    &                                      \\
-    28                       &                                          &                                           &                                                &                                    &                                      \\
-    29                       &                                          &                                           &                                                &                                    &                                      \\
-    30                       &                                          &                                           &                                                &                                    &                                      \\
-    31                       &                                          &                                           &                                                &                                    &                                      \\
-    32                       &                                          &                                           &                                                &                                    &                                      \\
-    33                       &                                          &                                           &                                                &                                    &                                      \\
-    34                       &                                          &                                           &                                                &                                    &                                      \\
-    35                       &                                          &                                           &                                                &                                    &                                      \\
-    36                       &                                          &                                           &                                                &                                    &                                      \\
-    37                       &                                          &                                           &                                                &                                    &                                      \\
-    38                       &                                          &                                           &                                                &                                    &                                      \\
-    39                       &                                          &                                           &                                                &                                    &                                      \\
-    40                       &                                          &                                           &                                                &                                    &                                      \\
-    41                       &                                          &                                           &                                                &                                    &                                      \\
-    42                       &                                          &                                           &                                                &                                    &                                      \\
-    43                       &                                          &                                           &                                                &                                    &                                      \\
-    44                       &                                          &                                           &                                                &                                    &                                      \\
-    45                       &                                          &                                           &                                                &                                    &                                      \\
-    46                       &                                          &                                           &                                                &                                    &                                      \\
-    47                       &                                          &                                           &                                                &                                    &                                      \\
-    48                       &                                          &                                           &                                                &                                    &                                      \\
-    49                       &                                          &                                           &                                                &                                    &                                      \\
-    50                       &                                          &                                           &                                                &                                    &                                      \\
-    51                       &                                          &                                           &                                                &                                    &                                      \\
-    52                       &                                          &                                           &                                                &                                    &                                      \\
-    53                       &                                          &                                           &                                                &                                    &                                      \\
-    54                       &                                          &                                           &                                                &                                    &                                      \\
-    55                       &                                          &                                           &                                                &                                    &                                      \\
-    56                       &                                          &                                           &                                                &                                    &                                      \\
-    57                       &                                          &                                           &                                                &                                    &                                      \\
-    58                       &                                          &                                           &                                                &                                    &                                      \\
-    59                       &                                          &                                           &                                                &                                    &                                      \\
-    60                       &                                          &                                           &                                                &                                    &                                      \\ \hline
+    \multirow{2}{*}{\#} & \multirow{2}{*}{\begin{tabular}[c]{@{}c@{}}Project\\ (LOC)\end{tabular}}      & \multicolumn{2}{c|}{Outcome}                  & \multicolumn{3}{c|}{Time(ms)}                               & \multicolumn{2}{l|}{Verification} \\
+                        &                                                                               & REM                   & New                   & \multicolumn{1}{c}{REM}  & \multicolumn{1}{c}{Raw} & User   & Result          & Reason          \\ \hline
+    1                   & \multirow{7}{*}{\begin{tabular}[c]{@{}c@{}}petgraph\\ (20,157)\end{tabular}}  & \cmark & \cmark & \multicolumn{1}{c}{370}  & 3.511                   & 184.32 &                 &                 \\
+    2                   &                                                                               & \cmark & \cmark & 1020                     & 3.753                   & 217.91 &                 &                 \\
+    3                   &                                                                               & \cmark & \cmark & 1470                     & 2.166                   & 231.08 &                 &                 \\
+    4                   &                                                                               & \cmark & \cmark & 1700                     & 3.337                   & 196.77 &                 &                 \\
+    5                   &                                                                               & \cmark & \cmark & 850                      & 2.018                   & 128.54 &                 &                 \\
+    6                   &                                                                               & \cmark & \cmark & 980                      & 2.148                   & 142.66 &                 &                 \\
+    7                   &                                                                               & \xmark & \cmark & 550                      & 2.030                   & 255.19 &                 &                 \\ \hline
+    8                   & \multirow{18}{*}{\begin{tabular}[c]{@{}c@{}}gitoxide\\ (20,211)\end{tabular}} & \cmark & \cmark & 930                      & 2.851                   & 199.45 &                 &                 \\
+    9                   &                                                                               & \cmark & \cmark & 1240                     & 3.240                   & 173.82 &                 &                 \\
+    10                  &                                                                               & \cmark & \cmark & 640                      & 2.823                   & 208.37 &                 &                 \\
+    11                  &                                                                               & \cmark & \cmark & 810                      & 2.991                   & 244.68 &                 &                 \\
+    12                  &                                                                               & \cmark & \cmark & 810                      & 3.282                   & 188.05 &                 &                 \\
+    13                  &                                                                               & \cmark & \cmark & 860                      & 2.995                   & 163.49 &                 &                 \\
+    14                  &                                                                               & \cmark & \cmark & 690                      & 5.345                   & 226.91 &                 &                 \\
+    15                  &                                                                               & \cmark & \cmark & 680                      & 5.468                   & 203.74 &                 &                 \\
+    16                  &                                                                               & \cmark & No Data & 540                      & N/A                   & N/A & N/A                & N/A                \\
+    17                  &                                                                               & \cmark & \cmark & 1200                     & 3.283                   & 179.4  &                 &                 \\
+    18                  &                                                                               & \cmark & \cmark & 920                      & 5.241                   & 210.62 &                 &                 \\
+    19                  &                                                                               & \cmark & \cmark & 2320                     & 3.283                   & 226.46 &                 &                 \\
+    20                  &                                                                               & \xmark & \cmark & 1150                     & 5.430                   & 192.92 &                 &                 \\
+    21                  &                                                                               & \cmark & \cmark & 690                      & 3.396                   & 123.84 &                 &                 \\
+    22                  &                                                                               & \cmark & \cmark & 640                      & 2.984                   & 264.15 &                 &                 \\
+    23                  &                                                                               & \cmark & \cmark & 700                      & 3.153                   & 132.97 &                 &                 \\
+    24                  &                                                                               & \cmark & \cmark & 640                      & 3.230                   & 147.53 &                 &                 \\
+    25                  &                                                                               & \cmark & \cmark & 720                      & 3.457                   & 221.84 &                 &                 \\ \hline
+    26                  & \multirow{5}{*}{\begin{tabular}[c]{@{}c@{}}kickoff\\ (1,502)\end{tabular}}    & \cmark & \cmark & 1030                     & 3.802                   & 185.09 &                 &                 \\
+    27                  &                                                                               & \cmark & \cmark & 1010                     & 8.557                   & 237.26 &                 &                 \\
+    28                  &                                                                               & \cmark & \cmark & 910                      & 7.365                   & 168.44 &                 &                 \\
+    29                  &                                                                               & \cmark & \cmark & 980                      & 4.864                   & 206.59 &                 &                 \\
+    30                  &                                                                               & \cmark & \cmark & 790                      & 4.191                   & 257.31 &                 &                 \\ \hline
+    31                  & \multirow{9}{*}{\begin{tabular}[c]{@{}c@{}}sniffnet\\ (7,304)\end{tabular}}   & \cmark & \cmark & 1040                     & 7.288                   & 121.06 &                 &                 \\
+    32                  &                                                                               & \xmark & \cmark & 760                      & 5.674                   & 195.22 &                 &                 \\
+    33                  &                                                                               & \cmark & \cmark & 1010                     & 4.439                   & 172.8  &                 &                 \\
+    34                  &                                                                               & \cmark & \cmark & 980                      & 3.602                   & 234.13 &                 &                 \\
+    35                  &                                                                               & \cmark & \cmark & 1060                     & 3.265                   & 141.95 &                 &                 \\
+    36                  &                                                                               & \cmark & \cmark & \multicolumn{1}{c}{1000} & 3.507                   & 260.42 &                 &                 \\
+    37                  &                                                                               & \cmark & \cmark & 1060                     & 4.147                   & 209.61 &                 &                 \\
+    38                  &                                                                               & \cmark & \cmark & 1080                     & 4.284                   & 187.32 &                 &                 \\
+    39                  &                                                                               & \cmark & \cmark & 1060                     & 4.273                   & 149.4  &                 &                 \\ \hline
+    40                  & beerus (302)                                                                  & \cmark & \cmark & 1070                     & 5.158                   & 224.75 &                 &                 \\ \hline
     \end{tabular}
-    \caption{Extraction Results. See appendix \ref{sec:appendix2} for details of each repository.}
-    \label{tab:extraction_results}
+    \captionsetup{justification=centering}
+    \caption{Comparison of the new toolchain to the original REM toolchain against the same cases.}
+    \label{tab:rem_original_results}
 \end{table}
 
-% Todo work out how to structure this section of the report
 \subsection{Analysis?}
 
 \section{Verification: Results and Analysis}
