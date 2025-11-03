@@ -17,8 +17,8 @@ struct Recorder {
     /// Next id to assign.
     next_id: u32,
 
-    /// Ad-hoc spans recorded explicitly (label -> seconds).
-    spans: Vec<(String, f64)>,
+    /// Ad-hoc spans recorded explicitly (label -> nanos).
+    spans: Vec<(String, u128)>,
 }
 
 #[derive(Clone)]
@@ -67,7 +67,7 @@ pub fn span(label: impl Into<String>) -> SpanGuard {
 
 /// Compute (and optionally record) a span between two named markers.
 /// Returns `Some(seconds)` if both markers exist and end is after start.
-pub fn span_between(start_name: &str, end_name: &str, record_phase: bool) -> Option<f64> {
+pub fn span_between(start_name: &str, end_name: &str, record_phase: bool) -> Option<u128> {
     let mut r = REC.lock().unwrap();
     let si = r.find_marker_index_by_name(start_name)?;
     let ei = r.find_marker_index_by_name(end_name)?;
@@ -76,11 +76,11 @@ pub fn span_between(start_name: &str, end_name: &str, record_phase: bool) -> Opt
     }
     let s = r.markers[si].t;
     let e = r.markers[ei].t;
-    let secs = (e - s).as_secs_f64();
+    let nanos = (e - s).as_nanos();
     if record_phase {
-        r.spans.push((format!("span:{start_name}->{end_name}"), secs));
+        r.spans.push((format!("span:{start_name}->{end_name}"), nanos));
     }
-    Some(secs)
+    Some(nanos)
 }
 
 /// List marker names in order of recording
@@ -95,14 +95,14 @@ pub fn span_between_markers(
     start_name: &str,
     end_name: &str,
     label: impl Into<String>,
-) -> Option<f64> {
+) -> Option<u128> {
     let mut r = REC.lock().unwrap();
     let si = r.find_marker_index_by_name(start_name)?;
     let ei = r.find_marker_index_by_name(end_name)?;
     if ei <= si { return None; }
-    let secs = (r.markers[ei].t - r.markers[si].t).as_secs_f64();
-    r.spans.push((label.into(), secs));
-    Some(secs)
+    let nanos = (r.markers[ei].t - r.markers[si].t).as_nanos();
+    r.spans.push((label.into(), nanos));
+    Some(nanos)
 }
 
 /// Record a custom-named span between two markers by *index* in the recorded order.
@@ -111,14 +111,14 @@ pub fn span_between_indices(
     start_idx: usize,
     end_idx: usize,
     label: impl Into<String>,
-) -> Option<f64> {
+) -> Option<u128> {
     let mut r = REC.lock().unwrap();
     if start_idx >= r.markers.len() || end_idx >= r.markers.len() || end_idx <= start_idx {
         return None;
     }
-    let secs = (r.markers[end_idx].t - r.markers[start_idx].t).as_secs_f64();
-    r.spans.push((label.into(), secs));
-    Some(secs)
+    let nanos = (r.markers[end_idx].t - r.markers[start_idx].t).as_nanos();
+    r.spans.push((label.into(), nanos));
+    Some(nanos)
 }
 
 /// Drain the current recorder as a list of `Timing` entries.
@@ -135,30 +135,30 @@ pub fn take_as_timings() -> Vec<Timing> {
         // Cumulative: first -> each
         let first = &r.markers[0];
         for (i, m) in r.markers.iter().enumerate() {
-            let secs = (m.t - first.t).as_secs_f64();
+            let nanos = (m.t - first.t).as_nanos();
             let name = if i == 0 {
                 format!("cum:{}->{}", m.name, m.name)
             } else {
                 format!("cum:{}->{}", first.name, m.name)
             };
-            out.push(Timing { name, seconds: secs });
+            out.push(Timing { name, nanos });
         }
 
         // Incremental: prev -> current
         for w in r.markers.windows(2) {
             let a = &w[0];
             let b = &w[1];
-            let secs = (b.t - a.t).as_secs_f64();
+            let nanos = (b.t - a.t).as_nanos();
             out.push(Timing {
                 name: format!("inc:{}->{}", a.name, b.name),
-                seconds: secs,
+                nanos,
             });
         }
     }
 
     // Ad-hoc spans
-    for (label, secs) in r.spans.drain(..) {
-        out.push(Timing { name: label, seconds: secs });
+    for (label, nanos) in r.spans.drain(..) {
+        out.push(Timing { name: label, nanos });
     }
 
     // Reset for next run
@@ -182,7 +182,7 @@ pub fn attach_to<T>(mut env: Envelope<T>) -> Envelope<T> {
     env
 }
 
-/* ============================ RAII guard ============================ */
+/*  RAII guard  */
 
 pub struct SpanGuard {
     label: String,
@@ -194,8 +194,8 @@ impl SpanGuard {
     /// Manually end the span now and record it.
     pub fn end(mut self) {
         if !self.committed {
-            let secs = self.start.elapsed().as_secs_f64();
-            REC.lock().unwrap().spans.push((format!("span:{}", self.label), secs));
+            let nanos = self.start.elapsed().as_nanos();
+            REC.lock().unwrap().spans.push((format!("span:{}", self.label), nanos));
             self.committed = true;
         }
     }
@@ -204,8 +204,8 @@ impl SpanGuard {
 impl Drop for SpanGuard {
     fn drop(&mut self) {
         if !self.committed {
-            let secs = self.start.elapsed().as_secs_f64();
-            REC.lock().unwrap().spans.push((format!("span:{}", self.label), secs));
+            let nanos = self.start.elapsed().as_nanos();
+            REC.lock().unwrap().spans.push((format!("span:{}", self.label), nanos));
             self.committed = true;
         }
     }

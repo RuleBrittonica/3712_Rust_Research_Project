@@ -89,7 +89,7 @@ pub enum Severity {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Timing {
     pub name: String,
-    pub seconds: f64,
+    pub nanos: u128,
 }
 
 pub fn ok_extract(extracted_fn: String, callsite: String, timings: Vec<Timing>) -> Envelope<ExtractData> {

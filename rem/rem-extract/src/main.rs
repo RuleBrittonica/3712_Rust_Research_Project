@@ -155,28 +155,32 @@ fn main() {
 }
 
 fn print_timings_table(mut timings: Vec<Timing>) {
-    // keep stable order; your metrics.rs already creates cum/inc/spans in sequence
     if timings.is_empty() {
         println!("No timings recorded.");
         return;
     }
-    // Find total if present to print last
+
+    // Extract total to print last
     let mut total = None;
     timings.retain(|t| {
         if t.name == "cum:Extraction Start->Extraction End" || t.name == "total" {
-            total = Some(Timing { name: t.name.clone(), seconds: t.seconds });
+            total = Some(Timing { name: t.name.clone(), nanos: t.nanos });
             false
-        } else { true }
+        } else {
+            true
+        }
     });
 
-    println!("\n=== Metrics (timings) ===");
-    for t in timings {
-        println!("{:<40} {:>8.3} s", t.name, t.seconds);
+    println!("\n=== Metrics (timings in nanoseconds) ===");
+    for t in &timings {
+        println!("{:<40} {:>15} ns", t.name, t.nanos);
     }
+
     if let Some(t) = total {
-        println!("{:-<53}", "");
-        println!("{:<40} {:>8.3} s", t.name, t.seconds);
+        println!("{:-<63}", "");
+        println!("{:<40} {:>15} ns", t.name, t.nanos);
     }
+
     println!();
 }
 

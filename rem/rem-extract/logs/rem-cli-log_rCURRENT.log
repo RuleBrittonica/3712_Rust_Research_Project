@@ -1,9 +1,9 @@
-2025-11-03 15:20:38 [INFO] - Application Started
-2025-11-03 15:20:38 [INFO] - Running 'extract' subcommand
-2025-11-03 15:20:38 [INFO] - File Path: "/home/matt/3712_Rust_Research_Project/evaluation/testfiles/REM_Original/beerus-ext-com1/beerus_rest_api/src/main.rs"
-2025-11-03 15:20:38 [INFO] - New Function Name: extracted
-2025-11-03 15:20:38 [INFO] - Start Index: 451
-2025-11-03 15:20:38 [INFO] - End Index: 1445
-2025-11-03 15:20:38 [INFO] - Verbose: no
-2025-11-03 15:20:38 [INFO] - Metrics: yes
-2025-11-03 15:20:38 [INFO] - JSON: no
+2025-11-03 20:21:25 [INFO] - Application Started
+2025-11-03 20:21:25 [INFO] - Running 'extract' subcommand
+2025-11-03 20:21:25 [INFO] - File Path: "/home/matt/3712_Rust_Research_Project/evaluation/testfiles/REM_Original/gitoxide-ext-com2/git-config/src/file/resolve_includes.rs"
+2025-11-03 20:21:25 [INFO] - New Function Name: extracted_fn
+2025-11-03 20:21:25 [INFO] - Start Index: 2135
+2025-11-03 20:21:25 [INFO] - End Index: 2422
+2025-11-03 20:21:25 [INFO] - Verbose: no
+2025-11-03 20:21:25 [INFO] - Metrics: yes
+2025-11-03 20:21:25 [INFO] - JSON: no

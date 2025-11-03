@@ -1,0 +1,3 @@
+timestamp_iso,file_path,start_index,end_index,exit_code,extraction_start__to__load_the_analysis,load_the_analysis__to__analysis_loaded,analysis_loaded__to__get_the_assists,get_the_assists__to__filter_for_extract_function_assist,filter_for_extract_function_assist__to__apply_extract_function_assist,apply_extract_function_assist__to__extraction_end
+2025-11-03T20:18:28,/home/matt/3712_Rust_Research_Project/evaluation/testfiles/REM_Original/beerus-ext-com1/beerus_rest_api/src/main.rs,451,1445,0,0.0,0.01,0.0,0.03,0.0,0.0
+2025-11-03T20:18:28,/home/matt/3712_Rust_Research_Project/evaluation/testfiles/REM_Original/gitoxide-ext-com1/git-protocol/src/packet_line/decode.rs,1431,2392,0,0.0,0.0,0.0,0.003,0.0,0.0
