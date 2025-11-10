@@ -1,6 +1,4 @@
 file_path,extraction_start__to__load_the_analysis,load_the_analysis__to__analysis_loaded,analysis_loaded__to__get_the_assists,get_the_assists__to__filter_for_extract_function_assist,filter_for_extract_function_assist__to__apply_extract_function_assist,apply_extract_function_assist__to__extraction_end,total_time,total_time_as_ms
-/home/matt/3712_Rust_Research_Project/evaluation/testfiles/REM_Original/beerus-ext-com1/beerus_rest_api/src/main.rs,690646,19243,2824,2784036,4202,10138,3511089,3.511089
-/home/matt/3712_Rust_Research_Project/evaluation/testfiles/REM_Original/gitoxide-ext-com1/git-protocol/src/packet_line/decode.rs,489277,43161,2218,3210099,2788,5408,3752951,3.752951
 /home/matt/3712_Rust_Research_Project/evaluation/testfiles/REM_Original/beerus-ext-com1/beerus_rest_api/src/main.rs,9285,86226,2120,2060529,2476,5371,2166007,2.166007
 /home/matt/3712_Rust_Research_Project/evaluation/testfiles/REM_Original/gitoxide-ext-com1/git-protocol/src/packet_line/decode.rs,307613,128739,2785,2887546,2574,7746,3337003,3.337003
 /home/matt/3712_Rust_Research_Project/evaluation/testfiles/REM_Original/gitoxide-ext-com2/git-config/src/file/resolve_includes.rs,10238,100897,2468,1872872,2692,28872,2018039,2.018039
@@ -18,6 +16,7 @@ file_path,extraction_start__to__load_the_analysis,load_the_analysis__to__analysi
 /home/matt/3712_Rust_Research_Project/evaluation/testfiles/REM_Original/gitoxide-inline-ext5/gix-lock/src/acquire.rs,495051,112329,2474,2657133,2991,12808,3282786,3.282786
 /home/matt/3712_Rust_Research_Project/evaluation/testfiles/REM_Original/gitoxide-inline-ext6/gix-discover/src/is.rs,622550,107609,2873,4480736,3848,22912,5240528,5.240528
 /home/matt/3712_Rust_Research_Project/evaluation/testfiles/REM_Original/gitoxide-inline-ext7/gix-glob/src/parse.rs,403207,96122,2356,2769977,2617,8734,3283013,3.283013
+/home/matt/3712_Rust_Research_Project/evaluation/testfiles/REM_Original/gitoxide-inline-ext8/gix-diff/src/tree/changes.rs,644857,113862,2226,4631719,3362,34001,5430027,5.430027
 /home/matt/3712_Rust_Research_Project/evaluation/testfiles/REM_Original/kickoff-ext1/src/font.rs,494546,112377,3619,2768148,2671,14533,3395894,3.395894
 /home/matt/3712_Rust_Research_Project/evaluation/testfiles/REM_Original/kickoff-ext2/src/history.rs,398752,124576,2850,2443569,2733,11091,2983571,2.983571
 /home/matt/3712_Rust_Research_Project/evaluation/testfiles/REM_Original/kickoff-ext3/src/font.rs,492629,110374,2586,2531962,2069,13516,3153136,3.153136

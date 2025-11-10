@@ -3,7 +3,7 @@
 This folder contains all files used to evaluate the performance of the new REM
 toolchain.
 
-## Extractionco
+## Extraction
 
 Contains a series of test files used to evaluate the extraction capabilities of
 REM
