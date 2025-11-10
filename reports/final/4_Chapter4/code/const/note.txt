@@ -1,0 +1,3 @@
+The extractor should recognize const items / const fn and keep them valid;
+lifting const fn out is different from plain fn (and we need to keep the
+fn const to maintain the garuntees of the compiler)

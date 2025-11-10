@@ -1,0 +1,2 @@
+The extractor must keep the code inside an async fn, preserve the Result type
+(because of ?), and not widen lifetimes/borrows across await. 

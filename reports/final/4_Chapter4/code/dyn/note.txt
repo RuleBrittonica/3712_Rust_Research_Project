@@ -1,0 +1,1 @@
+he extracted function must keep the dyn Trait type (and object-safety). 

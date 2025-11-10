@@ -1,0 +1,4 @@
+You can’t break from inside a new function; the extractor must reify control
+flow as a return value that the caller interprets. Rust-Analyzer based
+extraction will handle this using std::ops::controlflow.
+Rem-controller would handle this using custom CF enum types. 

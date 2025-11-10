@@ -1,0 +1,3 @@
+HRTBs are opaque to inference unless carried explicitly. The extractor must copy
+the for<'a> bound onto the new function. If it doesn't, the repairer tool must
+catch this issue and repair the lifetime

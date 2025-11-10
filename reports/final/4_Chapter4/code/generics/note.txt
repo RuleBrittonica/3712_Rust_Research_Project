@@ -1,0 +1,2 @@
+The extractor must preserve generic parameters and bounds (T: Ord + Copy) rather
+than monomorphizing (and ideally we don't try and generate a dyn Trait object)
