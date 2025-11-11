@@ -1,6 +1,5 @@
 use std::path::PathBuf;
 
-use anyhow::anyhow;
 use serde_json::json;
 
 use rem_extract::extract::extraction::extract_method_file;
@@ -25,6 +24,6 @@ pub fn handle_extract_file(
         Ok( (modified_code, caller_method) ) => {
             JsonResp::ok(json!({"output": modified_code, "callsite": caller_method}))
         }
-        Err(e) => JsonResp::err(format!("{e:#}")),
+        Err( e ) => JsonResp::err(format!("{e:#}")),
     }
 }

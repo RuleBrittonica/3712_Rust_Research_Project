@@ -3,6 +3,7 @@ import { RemDaemonClient } from './client';
 import { checkAll } from './check/checkEnv';
 import { DEFAULT_DAEMON_SETTING_KEY } from './interface';
 import { extractFromActiveEditor, initDaemonForPath, reinitDaemonForPath, runExtractFile } from './extract';
+import { runRepair } from './repairer';
 
 const INSTALL_BASE = 'https://github.com/RuleBrittonica/rem-vscode/scripts'
 
@@ -102,13 +103,54 @@ export async function activate(context: vscode.ExtensionContext) {
   });
 
   // 2) Repair
-  const cmdRepair = vscode.commands.registerCommand('remvscode.repair', async () => {
-    vscode.window.showInformationMessage('Repair command not implemented yet.');
-  });
+  // const cmdRepair = vscode.commands.registerCommand('remvscode.repair', async () => {
+  //   vscode.window.showInformationMessage('Repair command not implemented yet.');
+  // });
 
   // 3) Extract and Repair
   const cmdExtractRepair = vscode.commands.registerCommand('remvscode.extractRepair', async () => {
-    vscode.window.showInformationMessage('Extract & Repair command not implemented yet.');
+    let name = await vscode.window.showInputBox({
+      prompt: 'Enter the new function name',
+      placeHolder: 'extracted_function',
+    });
+
+    if (!name) {
+      name = "extracted_function";
+    }
+
+    const extract_data = await runExtractFile(client, name);
+
+    if (!extract_data) {
+      return vscode.window.showInformationMessage('Extract cancelled or failed.');
+    }
+
+    const new_src = extract_data.output;
+    const file_path = extract_data.file;
+    const callsite = extract_data.callsite;
+
+    // Try to update the file and then call the repairer
+    try {
+      await applyWorkspaceEdit(file_path, new_src);
+    } catch (e: any) {
+      return vscode.window.showErrorMessage(`Failed to apply extract: ${e.message || e}`);
+    }
+
+    // Now call the repairer on the modified file
+    const repair_data = await runRepair(client, file_path, callsite);
+
+    if (!repair_data) {
+      return vscode.window.showInformationMessage('Repair cancelled or failed.');
+    }
+
+    const id = repair_data.idx;
+    const system = repair_data.system_name;
+    const count = repair_data.repair_count;
+    const changed = repair_data.changed_files;
+
+    // Show some repair summary info
+    return vscode.window.showInformationMessage(
+      `Extract and Repair #${id} completed on system "${system}". Total repairs: ${count}. Changed files: ${changed}`
+    );
   });
 
   // 4) Extract and Verify
@@ -137,7 +179,7 @@ export async function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
     cmdReinit,
     cmdExtract,
-    cmdRepair,
+    // cmdRepair,
     cmdExtractRepair,
     cmdExtractVerify,
     cmdExtractRepairVerify

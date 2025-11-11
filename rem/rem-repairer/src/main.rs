@@ -66,8 +66,8 @@ fn main() {
         } => {
             let repair_system: &dyn RepairSystem = match repairer {
                 RepairerType::Simple => &repair_lifetime_simple::Repairer {},
-                TightestBoundsFirst => &repair_lifetime_tightest_bound_first::Repairer {},
-                LoosestBoundsFirst => &repair_lifetime_loosest_bound_first::Repairer {},
+                RepairerType::TightestBoundsFirst => &repair_lifetime_tightest_bound_first::Repairer {},
+                RepairerType::LoosestBoundsFirst => &repair_lifetime_loosest_bound_first::Repairer {},
             };
             let success = if *verbose {
                 print_repair_stat(&repair_system, file_name, new_file_name, fn_name)
@@ -89,8 +89,8 @@ fn main() {
         } => {
             let repair_system: &dyn RepairSystem = match repairer {
                 RepairerType::Simple => &repair_lifetime_simple::Repairer {},
-                TightestBoundsFirst => &repair_lifetime_tightest_bound_first::Repairer {},
-                LoosestBoundsFirst => &repair_lifetime_loosest_bound_first::Repairer {},
+                RepairerType::TightestBoundsFirst => &repair_lifetime_tightest_bound_first::Repairer {},
+                RepairerType::LoosestBoundsFirst => &repair_lifetime_loosest_bound_first::Repairer {},
             };
             let success = if *verbose {
                 print_repair_stat_project(&repair_system, src_path, manifest_path, fn_name)
@@ -182,9 +182,9 @@ fn test() {
         ("bar", ""),
     ];
     let repair_systems: Vec<&dyn RepairSystem> = vec![
-        //&repair_lifetime_simple::Repairer {},
-        //&repair_rustfix::Repairer {},
-        //&repair_lifetime_tightest_bound_first::Repairer {},
+        &repair_lifetime_simple::Repairer {},
+        &repair_rustfix::Repairer {},
+        &repair_lifetime_tightest_bound_first::Repairer {},
         &repair_lifetime_loosest_bound_first::Repairer {},
     ];
     for (file_name, (fn_name, _)) in zip(file_names, function_sigs) {

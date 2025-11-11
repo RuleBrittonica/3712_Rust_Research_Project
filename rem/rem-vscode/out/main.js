@@ -30,6 +30,7 @@ const client_1 = require("./client");
 const checkEnv_1 = require("./check/checkEnv");
 const interface_1 = require("./interface");
 const extract_1 = require("./extract");
+const repairer_1 = require("./repairer");
 const INSTALL_BASE = 'https://github.com/RuleBrittonica/rem-vscode/scripts';
 async function activate(context) {
     // Only run on a rust file!
@@ -105,12 +106,43 @@ async function activate(context) {
         }
     });
     // 2) Repair
-    const cmdRepair = vscode.commands.registerCommand('remvscode.repair', async () => {
-        vscode.window.showInformationMessage('Repair command not implemented yet.');
-    });
+    // const cmdRepair = vscode.commands.registerCommand('remvscode.repair', async () => {
+    //   vscode.window.showInformationMessage('Repair command not implemented yet.');
+    // });
     // 3) Extract and Repair
     const cmdExtractRepair = vscode.commands.registerCommand('remvscode.extractRepair', async () => {
-        vscode.window.showInformationMessage('Extract & Repair command not implemented yet.');
+        let name = await vscode.window.showInputBox({
+            prompt: 'Enter the new function name',
+            placeHolder: 'extracted_function',
+        });
+        if (!name) {
+            name = "extracted_function";
+        }
+        const extract_data = await (0, extract_1.runExtractFile)(client, name);
+        if (!extract_data) {
+            return vscode.window.showInformationMessage('Extract cancelled or failed.');
+        }
+        const new_src = extract_data.output;
+        const file_path = extract_data.file;
+        const callsite = extract_data.callsite;
+        // Try to update the file and then call the repairer
+        try {
+            await applyWorkspaceEdit(file_path, new_src);
+        }
+        catch (e) {
+            return vscode.window.showErrorMessage(`Failed to apply extract: ${e.message || e}`);
+        }
+        // Now call the repairer on the modified file
+        const repair_data = await (0, repairer_1.runRepair)(client, file_path, callsite);
+        if (!repair_data) {
+            return vscode.window.showInformationMessage('Repair cancelled or failed.');
+        }
+        const id = repair_data.idx;
+        const system = repair_data.system_name;
+        const count = repair_data.repair_count;
+        const changed = repair_data.changed_files;
+        // Show some repair summary info
+        return vscode.window.showInformationMessage(`Extract and Repair #${id} completed on system "${system}". Total repairs: ${count}. Changed files: ${changed}`);
     });
     // 4) Extract and Verify
     const cmdExtractVerify = vscode.commands.registerCommand('remvscode.extractVerify', async () => {
@@ -135,7 +167,9 @@ async function activate(context) {
             vscode.window.showErrorMessage(`Init failed: ${e.message || e}`);
         }
     });
-    context.subscriptions.push(cmdReinit, cmdExtract, cmdRepair, cmdExtractRepair, cmdExtractVerify, cmdExtractRepairVerify);
+    context.subscriptions.push(cmdReinit, cmdExtract, 
+    // cmdRepair,
+    cmdExtractRepair, cmdExtractVerify, cmdExtractRepairVerify);
 }
 function deactivate() { }
 // fallback for default ~/.local/bin on *nix, ~/bin on Windows

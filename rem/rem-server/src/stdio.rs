@@ -16,6 +16,8 @@ use crate::extract::create::handle_create;
 use crate::extract::change::handle_change;
 use crate::extract::delete::handle_delete;
 use crate::extract::extract::handle_extract;
+use crate::repairer::handle_repair_file;
+use crate::verification::handle_verification;
 
 #[derive(Deserialize)]
 #[serde(tag = "op")]
@@ -37,6 +39,12 @@ pub enum Request {
 
     #[serde(rename = "extract_file")]
     ExtractFile { file: PathBuf, new_fn_name: String, start: u32, end: u32 },
+
+    #[serde(rename = "repair")]
+    RepairFile { file: PathBuf, new_fn_name: String },
+
+    #[serde(rename = "verify")]
+    VerifyFile { crate_path: PathBuf, file: PathBuf, fn_name: String, new_fn_name: String, charon_path: PathBuf, aeneas_path: PathBuf },
 }
 
 #[derive(Serialize, Deserialize)]
@@ -97,8 +105,9 @@ pub fn run_stdio_server() -> Result<()> {
 }
 
 fn handle_request(req: Request, state: &mut Option<State>) -> JsonResp {
+    use Request as R;
     match req {
-        Request::Init { manifest_path } => match init_daemon(&manifest_path) {
+        R::Init { manifest_path } => match init_daemon(&manifest_path) {
             Ok(core) => {
                 let mut hashes = HashMap::new();
                 for FileRepr { path, hash } in core.hashed_files {
@@ -116,25 +125,35 @@ fn handle_request(req: Request, state: &mut Option<State>) -> JsonResp {
             Err(e) => JsonResp::err(format!("{e:#}")),
         },
 
-        Request::Create { path, text } => with_state(state, |st| {
+        R::Create { path, text } => with_state(state, |st| {
             handle_create(&mut st.host, &mut st.vfs, &mut st.hashes, path, text)
         }),
 
-        Request::Change { path, text } => with_state(state, |st| {
+        R::Change { path, text } => with_state(state, |st| {
             handle_change(&mut st.host, &mut st.vfs, &mut st.hashes, path, text)
         }),
 
-        Request::Delete { path } => with_state(state, |st| {
+        R::Delete { path } => with_state(state, |st| {
             handle_delete(&mut st.host, &mut st.vfs, &mut st.hashes, path)
         }),
 
-        Request::Extract { file, new_fn_name, start, end } => with_state(state, |st| {
+        R::Extract { file, new_fn_name, start, end } => with_state(state, |st| {
             handle_extract(&st.host, &st.vfs, file, new_fn_name, start, end)
         }),
 
-        Request::ExtractFile { file, new_fn_name, start, end } => {
+        R::ExtractFile { file, new_fn_name, start, end } => {
             handle_extract_file(file, new_fn_name, start, end)
         },
+
+        R::RepairFile { file, new_fn_name } => {
+            handle_repair_file(file, new_fn_name)
+        },
+
+        R::VerifyFile { crate_path, file, fn_name, new_fn_name, charon_path, aeneas_path } => {
+            handle_verification(crate_path, file, fn_name, new_fn_name, charon_path, aeneas_path)
+        },
+
+        // _ => JsonResp::err("unimplemented operation"),
     }
 }
 

@@ -28,7 +28,6 @@
     "commands": [
       { "command": "remvscode.reinit", "title": "REM: Reinitialize Database" },
       { "command": "remvscode.extract", "title": "REM: Extract Method" },
-      { "command": "remvscode.repair", "title": "REM: Repair Code" },
       { "command": "remvscode.extractRepair", "title": "REM: Extract Method & Repair" },
       { "command": "remvscode.extractVerify", "title": "REM: Extract Method & Verify" },
       { "command": "remvscode.extractRepairVerify", "title": "REM: Extract, Repair & Verify" }
@@ -42,11 +41,6 @@
         {
           "command": "remvscode.extract",
           "group": "navigation@10",
-          "when": "editorHasSelection && editorLangId == rust"
-        },
-        {
-          "command": "remvscode.repair",
-          "group": "navigation@11",
           "when": "editorHasSelection && editorLangId == rust"
         },
         {

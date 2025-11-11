@@ -13,7 +13,6 @@ export type JsonResp<T = unknown> =
   | { ok: true; data: T }
   | { ok: false; error: string };
 
-/** Type guard for convenient narrowing when you want a function call. */
 export function isOk<T>(r: JsonResp<T>): r is { ok: true; data: T } {
   return r.ok === true;
 }
@@ -66,15 +65,18 @@ export interface ExtractData {
   callsite: string;
 }
 
-/** Future placeholders */
 export interface RepairPayload {
-  // e.g., file/module identifiers, options, etc.
+  file: string,
+  new_fn_name: string,
 }
 export interface VerifyPayload {
   // e.g., proof target config, options, etc.
 }
 export interface RepairData {
-  // results/artifacts/log summaries
+  idx: number; // integer identifier of repair task we got to
+  system_name: string;
+  repair_count: number; // total number of repairs completed
+  changed_files: string; // string (comma separated) of changed file paths
 }
 export interface VerifyData {
   // results/artifacts/log summaries
@@ -87,5 +89,7 @@ export const buildChange = (path: string, text?: string): ChangePayload => ({ pa
 export const buildDelete = (path: string): DeletePayload => ({ path });
 export const buildExtract = (file: string, new_fn_name: string, start: number, end: number): ExtractPayload =>
   ({ file, new_fn_name, start, end });
+export const buildRepair = (file: string, new_fn_name: string): RepairPayload =>
+  ({ file, new_fn_name });
 
 export const DEFAULT_DAEMON_SETTING_KEY = 'remvscode.daemonPath'; // points at rem-extract for now

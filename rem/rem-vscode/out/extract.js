@@ -74,9 +74,6 @@ currentText) {
     // Filepaths returned by VSCode might be URLs - if so we need to convert them
     // to local paths (applicable to the OS)
     const localPath = (0, utils_1.toLocalFsPath)(filePath);
-    // if (currentText !== undefined) {
-    //   await sendChange(client, localPath, currentText);
-    // }
     const payload = (0, interface_1.buildExtract)(localPath, newFnName, start, end);
     const resp = await client.send('extract', payload);
     if (!(0, interface_1.isOk)(resp)) {

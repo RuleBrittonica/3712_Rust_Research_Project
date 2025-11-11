@@ -66,9 +66,6 @@ export async function runExtract(
   // to local paths (applicable to the OS)
   const localPath = toLocalFsPath(filePath);
 
-  // if (currentText !== undefined) {
-  //   await sendChange(client, localPath, currentText);
-  // }
   const payload = buildExtract(localPath, newFnName, start, end);
   const resp = await client.send<ExtractData>('extract', payload);
 

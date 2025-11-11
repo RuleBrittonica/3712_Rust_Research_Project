@@ -68,11 +68,11 @@ ra_ap_syntax           = "0.0.262"
 rowan                  = "0.15.15"
 
 # REM member crates
-rem-utils     = { path = "rem-utils" }
-rem-extract   = { path = "rem-extract" }
-rem-repairer  = { path = "rem-repairer" }
-rem-interface = { path = "rem-interface" }
-rem-verifyer  = { path = "rem-verification" }
+rem-utils         = { path = "rem-utils" }
+rem-extract       = { path = "rem-extract" }
+rem-repairer      = { path = "rem-repairer" }
+rem-interface     = { path = "rem-interface" }
+rem-verification  = { path = "rem-verification" }
 
 # [patch.crates-io]
 # rem-utils = { path = "rem-utils" }
