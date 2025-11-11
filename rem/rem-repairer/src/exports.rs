@@ -24,9 +24,9 @@ impl std::fmt::Display for RepairError {
 
 // If we get a return then by definition the repair succeeded
 #[derive(Debug)]
-pub struct RepairReturn {
+pub struct RepairReturn<'a> {
     pub idx: u8,
-    pub system_name: &str,
+    pub system_name: &'a str,
     pub repair_count: u8,
     pub changed_files: Vec<String>,
 }
@@ -46,7 +46,7 @@ impl RepairerInput {
 
 pub fn call_all_repairers(
     input: RepairerInput
-) -> Result<RepairReturn, RepairError> {
+) -> Result<RepairReturn<'static>, RepairError> {
     // The process will look something like this:
     // 1. Derive the (minimal) crate root from the file path (assuming the file
     //    is in a crate - return an error if it isn't).
@@ -117,7 +117,7 @@ pub fn call_all_repairers(
                 RepairReturn {
                     idx: idx as u8,
                     system_name: system.name(),
-                    repair_count: result.repair_count,
+                    repair_count: result.repair_count as u8,
                     changed_files,
                 }
             );
