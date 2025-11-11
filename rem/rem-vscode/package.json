@@ -15,7 +15,7 @@
         "remvscode.aeneasBinariesPath": {
           "type": "string",
           "default": "",
-          "description": "Path to the folder where Aeneas/CHARON binaries are stored. Leave empty to use $HOME/.local/bin."
+          "description": "Path to the folder where Aeneas/CHARON binaries are stored. Leave empty to use $HOME/.local/bin. Both binaries must be present in the same directory."
         },
         "remvscode.daemonPath": {
           "type": "string",

@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import { RemDaemonClient } from './client';
 import { checkAll } from './check/checkEnv';
 import { DEFAULT_DAEMON_SETTING_KEY } from './interface';
-import { extractFromActiveEditor, initDaemonForPath, reinitDaemonForPath, runExtractFile } from './extract';
+import { reinitDaemonForPath, runExtractFile } from './extract';
 import { runRepair } from './repairer';
 
 const INSTALL_BASE = 'https://github.com/RuleBrittonica/rem-vscode/scripts'
@@ -154,13 +154,104 @@ export async function activate(context: vscode.ExtensionContext) {
   });
 
   // 4) Extract and Verify
+  //    FIXME - currently this goes back and forth - we extract, that is
+  //    successfull and thus applied, and then we wait for the verification
+  //    process to complete. However, if the verification fails, we give the
+  //    user the option to rever to the original file, which is stored in
+  //    memory. Maybe this is not the best UX, as the user might have made
+  //    changes elsewhere in the file in the meantime, that then get undone...
   const cmdExtractVerify = vscode.commands.registerCommand('remvscode.extractVerify', async () => {
-    vscode.window.showInformationMessage('Extract & Verify command not implemented yet.');
+    // Extract, apply the extract, but store a backup of the original file in
+    // memory
+    let name = await vscode.window.showInputBox({
+      prompt: 'Enter the new function name',
+      placeHolder: 'extracted_function',
+    });
+
+    if (!name) {
+      name = "extracted_function";
+    }
+
+    const extract_data = await runExtractFile(client, name);
+
+    if (!extract_data) {
+      return vscode.window.showInformationMessage('Extract cancelled or failed.');
+    }
+
+    const new_src = extract_data.output;
+    const file_path = extract_data.file;
+    const callsite = extract_data.callsite;
+
+    // Read the original content for verification later
+    const uri = vscode.Uri.file(file_path);
+    const doc = await vscode.workspace.openTextDocument(uri);
+    const original_content = doc.getText();
+
+    // Try to update the file
+    try {
+      await applyWorkspaceEdit(file_path, new_src);
+    } catch (e: any) {
+      return vscode.window.showErrorMessage(`Failed to apply extract: ${e.message || e}`);
+    }
+
+    // Call the verification process, with both the original and new content
   });
 
   // 5) Extract, Repair, and Verify
+  //    FIXME - currently this goes back and forth - we extract, that is
+  //    successfull and thus applied, and then we wait for the verification
+  //    process to complete. However, if the verification fails, we give the
+  //    user the option to rever to the original file, which is stored in
+  //    memory. Maybe this is not the best UX, as the user might have made
+  //    changes elsewhere in the file in the meantime, that then get undone...
   const cmdExtractRepairVerify = vscode.commands.registerCommand('remvscode.extractRepairVerify', async () => {
-    vscode.window.showInformationMessage('Extract, Repair & Verify command not implemented yet.');
+    // Extract, apply the extract, but store a backup of the original file in
+    // memory. Then call the repairer, and finally the verifier.
+    let name = await vscode.window.showInputBox({
+      prompt: 'Enter the new function name',
+      placeHolder: 'extracted_function',
+    });
+
+    if (!name) {
+      name = "extracted_function";
+    }
+
+    const extract_data = await runExtractFile(client, name);
+
+    if (!extract_data) {
+      return vscode.window.showInformationMessage('Extract cancelled or failed.');
+    }
+
+    const new_src = extract_data.output;
+    const file_path = extract_data.file;
+    const callsite = extract_data.callsite;
+
+    // Read the original content for verification later
+    const uri = vscode.Uri.file(file_path);
+    const doc = await vscode.workspace.openTextDocument(uri);
+    const original_content = doc.getText();
+
+    // Try to update the file
+    try {
+      await applyWorkspaceEdit(file_path, new_src);
+    } catch (e: any) {
+      return vscode.window.showErrorMessage(`Failed to apply extract: ${e.message || e}`);
+    }
+
+    // Call the repairer on the modified file
+    const repair_data = await runRepair(client, file_path, callsite);
+
+    if (!repair_data) {
+      return vscode.window.showInformationMessage('Repair cancelled or failed.');
+    }
+
+    const id = repair_data.idx;
+    const system = repair_data.system_name;
+    const count = repair_data.repair_count;
+    const changed = repair_data.changed_files;
+
+    // Apply the verifyer here (TODO)
+
   });
 
   // 6) Reinit command (Command Palette): reinitialize database for current file

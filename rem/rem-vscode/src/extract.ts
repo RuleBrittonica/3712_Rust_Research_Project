@@ -8,7 +8,6 @@ import {
 } from './interface';
 
 import { toLocalFsPath } from './utils';
-import { ClientRequest } from 'node:http';
 
 /** Initialise the daemon DB using a path (Cargo.toml or .rs) */
 export async function initDaemonForPath(client: RemDaemonClient, manifestOrFile: string): Promise<InitData> {
@@ -78,49 +77,6 @@ export async function runExtract(
 }
 
 type ExtractDataWithFile = ExtractData & { file: string };
-
-/** Convenience: extract from current editor selection, prompting for a name. */
-export async function extractFromActiveEditor(
-  client: RemDaemonClient,
-  options?: { prompt?: string; defaultName?: string; preview?: boolean }
-): Promise<ExtractDataWithFile | null> {
-  const editor = vscode.window.activeTextEditor;
-  if (!editor) {
-    vscode.window.showErrorMessage('No active editor');
-    return null;
-  }
-
-  const doc = editor.document;
-  const sel = editor.selection;
-  const start = doc.offsetAt(sel.start);
-  const end = doc.offsetAt(sel.end);
-  const file = doc.uri.fsPath;
-
-  const name = await vscode.window.showInputBox({
-    prompt: options?.prompt ?? 'Enter the new function name',
-    placeHolder: options?.defaultName ?? 'extracted_function',
-  });
-  if (!name) {
-    return null;
-  }
-
-  try {
-    // push current buffer (even if unsaved)
-    const data = await runExtract(client, file, name, start, end, doc.getText());
-
-    if (!data) {
-      vscode.window.showErrorMessage('Extract failed: received no data');
-      return null;
-    }
-
-    // Return ExtractData along with the file path
-    return { ...data, file };
-
-  } catch (e: any) {
-    vscode.window.showErrorMessage(`Extract failed: ${e.message || e}`);
-    return null;
-  }
-}
 
 /** Faster no daemon pathway */
 export async function runExtractFile(

@@ -27,7 +27,6 @@ exports.initDaemonForPath = initDaemonForPath;
 exports.reinitDaemonForPath = reinitDaemonForPath;
 exports.sendChange = sendChange;
 exports.runExtract = runExtract;
-exports.extractFromActiveEditor = extractFromActiveEditor;
 exports.runExtractFile = runExtractFile;
 const vscode = __importStar(require("vscode"));
 const interface_1 = require("./interface");
@@ -81,40 +80,6 @@ currentText) {
         return { output: '', callsite: '' };
     }
     return resp.data;
-}
-/** Convenience: extract from current editor selection, prompting for a name. */
-async function extractFromActiveEditor(client, options) {
-    const editor = vscode.window.activeTextEditor;
-    if (!editor) {
-        vscode.window.showErrorMessage('No active editor');
-        return null;
-    }
-    const doc = editor.document;
-    const sel = editor.selection;
-    const start = doc.offsetAt(sel.start);
-    const end = doc.offsetAt(sel.end);
-    const file = doc.uri.fsPath;
-    const name = await vscode.window.showInputBox({
-        prompt: options?.prompt ?? 'Enter the new function name',
-        placeHolder: options?.defaultName ?? 'extracted_function',
-    });
-    if (!name) {
-        return null;
-    }
-    try {
-        // push current buffer (even if unsaved)
-        const data = await runExtract(client, file, name, start, end, doc.getText());
-        if (!data) {
-            vscode.window.showErrorMessage('Extract failed: received no data');
-            return null;
-        }
-        // Return ExtractData along with the file path
-        return { ...data, file };
-    }
-    catch (e) {
-        vscode.window.showErrorMessage(`Extract failed: ${e.message || e}`);
-        return null;
-    }
 }
 /** Faster no daemon pathway */
 async function runExtractFile(client, name) {
