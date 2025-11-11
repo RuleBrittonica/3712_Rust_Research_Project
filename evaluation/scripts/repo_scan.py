@@ -91,28 +91,19 @@ def ensure_repo_cloned(root: Path, full_name: str, verbose: bool = False) -> Pat
     if dest.exists():
         if verbose:
             print(f"\033[1;34m[fetch]\033[0m {full_name}")
-        # fetch all remote branches and tags
         run(["git", "fetch", "--all", "--tags", "--prune", "--quiet"], cwd=dest)
     else:
         if verbose:
             print(f"\033[1;34m[clone]\033[0m {full_name}")
         run(["git", "clone", "--filter=blob:none", f"https://github.com/{full_name}.git", str(dest)])
-        # make sure we have all history metadata needed for counting
         run(["git", "fetch", "--all", "--tags", "--prune", "--quiet"], cwd=dest)
     return dest
 
 def list_remote_branches(repo_dir: Path) -> List[str]:
-    """
-    Return remote branch names like 'origin/main', excluding the symbolic origin/HEAD.
-    """
     out = run(["git", "for-each-ref", "--format=%(refname:short)", "refs/remotes/origin"], cwd=repo_dir)
-    branches = [b for b in (ln.strip() for ln in out.splitlines()) if b and b != "origin/HEAD"]
-    return branches
+    return [b for b in (ln.strip() for ln in out.splitlines()) if b and b != "origin/HEAD"]
 
 def branch_commit_count(repo_dir: Path, branch: str) -> int:
-    """
-    Count commits reachable from the given remote branch.
-    """
     try:
         out = run(["git", "rev-list", "--count", branch], cwd=repo_dir)
         return int(out.strip() or "0")
@@ -123,9 +114,7 @@ def pick_top_branches(repo_dir: Path, top_n: int = 2) -> List[str]:
     branches = list_remote_branches(repo_dir)
     scored = [(branch_commit_count(repo_dir, b), b) for b in branches]
     scored.sort(reverse=True)
-    # Filter out zero-commit oddities just in case
-    top = [b for (cnt, b) in scored if cnt > 0][:top_n]
-    return top
+    return [b for (cnt, b) in scored if cnt > 0][:top_n]
 
 def build_log_args(branch: str, since: str | None, per_branch_limit: int) -> List[str]:
     args = ["git", "log", branch, "-i",
@@ -180,10 +169,18 @@ def commit_url(full_name: str, sha: str) -> str:
     return f"https://github.com/{full_name}/commit/{sha}"
 
 DEFAULT_PER_BRANCH_LIMIT = 200
-BRANCHES = 3 # default number of branches to scan (top N by commit count)
+BRANCHES = 3  # default number of branches to scan (top N by commit count)
 OUT_PATH = "/home/matt/3712_Rust_Research_Project/evaluation/Results/extract_refs/extract_refs.csv"
 
+def derive_unclassified_path(main_out: str) -> str:
+    p = Path(main_out)
+    stem = p.stem
+    if p.suffix.lower() == ".csv":
+        return str(p.with_name(f"{stem}_unclassified.csv"))
+    return f"{main_out}_unclassified.csv"
+
 def main():
+    # rotate existing main CSV (preserving your original behavior)
     if Path(OUT_PATH).exists():
         idx = 1
         while True:
@@ -195,7 +192,9 @@ def main():
             idx += 1
 
     ap = argparse.ArgumentParser()
-    ap.add_argument("--out", default=OUT_PATH, help="Output CSV path")
+    ap.add_argument("--out", default=OUT_PATH, help="Output CSV path for CLASSIFIED hits")
+    ap.add_argument("--unclassified-out", default=None,
+                    help="Output CSV path for UNCLASSIFIED hits (default: <out>_unclassified.csv)")
     ap.add_argument("--root", default="repos", help="Clone/fetch directory")
     ap.add_argument("--repo", action="append", help="Limit to specific repo(s); repeatable")
     ap.add_argument("--since", default=None, help="ISO date, e.g. 2019-01-01")
@@ -210,13 +209,23 @@ def main():
     root = Path(args.root).resolve()
     root.mkdir(parents=True, exist_ok=True)
 
-    with open(args.out, "w", newline="", encoding="utf-8") as f:
-        w = csv.writer(f)
-        w.writerow([
-            "repo", "commit", "commit_url", "author_date", "author", "subject",
-            "hit_aspects", "files_changed", "insertions", "deletions", "branch"
-        ])
+    unclassified_out = args.unclassified_out or derive_unclassified_path(args.out)
 
+    # Writers for classified and unclassified
+    classified_file = open(args.out, "w", newline="", encoding="utf-8")
+    unclassified_file = open(unclassified_out, "w", newline="", encoding="utf-8")
+
+    classified_writer = csv.writer(classified_file)
+    unclassified_writer = csv.writer(unclassified_file)
+
+    headers = [
+        "repo", "commit", "commit_url", "author_date", "author", "subject",
+        "hit_aspects", "files_changed", "insertions", "deletions", "branch"
+    ]
+    classified_writer.writerow(headers)
+    unclassified_writer.writerow(headers)
+
+    try:
         for full_name in repos:
             try:
                 repo_dir = ensure_repo_cloned(root, full_name, verbose=args.verbose)
@@ -243,31 +252,54 @@ def main():
                             ln for ln in diff.splitlines() if ln.startswith("+") and not ln.startswith("+++")
                         )
                         aspects = label_capabilities(added_lines)
-                        if not aspects:
-                            continue
 
                         fc, ins, dels = parse_stat_line(repo_dir, meta.sha)
                         url = commit_url(full_name, meta.sha)
-                        w.writerow([
-                            full_name, meta.sha, url, meta.author_date, meta.author,
-                            meta.subject, " ".join(aspects), fc, ins, dels, br
-                        ])
 
-                        tag_color = "\033[92m"  # green
                         repo_color = "\033[96m"
-                        url_color = "\033[94m"
                         reset = "\033[0m"
                         sha_short = short_sha(meta.sha)
-                        aspects_str = ", ".join(aspects)
-                        print(f"{repo_color}{full_name:<25}{reset} "
-                              f"{meta.author_date} {sha_short} "
-                              f"{tag_color}[{aspects_str}]{reset} {meta.subject}\n"
-                              f"    {url_color}{url}{reset}  ({br})")
+
+                        if aspects:
+                            classified_writer.writerow([
+                                full_name, meta.sha, url, meta.author_date, meta.author,
+                                meta.subject, " ".join(aspects), fc, ins, dels, br
+                            ])
+                            tag_color = "\033[92m"  # green
+                            aspects_str = ", ".join(aspects)
+                            print(f"{repo_color}{full_name:<25}{reset} "
+                                  f"{meta.author_date} {sha_short} "
+                                  f"{tag_color}[{aspects_str}]{reset} {meta.subject}\n"
+                                  f"    \033[94m{url}\033[0m  ({br})")
+                        else:
+                            # Store & print UNCLASSIFIED hits
+                            unclassified_writer.writerow([
+                                full_name, meta.sha, url, meta.author_date, meta.author,
+                                meta.subject, "", fc, ins, dels, br
+                            ])
+                            tag_color = "\033[93m"  # yellow
+                            print(f"{repo_color}{full_name:<25}{reset} "
+                                  f"{meta.author_date} {sha_short} "
+                                  f"{tag_color}[unclassified]{reset} {meta.subject}\n"
+                                  f"    \033[94m{url}\033[0m  ({br})")
 
             except Exception as e:
                 print(f"[error] scanning {full_name}: {e}", file=sys.stderr)
 
-    print(f"\nWrote CSV to {args.out}")
+    finally:
+        classified_file.close()
+        unclassified_file.close()
+
+    print(f"\nWrote CLASSIFIED CSV to {args.out}")
+    print(f"Wrote UNCLASSIFIED CSV to {unclassified_out}")
+
+    # delete the repo dir to save space (and avoid them getting added to the
+    # git repo by accident)
+    # delete every folder in repos
+    repo_path = "/home/matt/3712_Rust_Research_Project/repos"
+    for directory in repo_path:
+        if directory.is_dir():
+            subprocess.run(["rm", "-rf", str(directory)])
 
 if __name__ == "__main__":
     main()
