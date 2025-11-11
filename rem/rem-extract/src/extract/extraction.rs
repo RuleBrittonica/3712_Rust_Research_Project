@@ -7,7 +7,7 @@ use std::{
     path::PathBuf
 };
 
-use ra_ap_ide_db::{EditionedFileId, assists};
+use ra_ap_ide_db::EditionedFileId;
 use ra_ap_project_model::{
     CargoConfig,
     ProjectWorkspace,
@@ -15,7 +15,7 @@ use ra_ap_project_model::{
 };
 
 use ra_ap_ide::{
-    Analysis, AnalysisHost, AssistConfig, AssistResolveStrategy, FileRange, TextSize
+    Analysis, AssistConfig, AssistResolveStrategy, TextSize
 };
 
 use ra_ap_syntax::{
@@ -26,12 +26,12 @@ use ra_ap_hir::Semantics;
 
 use ra_ap_ide_assists::Assist;
 
-use ra_ap_vfs::{AbsPathBuf, FileId, Vfs};
+use ra_ap_vfs::AbsPathBuf;
 
 use crate::{
     error::ExtractionError,
     extract::extraction_utils::{
-        apply_edits, apply_extract_function, check_braces, check_comment, convert_to_abs_path_buf, filter_extract_function_assist, fixup_controlflow, generate_frange, generate_frange_from_fileid, get_assists, get_cargo_config, get_cargo_toml, get_manifest_dir, load_project_manifest, load_project_workspace, load_workspace_data, rename_function, run_analysis, trim_range
+        apply_edits, apply_extract_function, check_braces, check_comment, convert_to_abs_path_buf, filter_extract_function_assist, fixup_controlflow, generate_frange, generate_frange_from_fileid, get_assists, get_cargo_config, get_cargo_toml, get_manifest_dir, load_project_manifest, load_project_workspace, load_workspace_data, rename_function, trim_range
     },
 };
 

@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.DEFAULT_DAEMON_SETTING_KEY = exports.buildRepair = exports.buildExtract = exports.buildDelete = exports.buildChange = exports.buildCreate = exports.buildInit = void 0;
+exports.DEFAULT_DAEMON_SETTING_KEY = exports.buildVerify = exports.buildRepair = exports.buildExtract = exports.buildDelete = exports.buildChange = exports.buildCreate = exports.buildInit = void 0;
 exports.isOk = isOk;
 function isOk(r) {
     return r.ok === true;
@@ -18,5 +18,7 @@ const buildExtract = (file, new_fn_name, start, end) => ({ file, new_fn_name, st
 exports.buildExtract = buildExtract;
 const buildRepair = (file, new_fn_name) => ({ file, new_fn_name });
 exports.buildRepair = buildRepair;
+const buildVerify = (file_path, original_content, refactored_content, fn_name, charon_path, aeneas_path) => ({ file_path, original_content, refactored_content, fn_name, charon_path, aeneas_path });
+exports.buildVerify = buildVerify;
 exports.DEFAULT_DAEMON_SETTING_KEY = 'remvscode.daemonPath'; // points at rem-extract for now
 //# sourceMappingURL=interface.js.map

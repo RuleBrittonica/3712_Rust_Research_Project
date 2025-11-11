@@ -11,7 +11,7 @@ use std::io::{BufWriter, Write};
 use std::process::Command;
 use syn::{
     visit_mut::VisitMut, ExprCall, ExprMethodCall, FnArg, GenericArgument, GenericParam,
-    ImplItemFn, ItemFn, Lifetime, PredicateLifetime, ReturnType, Signature, TraitItemFn,
+    ItemFn, Lifetime, PredicateLifetime, ReturnType, Signature,
     TypeReference, WhereClause, WherePredicate,
 };
 use std::fmt::{

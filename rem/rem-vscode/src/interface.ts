@@ -70,7 +70,12 @@ export interface RepairPayload {
   new_fn_name: string,
 }
 export interface VerifyPayload {
-  // e.g., proof target config, options, etc.
+  file_path: string,
+  original_content: string,
+  refactored_content: string,
+  fn_name: string, // caller function name
+  charon_path: string, // path to charon binary
+  aeneas_path: string, // path to aeneas binary
 }
 export interface RepairData {
   idx: number; // integer identifier of repair task we got to
@@ -79,7 +84,7 @@ export interface RepairData {
   changed_files: string; // string (comma separated) of changed file paths
 }
 export interface VerifyData {
-  // results/artifacts/log summaries
+  success: boolean;
 }
 
 /**  Small helpers to build request payloads */
@@ -91,5 +96,14 @@ export const buildExtract = (file: string, new_fn_name: string, start: number, e
   ({ file, new_fn_name, start, end });
 export const buildRepair = (file: string, new_fn_name: string): RepairPayload =>
   ({ file, new_fn_name });
+export const buildVerify = (
+  file_path: string,
+  original_content: string,
+  refactored_content: string,
+  fn_name: string,
+  charon_path: string,
+  aeneas_path: string
+): VerifyPayload =>
+  ({ file_path, original_content, refactored_content, fn_name, charon_path, aeneas_path });
 
 export const DEFAULT_DAEMON_SETTING_KEY = 'remvscode.daemonPath'; // points at rem-extract for now

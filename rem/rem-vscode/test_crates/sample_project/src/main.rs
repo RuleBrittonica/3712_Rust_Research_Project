@@ -1,7 +1,6 @@
 fn main() {
     test_incr();
 }
-
 fn ref_incr(x: &mut i32) {
     *x = *x + 1;
 }

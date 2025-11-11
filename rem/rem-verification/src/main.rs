@@ -111,7 +111,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             original_coq,
             refactored_coq,
             top_level_function,
-            verbose,
+            verbose: _,
             aeneas_path,
         } => {
             let paths: (std::path::PathBuf, std::path::PathBuf, std::path::PathBuf, bool) = coq_verification(
@@ -151,8 +151,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         },
 
         CLICommands::Test {
-            verbose,
-            aeneas_path,
+            verbose: _,
+            aeneas_path: _,
         } => {
             todo!("Implement the test command.");
         },

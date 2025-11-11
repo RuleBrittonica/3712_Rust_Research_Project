@@ -22,6 +22,8 @@ impl std::fmt::Display for RepairError {
     }
 }
 
+impl std::error::Error for RepairError {}
+
 // If we get a return then by definition the repair succeeded
 #[derive(Debug)]
 pub struct RepairReturn<'a> {
@@ -30,8 +32,6 @@ pub struct RepairReturn<'a> {
     pub repair_count: u8,
     pub changed_files: Vec<String>,
 }
-
-impl std::error::Error for RepairError {}
 
 pub struct RepairerInput {
     file: PathBuf,
@@ -141,18 +141,24 @@ pub fn call_all_repairers(
 }
 
 
+/// Finds the nearest `Cargo.toml` from `path` upward.
 fn find_manifest_for(path: &Path) -> Option<PathBuf> {
-    // If a file was given, start from its directory; otherwise from the path itself.
-    let mut dir = if path.is_file() { path.parent()? } else { path }.to_path_buf();
-    loop {
+    // Fast path: the input is already a Cargo.toml file.
+    if path.file_name().is_some_and(|n| n == "Cargo.toml") && path.is_file() {
+        return Some(path.to_path_buf());
+    }
+
+    // Choose a starting directory: `path` if dir, else its parent.
+    let start_dir = if path.is_dir() { path } else { path.parent()? };
+
+    // Walk ancestors without allocating a mutable PathBuf we pop from.
+    for dir in start_dir.ancestors() {
         let candidate = dir.join("Cargo.toml");
         if candidate.is_file() {
             return Some(candidate);
         }
-        if !dir.pop() {
-            return None;
-        }
     }
+    None
 }
 
 #[derive(Clone, Debug)]

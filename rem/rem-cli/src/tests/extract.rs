@@ -3,8 +3,8 @@ use rem_extract::extract::{
         ExtractionInput,
         extract_method,
     },
-    error::ExtractionError,
-    };
+};
+use rem_extract::error::ExtractionError;
 use crate::tests::utils::compile_file;
 use log::{
     error,

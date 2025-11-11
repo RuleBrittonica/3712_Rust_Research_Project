@@ -44,7 +44,14 @@ pub enum Request {
     RepairFile { file: PathBuf, new_fn_name: String },
 
     #[serde(rename = "verify")]
-    VerifyFile { crate_path: PathBuf, file: PathBuf, fn_name: String, new_fn_name: String, charon_path: PathBuf, aeneas_path: PathBuf },
+    VerifyFile {
+        file_path: PathBuf,
+        original_content: String,
+        refactored_content: String,
+        fn_name: String,
+        charon_path: PathBuf,
+        aeneas_path: PathBuf,
+     },
 }
 
 #[derive(Serialize, Deserialize)]
@@ -149,8 +156,15 @@ fn handle_request(req: Request, state: &mut Option<State>) -> JsonResp {
             handle_repair_file(file, new_fn_name)
         },
 
-        R::VerifyFile { crate_path, file, fn_name, new_fn_name, charon_path, aeneas_path } => {
-            handle_verification(crate_path, file, fn_name, new_fn_name, charon_path, aeneas_path)
+        R::VerifyFile { file_path, original_content, refactored_content, fn_name, charon_path, aeneas_path  } => {
+            handle_verification(
+                file_path,
+                original_content,
+                refactored_content,
+                fn_name,
+                charon_path,
+                aeneas_path,
+            )
         },
 
         // _ => JsonResp::err("unimplemented operation"),

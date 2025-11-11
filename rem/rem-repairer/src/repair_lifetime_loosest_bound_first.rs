@@ -4,7 +4,7 @@ use quote::ToTokens;
 use std::borrow::BorrowMut;
 use std::fs;
 use syn::{
-    visit_mut::VisitMut, AngleBracketedGenericArguments, FnArg, GenericArgument, ImplItemFn,
+    visit_mut::VisitMut, AngleBracketedGenericArguments, FnArg, GenericArgument,
     Lifetime, LifetimeParam, PathArguments, ReturnType, Signature, TraitItemFn, Type,
     TypeParamBound,
 };
@@ -65,7 +65,7 @@ impl RepairSystem for Repairer {
 
     fn repair_function(&self, file_name: &str, new_file_name: &str, fn_name: &str) -> RepairResult {
         fs::copy(file_name, &new_file_name).unwrap();
-        annotate_loose_named_lifetime(&new_file_name, fn_name); //\ just reads the file under the hood and writes back to it 
+        annotate_loose_named_lifetime(&new_file_name, fn_name); //\ just reads the file under the hood and writes back to it
         // println!("annotated: {}", fs::read_to_string(&new_file_name).unwrap());
         let args: Vec<&str> = vec!["--error-format=json"];
 

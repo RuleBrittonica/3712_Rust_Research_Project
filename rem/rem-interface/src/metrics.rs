@@ -170,7 +170,7 @@ pub fn take_as_timings() -> Vec<Timing> {
 }
 
 /// Convenience: attach current metrics to an Envelope (appends to `timings`)
-pub fn attach_to<T>(mut env: Envelope<T>) -> Envelope<T> {
+pub fn cd <T>(mut env: Envelope<T>) -> Envelope<T> {
     let timings = take_as_timings();
     if !timings.is_empty() {
         if env.timings.is_empty() {

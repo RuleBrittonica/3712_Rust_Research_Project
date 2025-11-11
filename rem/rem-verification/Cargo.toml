@@ -17,3 +17,6 @@ log = { workspace = true }
 regex = { workspace = true }
 clap = { workspace = true }
 config = { workspace = true }
+
+[dev-dependencies]
+tempfile.workspace = true

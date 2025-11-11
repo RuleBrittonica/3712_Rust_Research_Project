@@ -4,6 +4,7 @@ import { checkAll } from './check/checkEnv';
 import { DEFAULT_DAEMON_SETTING_KEY } from './interface';
 import { reinitDaemonForPath, runExtractFile } from './extract';
 import { runRepair } from './repairer';
+import { runVerify } from './verification';
 
 const INSTALL_BASE = 'https://github.com/RuleBrittonica/rem-vscode/scripts'
 
@@ -195,6 +196,38 @@ export async function activate(context: vscode.ExtensionContext) {
     }
 
     // Call the verification process, with both the original and new content
+    let verify_data = await runVerify(
+      client,
+      file_path,
+      original_content,
+      new_src,
+      callsite,
+      charonPath,
+      aeneasPath
+    );
+
+    if (!verify_data) {
+      return vscode.window.showInformationMessage('Verification cancelled or failed.');
+    }
+
+    const success = verify_data.success;
+
+    if (success) {
+      return vscode.window.showInformationMessage('Verification succeeded.');
+    } else {
+      const choice = await vscode.window.showErrorMessage(
+        'Verification failed: refactored code does not pass required garuntees.',
+        'Revert to original'
+      );
+      if (choice === 'Revert to original') {
+        try {
+          await applyWorkspaceEdit(file_path, original_content);
+          return vscode.window.showInformationMessage('File reverted to original content.');
+        } catch (e: any) {
+          return vscode.window.showErrorMessage(`Failed to revert file: ${e.message || e}`);
+        }
+      }
+    }
   });
 
   // 5) Extract, Repair, and Verify
@@ -250,8 +283,44 @@ export async function activate(context: vscode.ExtensionContext) {
     const count = repair_data.repair_count;
     const changed = repair_data.changed_files;
 
-    // Apply the verifyer here (TODO)
+    // Show some repair summary info
+    vscode.window.showInformationMessage(
+      `Extract and Repair #${id} completed on system "${system}". Total repairs: ${count}. Changed files: ${changed}`
+    );
 
+    // Call the verification process, with both the original and new content
+    let verify_data = await runVerify(
+      client,
+      file_path,
+      original_content,
+      new_src,
+      callsite,
+      charonPath,
+      aeneasPath
+    );
+
+    if (!verify_data) {
+      return vscode.window.showInformationMessage('Verification cancelled or failed.');
+    }
+
+    const success = verify_data.success;
+
+    if (success) {
+      return vscode.window.showInformationMessage('Verification succeeded.');
+    } else {
+      const choice = await vscode.window.showErrorMessage(
+        'Verification failed: refactored code does not pass required garuntees.',
+        'Revert to original'
+      );
+      if (choice === 'Revert to original') {
+        try {
+          await applyWorkspaceEdit(file_path, original_content);
+          return vscode.window.showInformationMessage('File reverted to original content.');
+        } catch (e: any) {
+          return vscode.window.showErrorMessage(`Failed to revert file: ${e.message || e}`);
+        }
+      }
+    }
   });
 
   // 6) Reinit command (Command Palette): reinitialize database for current file
