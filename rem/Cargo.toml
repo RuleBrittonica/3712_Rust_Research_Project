@@ -10,7 +10,7 @@ members = [
 ]
 
 resolver = "3"
-default-members = ["rem-cli", "rem-server"]
+default-members = ["rem-cli", "rem-server", "rem-extract"]
 
 [workspace.package]
 edition      = "2021"
@@ -70,12 +70,14 @@ rowan                  = "0.15.15"
 # REM member crates
 rem-utils         = "0.2.1"
 rem-repairer      = "0.1.4"
+rem-interface     = "0.1.0"
+rem-extract       = "0.1.4"
 
 # [patch.crates-io]
 # rem-utils         = { path = "rem-utils" }
-rem-extract       = { path = "rem-extract" }
+# rem-extract       = { path = "rem-extract" }
 # rem-repairer      = { path = "rem-repairer" }
-rem-interface     = { path = "rem-interface" }
+# rem-interface     = { path = "rem-interface" }
 rem-verification  = { path = "rem-verification" }
 
 
