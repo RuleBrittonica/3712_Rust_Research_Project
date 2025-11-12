@@ -2484,7 +2484,7 @@ dependencies = [
  "once_cell",
  "ra_ap_vfs",
  "rem-extract",
- "rem-repairer",
+ "rem-repairer 0.1.4 (registry+https://github.com/rust-lang/crates.io-index)",
  "rem-utils 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_json",
  "tempfile",
@@ -2559,6 +2559,26 @@ dependencies = [
 ]
 
 [[package]]
+name = "rem-repairer"
+version = "0.1.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8e657fd1ee0e9a415260d5fc37e53f6087e78fd2e504662ef13282c806b2b467"
+dependencies = [
+ "clap",
+ "colored",
+ "env_logger",
+ "log",
+ "proc-macro2",
+ "quote",
+ "regex",
+ "rem-utils 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "rustfix",
+ "serde",
+ "serde_json",
+ "syn",
+]
+
+[[package]]
 name = "rem-server"
 version = "0.1.0"
 dependencies = [
@@ -2571,7 +2591,7 @@ dependencies = [
  "ra_ap_syntax",
  "ra_ap_vfs",
  "rem-extract",
- "rem-repairer",
+ "rem-repairer 0.1.4 (registry+https://github.com/rust-lang/crates.io-index)",
  "rem-verification",
  "serde",
  "serde_json",
