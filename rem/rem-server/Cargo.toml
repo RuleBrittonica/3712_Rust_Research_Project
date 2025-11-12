@@ -6,6 +6,10 @@ license.workspace = true
 authors.workspace = true
 rust-version.workspace = true
 
+description = "JSON-RPC Client for the REM Toolchain"
+repository = "https://github.com/RuleBrittonica/3712_Rust_Research_Project.git"
+
+
 [dependencies]
 anyhow.workspace = true
 ra_ap_hir.workspace = true
