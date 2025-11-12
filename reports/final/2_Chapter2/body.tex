@@ -1,57 +1,38 @@
 \chapter{Expanding the Capabilities of REM}
 \label{chap:expanding_rem}
 
-%  Approx 8-10 pages
-
-% Quick introduction to what this chapter will cover
-% Emphasize the first innovation, being how the project has expanded the
-% capabiliteis of REM beyond its original scope
-% Statement of what this chapter will demonstrate:
-% - generic code
-% - support for async code
-% - standalone CLI that handles all the logic
-% - integration with IDEs (VSCode)
-
 Automated refactoring in Rust has long been constrained by the languages strict
-ownership, borrwing and lifetime rules. Early prototypes of the Rusty Extraction
+ownership, borrowing and lifetime rules. Early prototypes of the Rusty Extraction
 Maestro demonstrated that \emph{Extract Method} refactorings could be made
 effective, but only within relatively narrow limits. Complex language features,
 such as generic types and asynchronous code, were not supported. Moreover, the
 entire toolchain was reliant on a fragile integration with IntelliJ, which
-quickly became outdated. As as result, REM remained an academic proof-of-concept
-rahter than a tool developers could realistically adopt.
+quickly became outdated. As a result, REM remained an academic proof-of-concept
+rather than a tool developers could realistically adopt.
 
-This chapters details how REM has been transformed from a fragile prototype into
-a robust and flexible system. We introduce support for two lanugage features
-that were previously out of reach - generic code and asynchronous functions -
-both of which are pervasive in real-world Rust codebases. We then describe the
-design of a standalone command-line interface (CLI), eliminating dependenceis on
-third-party IDEs and making REM portable across development environments.
-% TODO mention either here or later that the CLI could easily be ported into the
-% Language Server Protocol (LSP) framework to provide immediate IDE support.
-Finally, we present a prototype Visual Studio Code (VSCode) extension that
-integrates seamlessly into one of the most widely used Rust workflows. Together
-these advances greatly expand the scope and usability of REM, demonstrating that
-advanced refactoring can be brought to everyday developers without sacrificing
-continued improvement through research. This chapter thus sets the stage by
-showing how REM's capabilities now align with the realities of modern Rust programming.
+This chapter details how REM has evolved from a fragile prototype into a robust, modular, and extensible system. At its core, REM now operates through a streamlined, multi-component pipeline designed for speed, flexibility, and integration with modern Rust workflows.
 
-% TODO here we need to mention how the extraction algorithm is ported from
-% Rust-Analyzer. It has plently of custom modifications to make it work with
-% REM, but a lot of the core logic is taken from there. Addtionally, the goal is
-% either to implement incremental compilation (so that we don't need to fully
-% build out the AST every time) or to integrate directly into Rust-Analyzer
-\section{Refactoring Generics}
-\label{sec:refactoring_generics}
+The REM server orchestrates the entire process through a JSON-RPC interface, coordinating extraction, repair, and verification processes (the latter discussed in Chapter 3). The extraction tool, built directly on top of Rust Analyzer’s incremental analysis engine, performs lightning-fast semantic extraction while integrating the capabilities of REM’s original controller and borrower modules. The repairer tool, adapted from the original REM toolchain, continues to play a key role in resolving lifetimes and other semantic inconsistencies that may arise during refactoring.
 
-\section{Supporting Asynchronous Code}
-\label{sec:supporting_asynchronous_code}
+Finally, a prototype Visual Studio Code (VSCode) extension connects with the REM server to deliver near-instant feedback—typically around 200 ms end-to-end (see Chapter 4). Together, these components transform REM into a practical refactoring system capable of integrating into everyday Rust development while preserving its foundation as a platform for continued research.
 
-\section{Standalone, Editor Agnostic CLI}
-\label{sec:standalone_cli}
+\section{Motivation}
+\label{sec:expanding_motivation}
 
-\section{Integration with IDEs}
-\label{sec:integration_ides}
+\section{Architecture Overview}
+\label{sec:architecture_overview}
 
-\section{Summary}
-\label{sec:summary_2}
+\section{Single-File Analysis}
+\label{sec:single_file_analysis}
+
+\section{Extraction Workflow}
+\label{sec:extraction_workflow}
+
+\section{Handling Advanced Language Features}
+\label{sec:handling_advanced_language_features}
+
+\section{Editor Integration}
+\label{sec:editor_integration}
+
+\section{Future Directions}
+\label{sec:expanding_future_directions}

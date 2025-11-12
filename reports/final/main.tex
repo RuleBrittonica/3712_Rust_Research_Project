@@ -15,13 +15,14 @@
 \usepackage{changepage} % to adjust page width for fat tables
 %\usepackage{titlepic}
 \usepackage{setspace}
+\usepackage{changepage}
 \usepackage[colorlinks=true,
 linkcolor=black,
 urlcolor=black,
 citecolor=black, breaklinks=true]{hyperref}
 \usepackage{rotating}
 \usepackage{longtable}
-\usepackage[authoryear]{natbib}
+\usepackage[numbers,sort&compress]{natbib}
 \usepackage[flushleft]{threeparttable}
 \usepackage{threeparttablex}
 \usepackage{multirow}
@@ -57,8 +58,8 @@ citecolor=black, breaklinks=true]{hyperref}
 \usepackage{wrapfig}
 \usepackage{subcaption}
 \usepackage[absolute,overlay]{textpos}
-\usepackage{enumitem}
-\usepackage{longtable}
+\usepackage{enumitem}   
+\usepackage{longtable} 
 
 
 \usepackage{minted}
@@ -114,6 +115,10 @@ citecolor=black, breaklinks=true]{hyperref}
 \usepackage{epigraph} % for quotes
 \usepackage[table,xcdraw]{xcolor} % for colored tables
 
+\usepackage{pifont}
+\newcommand{\cmark}{\ding{51}} % ✔
+\newcommand{\xmark}{\ding{55}} % ✘
+
 %%%%%%%%%%%%%%%%%%%% DEFINE PAPER ALIASES  HERE %%%%%%%%%%%%%%%%%%%
 
 \onehalfspacing
@@ -127,7 +132,7 @@ citecolor=black, breaklinks=true]{hyperref}
 \renewcommand{\epigraphrule}{1pt}
 \renewcommand{\epigraphflush}{flushright}
 %\renewcommand{\textflush}{flushleft}
-\citestyle{aa}
+% \citestyle{aa}
 \pagestyle{empty}
 
 %
@@ -279,7 +284,7 @@ citecolor=black, breaklinks=true]{hyperref}
 \cleardoublepage
 \phantomsection\addcontentsline{toc}{chapter}{Bibliography}
 % change bib style to 'apj' to remove the ADS links in the printed version
-\bibliographystyle{plainnat}
+\bibliographystyle{unsrtnat}
 \bibliography{bibfile}
 
 \end{document}
