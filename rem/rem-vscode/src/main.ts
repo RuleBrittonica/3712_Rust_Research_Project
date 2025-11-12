@@ -6,7 +6,7 @@ import { reinitDaemonForPath, runExtractFile } from './extract';
 import { runRepair } from './repairer';
 import { runVerify } from './verification';
 
-const INSTALL_BASE = 'https://github.com/RuleBrittonica/rem-vscode/scripts'
+const INSTALL_BASE = 'https://github.com/RuleBrittonica/3712_Rust_Research_Project/tree/main/rem/rem-vscode/scripts'
 
 export async function activate(context: vscode.ExtensionContext) {
   // Only run on a rust file!
