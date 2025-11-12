@@ -2644,7 +2644,7 @@ dependencies = [
  "ra_ap_vfs",
  "rem-extract 0.1.4 (registry+https://github.com/rust-lang/crates.io-index)",
  "rem-repairer 0.1.4 (registry+https://github.com/rust-lang/crates.io-index)",
- "rem-verification",
+ "rem-verification 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde",
  "serde_json",
  "sha2",
@@ -2693,7 +2693,7 @@ dependencies = [
 
 [[package]]
 name = "rem-verification"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "clap",
  "config",
@@ -2703,6 +2703,21 @@ dependencies = [
  "rem-utils 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde",
  "tempfile",
+]
+
+[[package]]
+name = "rem-verification"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f57cbb16409e83eadf6ffc5f7afe19e905f9819e4fb19ff49f6512e79dcfea63"
+dependencies = [
+ "clap",
+ "config",
+ "flexi_logger",
+ "log",
+ "regex",
+ "rem-utils 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "serde",
 ]
 
 [[package]]

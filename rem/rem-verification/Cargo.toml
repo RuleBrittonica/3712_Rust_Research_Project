@@ -1,6 +1,6 @@
 [package]
 name = "rem-verification"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 authors = [ "Matthew Britton <matt.britton@anu.edu.au>",]
 license = "MIT"
