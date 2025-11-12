@@ -1,0 +1,16 @@
+# config.toml
+[ocaml]
+version = "5.2.1"
+variant = "ocaml-base-compiler.5.2.1"
+
+[opam.packages]
+common  = ["dune","dune-configurator","ppx_deriving","visitors","easy_logging",
+           "zarith","yojson","core_unix","odoc","ocamlgraph",
+           "menhir","ocamlformat","unionFind","progress","domainslib"]
+linux   = []
+macos   = []
+windows = []
+
+[aeneas]
+repo = "https://github.com/AeneasVerif/aeneas"
+ref  = "main"

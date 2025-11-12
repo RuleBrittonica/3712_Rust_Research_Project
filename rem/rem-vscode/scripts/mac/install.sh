@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# 0) Load config from config.toml
+#    Exports: SWITCH, OCAML_VARIANT, OPAM_PACKAGES, AENEAS_REPO, AENEAS_REF
+eval "$(python3 tools/cfg.py export-shell macos)"
+
 # 1) Homebrew & Core Packages
 echo "=> Checking for Homebrew…"
 if ! command -v brew >/dev/null; then
@@ -34,7 +38,8 @@ if ! command -v rustup >/dev/null; then
   export PATH="$HOME/.cargo/bin:$PATH"
 fi
 
-TOOLCHAIN="nightly-2025-02-08"
+# TOOLCHAIN="nightly-2025-02-08"
+TOOLCHAIN="nightly"
 echo "=> Ensuring Rust toolchain $TOOLCHAIN…"
 rustup toolchain install "$TOOLCHAIN" --profile minimal
 for comp in rust-src rust-std rustc-dev llvm-tools-preview rust-analyzer-preview rustfmt; do
@@ -48,42 +53,63 @@ if ! opam config env >/dev/null 2>&1; then
 fi
 eval "$(opam env)"
 
-SWITCH="4.14.2"
 echo "=> Setting up OPAM switch $SWITCH…"
-opam switch create "$SWITCH" --yes || opam switch "$SWITCH"
+if ! opam switch list --short | grep -qx "$SWITCH"; then
+  if [ -n "${OCAML_VARIANT:-}" ]; then
+    opam switch create "$SWITCH" "$OCAML_VARIANT" --yes
+  else
+    opam switch create "$SWITCH" --yes
+  fi
+else
+  opam switch "$SWITCH"
+fi
 eval "$(opam env)"
 
 echo "=> Updating OPAM…"
 opam update --yes
 opam upgrade --yes
 
-echo "=> Installing OCaml libraries…"
-opam install -y \
-  ppx_deriving visitors easy_logging zarith yojson \
-  core_unix odoc ocamlgraph menhir ocamlformat unionFind
+echo "=> Installing OCaml libraries from config…"
+# OPAM_PACKAGES is space-separated (from cfg.py)
+opam install -y $OPAM_PACKAGES
 
+# Coq install: keep behavior, but skip if on OCaml 5.x (8.18 may not be compatible)
 REQ_COQ="8.18.0"
-if ! coqc --version 2>/dev/null | grep -qE "version[[:space:]]+$REQ_COQ"; then
-  echo "=> Installing Coq $REQ_COQ…"
-  opam pin add coq "$REQ_COQ" --yes --no-action
-  opam install -y coq
+OCAML_MAJOR="$(ocamlc -version | cut -d. -f1)"
+if [ "$OCAML_MAJOR" -ge 5 ]; then
+  echo "=> Detected OCaml $(ocamlc -version). Skipping Coq $REQ_COQ (may be incompatible with OCaml 5.x)."
+else
+  if ! coqc --version 2>/dev/null | grep -qE "version[[:space:]]+$REQ_COQ"; then
+    echo "=> Installing Coq $REQ_COQ…"
+    opam pin add coq "$REQ_COQ" --yes --no-action
+    opam install -y coq
+  fi
 fi
 
-# 4) Aeneas & CHARON
-
-# This is a pinned version of aeneas that is known to work with the current
-# setup.It has a couple of changes to the Mkaefile to remove Nix compatibility
-# but make it easier to build across the board. Feel free to install from source
-# but YMMV.
-REPO="https://github.com/RuleBrittonica/aeneas.git"
+# 4) Aeneas & CHARON (from config)
+REPO="${AENEAS_REPO:?AENEAS_REPO not set by cfg.py}"
+REF="${AENEAS_REF:-}"
 CLONE="$HOME/.cache/aeneas"
 BIN_DIR="${XDG_BIN_HOME:-$HOME/.local/bin}"
 
 echo "=> Cloning/updating Aeneas…"
-if [ ! -d "$CLONE" ]; then
+if [ ! -d "$CLONE/.git" ]; then
   git clone "$REPO" "$CLONE"
 else
-  git -C "$CLONE" pull
+  git -C "$CLONE" remote set-url origin "$REPO"
+  git -C "$CLONE" fetch --all --tags
+fi
+
+if [ -n "$REF" ]; then
+  echo "=> Checking out Aeneas @ $REF…"
+  git -C "$CLONE" fetch --all --tags
+  git -C "$CLONE" checkout --detach "$REF" || {
+    echo "!! Failed to checkout '$REF' — does it exist?" >&2
+    exit 1
+  }
+else
+  echo "=> No AENEAS_REF provided; staying on repository default."
+  git -C "$CLONE" checkout -f "$(git -C "$CLONE" rev-parse HEAD)"
 fi
 
 echo "=> Building CHARON & Aeneas…"
@@ -95,19 +121,23 @@ make test
 echo "=> Installing binaries to $BIN_DIR…"
 mkdir -p "$BIN_DIR"
 for rel in bin/aeneas charon/bin/charon charon/bin/charon-driver; do
-  cp -v "$CLONE/$rel" "$BIN_DIR" && chmod +x "$BIN_DIR/$(basename "$rel")" || \
+  if [ -f "$CLONE/$rel" ]; then
+    cp -v "$CLONE/$rel" "$BIN_DIR"
+    chmod +x "$BIN_DIR/$(basename "$rel")"
+  else
     echo "Warning: $rel not found"
+  fi
 done
 
-# 5) rem-command-line
+# 5) rem-server (parity with Linux script)
 echo "=> Setting Rust default to $TOOLCHAIN…"
 rustup default "$TOOLCHAIN"
 
-if ! command -v rem-cli >/dev/null; then
-  echo "=> Installing rem-command-line…"
-  cargo install rem-command-line --locked
+if ! command -v rem-server >/dev/null; then
+  echo "=> Installing rem-server…"
+  cargo install rem-server --locked
 else
-  echo "=> rem-cli already installed, skipping"
+  echo "=> rem-server already installed, skipping"
 fi
 
 echo

@@ -1,5 +1,5 @@
 # run from an Administrator or normal shell
-$deps = 'rustup','opam','coqc','aeneas','charon','rem-cli'
+$deps = 'rustup','opam','coqc','aeneas','charon','rem-server'
 $missing = @()
 
 foreach ($d in $deps) {

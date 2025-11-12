@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # list your binaries here
-deps=( rustup opam coqc aeneas charon rem-cli )
+deps=( rustup opam coqc aeneas charon rem-server )
 
 missing=()
 for cmd in "${deps[@]}"; do

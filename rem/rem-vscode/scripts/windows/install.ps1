@@ -4,11 +4,11 @@
 
 .DESCRIPTION
   1) Installs Git and OPAM (with OCaml & Coq) via WinGet.
-  2) Inits OPAM, creates switch, installs Dune & libraries.
-  3) Installs Rust nightly-2025-02-08 + components via rustup.
+  2) Inits OPAM, creates switch, installs Dune & libraries (from config.toml).
+  3) Installs Rust nightly + components via rustup.
   4) Uses OPAM’s MSYS2 bash to build Aeneas & CHARON.
-  5) Copies aeneas.exe, charon.exe, charon-driver.exe → %USERPROFILE%\bin.
-  6) Installs rem-command-line via cargo.
+  5) Copies binaries → %USERPROFILE%\bin.
+  6) Installs rem-server via cargo.
 #>
 
 Set-StrictMode -Version Latest
@@ -17,13 +17,17 @@ $ErrorActionPreference = 'Stop'
 function Write-Ok($msg){ Write-Host "$msg" -ForegroundColor Green }
 function Write-Warn($msg){ Write-Host "$msg" -ForegroundColor Yellow }
 
+# 0) Load configuration from config.toml
+#    Exports: $switch, $ocamlVariant, $opamPackages, $aeneasRepo, $aeneasRef
+python tools/cfg.py export-powershell windows | Invoke-Expression
+
 # 1) Ensure WinGet is available
 if (-not (Get-Command winget -ErrorAction SilentlyContinue)) {
   Write-Warn "WinGet not found. Please install the 'App Installer' from the Microsoft Store."
   exit 1
 }
 
-# 2) Install Git & OPAM (with OCaml & Coq) via WinGet
+# 2) Install Git & OPAM via WinGet
 Write-Host "==> Installing Git and OPAM (OCaml) via WinGet…"
 winget install --exact --id Git.Git --silent --accept-package-agreements
 winget install --exact --id OCaml.opam --silent --accept-package-agreements
@@ -32,35 +36,41 @@ Write-Ok "Git and OPAM installed"
 # 3) Bootstrap OPAM
 Write-Host "==> Initializing OPAM…"
 & opam init --disable-sandboxing -y | Out-Null
-
-#   Ensure OPAM environment is loaded in this session
 & opam env --shell=powershell | Invoke-Expression
 
-# 3.a) Create/use OCaml 4.14.2 switch
-$switch = "4.14.2"
+# 3.a) Create or switch to configured OCaml version
 Write-Host "==> Creating / switching to OPAM switch $switch…"
 if (-not (& opam switch list --short | Select-String "^$switch$")) {
-  & opam switch create $switch --yes
+  if ($ocamlVariant) {
+    & opam switch create $switch $ocamlVariant --yes
+  } else {
+    & opam switch create $switch --yes
+  }
 } else {
   & opam switch $switch
 }
 & opam env --shell=powershell | Invoke-Expression
 
-# 3.b) Install OCaml platform tools & Coq (≥ 8.18.0)
+# 3.b) Install OCaml packages from config.toml
 Write-Host "==> Installing OCaml platform libraries via OPAM…"
 & opam update --yes | Out-Null
 & opam upgrade --yes | Out-Null
-& opam install -y dune ppx_deriving visitors easy_logging zarith yojson `
-                 core_unix odoc ocamlgraph menhir ocamlformat unionFind
+& opam install -y @opamPackages
 
+# Coq handling — skip if on OCaml 5.x
 $reqCoq = "8.18.0"
-$coqVer = (& coqc --version 2>$null) -replace '[^\d\.]',''
-if ($coqVer -ne $reqCoq) {
-  Write-Host "==> Installing Coq $reqCoq…"
-  & opam pin add coq $reqCoq --yes --no-action
-  & opam install -y coq
+$ocamlVer = (& ocamlc -version)
+if ($ocamlVer.Split('.')[0] -ge 5) {
+  Write-Warn "OCaml $ocamlVer detected — skipping Coq $reqCoq (may not support OCaml 5.x)."
+} else {
+  $coqVer = (& coqc --version 2>$null) -replace '[^\d\.]',''
+  if ($coqVer -ne $reqCoq) {
+    Write-Host "==> Installing Coq $reqCoq…"
+    & opam pin add coq $reqCoq --yes --no-action
+    & opam install -y coq
+  }
 }
-Write-Ok "OPAM, OCaml, Dune & Coq ready"
+Write-Ok "OPAM, OCaml, and libraries ready"
 
 # 4) Install Rust + nightly toolchain
 $rustupExe = "$env:USERPROFILE\.cargo\bin\rustup.exe"
@@ -74,7 +84,7 @@ if (-not (Test-Path $rustupExe)) {
 # Ensure Cargo & rustup are on PATH
 $env:PATH = "$env:USERPROFILE\.cargo\bin;$env:PATH"
 
-$toolchain = "nightly-2025-02-08"
+$toolchain = "nightly"
 Write-Host "==> Installing Rust toolchain $toolchain…"
 rustup toolchain install $toolchain --profile minimal
 "rust-src","rust-std","rustc-dev","llvm-tools-preview","rust-analyzer-preview","rustfmt" `
@@ -82,22 +92,34 @@ rustup toolchain install $toolchain --profile minimal
 Write-Ok "Rust $toolchain + components ready"
 
 # 5) Clone & build Aeneas/CHARON under MSYS2
-$repo     = "https://github.com/RuleBrittonica/aeneas.git"
 $cacheDir = "$env:LOCALAPPDATA\aeneas"
-if (-not (Test-Path $cacheDir)) {
+$repo = $aeneasRepo
+$ref  = $aeneasRef
+
+Write-Host "==> Cloning/updating Aeneas from $repo…"
+if (-not (Test-Path "$cacheDir\.git")) {
   git clone $repo $cacheDir
 } else {
-  git -C $cacheDir pull
+  git -C $cacheDir remote set-url origin $repo
+  git -C $cacheDir fetch --all --tags
 }
 
-# Locate the MSYS2 bash that OPAM installed
+if ($ref) {
+  Write-Host "==> Checking out Aeneas @ $ref…"
+  git -C $cacheDir fetch --all --tags
+  git -C $cacheDir checkout --detach $ref
+} else {
+  Write-Host "==> No AENEAS_REF specified; using current default branch."
+}
+
+# Locate MSYS2 bash from OPAM
 $opamRoot = (& opam var root).Trim()
 $bashPath = Join-Path $opamRoot "msys2\usr\bin\bash.exe"
 if (-not (Test-Path $bashPath)) {
   Write-Warn "Could not find MSYS2 bash at $bashPath"
 } else {
-  # Convert Windows path to MSYS path (C:\foo → /c/foo)
-  $msysPath = "/" + ($cacheDir[0..0] -join '').ToLower() + ($cacheDir.Substring(2) -replace '\\','/')
+  $drive = $cacheDir.Substring(0,1).ToLower()
+  $msysPath = "/$drive" + ($cacheDir.Substring(2) -replace '\\','/')
   Write-Host "==> Building CHARON & Aeneas in MSYS2…"
   & $bashPath -lc "
     cd `"$msysPath`"
@@ -123,13 +145,13 @@ if (-not (Test-Path $binDir)) { New-Item -ItemType Directory -Path $binDir | Out
       }
     }
 
-# 7) Install rem-command-line via Cargo
-if (-not (Get-Command rem-cli -ErrorAction SilentlyContinue)) {
-  Write-Host "==> Installing rem-command-line…"
-  cargo install rem-command-line --locked
-  Write-Ok "rem-cli installed"
+# 7) Install rem-server via Cargo (to match Linux/macOS)
+if (-not (Get-Command rem-server -ErrorAction SilentlyContinue)) {
+  Write-Host "==> Installing rem-server via cargo…"
+  cargo install rem-server --locked
+  Write-Ok "rem-server installed"
 } else {
-  Write-Ok "rem-cli already present"
+  Write-Ok "rem-server already present"
 }
 
 Write-Host "`nAll done!"
