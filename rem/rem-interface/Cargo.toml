@@ -1,7 +1,13 @@
 [package]
 name = "rem-interface"
 version = "0.1.0"
-edition = "2024"
+
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+
+repository = "https://github.com/RuleBrittonica/3712_Rust_Research_Project.git"
+description = "Interface and Metrics for REM"
 
 [dependencies]
 serde      = { workspace = true }
