@@ -1,0 +1,5 @@
+Imported from: https://github.com/meilisearch/meilisearch
+Requested URL: https://github.com/meilisearch/meilisearch/commit/31142b36635ba062184b7d42f2e86021b11e911c
+Captured commit: 31142b36635b
+Imported at: 2025-11-12T20:45:49+11:00
+Tool: import_repo (one-arg vendor)

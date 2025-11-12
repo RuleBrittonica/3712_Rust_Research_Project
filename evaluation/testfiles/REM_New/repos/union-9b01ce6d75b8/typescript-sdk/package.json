@@ -1,0 +1,47 @@
+{
+  "name": "@union/client",
+  "version": "0.0.0",
+  "description": "Union Labs cross-chain transfers client",
+  "type": "module",
+  "exports": "./mod.ts",
+  "scripts": {
+    "build": "echo 'No need… jsr.io requires no build step'",
+    "typecheck": "tsc --project tsconfig.json --noEmit",
+    "demo": "bun ./scripts/demo.ts",
+    "faucet": "bun ./scripts/faucet.ts",
+    "balance": "bun ./scripts/balance.ts",
+    "transfer": "bun ./scripts/transfer.ts",
+    "test": "vitest --run",
+    "clean": "rm -rf dist node_modules",
+    "postinstall": "patch-package"
+  },
+  "dependencies": {
+    "@cosmjs/cosmwasm-stargate": "0.32.3",
+    "@cosmjs/encoding": "^0.32.3",
+    "@cosmjs/stargate": "0.32.3",
+    "@cosmjs/tendermint-rpc": "0.32.3",
+    "viem": "^2.10.5"
+  },
+  "devDependencies": {
+    "@arethetypeswrong/cli": "^0.15.3",
+    "@cosmjs/amino": "0.32.3",
+    "@cosmjs/proto-signing": "0.32.3",
+    "@scure/base": "^1.1.6",
+    "@total-typescript/ts-reset": "^0.5.1",
+    "@types/bun": "^1.1.2",
+    "@types/node": "^20.12.11",
+    "cosmjs-types": "^0.9.0",
+    "patch-package": "^8.0.0",
+    "tsx": "^4.10.2",
+    "typescript": "^5.4.5",
+    "vite-tsconfig-paths": "^4.3.2",
+    "vitest": "^1.6.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/unionlabs/union.git",
+    "directory": "typescript-sdk"
+  },
+  "engineStrict": true,
+  "sideEffects": false
+}

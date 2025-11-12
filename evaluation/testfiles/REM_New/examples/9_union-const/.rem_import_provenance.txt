@@ -1,0 +1,5 @@
+Imported from: https://github.com/unionlabs/union
+Requested URL: https://github.com/unionlabs/union/commit/9b01ce6d75b84f049c1ede75750d33ce26ae73d9
+Captured commit: 9b01ce6d75b8
+Imported at: 2025-11-12T20:43:12+11:00
+Tool: import_repo (one-arg vendor)

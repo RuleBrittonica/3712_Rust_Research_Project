@@ -1,0 +1,5 @@
+Imported from: https://github.com/BurntSushi/ripgrep
+Requested URL: https://github.com/BurntSushi/ripgrep/commit/7534d5144f5c5e89d67c791e663cdc0bee069b0e
+Captured commit: 7534d5144f5c
+Imported at: 2025-11-12T20:45:13+11:00
+Tool: import_repo (one-arg vendor)

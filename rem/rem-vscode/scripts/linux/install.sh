@@ -18,7 +18,8 @@ sudo apt-get install -y \
     libssl-dev \
     pkg-config \
     opam \
-    dune
+    dune \
+    coq
 
 # 2) Install rustup (hopefully you already have it!) and ensure correct toolchain
 if ! command -v rustup >/dev/null 2>&1; then

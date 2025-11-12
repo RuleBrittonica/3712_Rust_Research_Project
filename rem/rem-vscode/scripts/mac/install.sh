@@ -25,7 +25,8 @@ brew install \
   openssl@3 \
   opam \
   dune \
-  make
+  make \
+  coq
 
 # ensure we pick up openssl@3
 export LDFLAGS="-L$(brew --prefix openssl@3)/lib"

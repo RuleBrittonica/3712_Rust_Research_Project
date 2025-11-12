@@ -32,7 +32,7 @@ const interface_1 = require("./interface");
 const extract_1 = require("./extract");
 const repairer_1 = require("./repairer");
 const verification_1 = require("./verification");
-const INSTALL_BASE = 'https://github.com/RuleBrittonica/rem-vscode/scripts';
+const INSTALL_BASE = 'https://github.com/RuleBrittonica/3712_Rust_Research_Project/tree/main/rem/rem-vscode/scripts';
 async function activate(context) {
     // Only run on a rust file!
     // if (!(vscode.window.activeTextEditor?.document.languageId === 'rust')) {

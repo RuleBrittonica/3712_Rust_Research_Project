@@ -1,8 +1,6 @@
 import { ChildProcessWithoutNullStreams, spawn } from 'node:child_process';
 import * as vscode from 'vscode';
 import {
-  InitPayload, CreatePayload, ChangePayload, ExtractPayload, DeletePayload,
-  InitData, ApplyData, ExtractData,
   JsonResp
 } from './interface';
 

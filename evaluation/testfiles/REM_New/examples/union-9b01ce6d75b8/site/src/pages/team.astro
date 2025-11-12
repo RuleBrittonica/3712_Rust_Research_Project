@@ -1,0 +1,207 @@
+---
+import SectionsLayout from "#/layouts/SectionsLayout.astro"
+import LanderSection from "#/components/LanderSection.astro"
+import IntroHeading from "#/components/typography/IntroHeading.astro"
+import Card from "#/components/Card.astro"
+
+import headshot_karel from "#/assets/images/headshots/karel.jpg"
+import headshot_cor from "#/assets/images/headshots/cor.jpg"
+import headshot_ben from "#/assets/images/headshots/ben.jpeg"
+import headshot_emir from "#/assets/images/headshots/emir.jpeg"
+import headshot_sarah from "#/assets/images/headshots/sarah.jpg"
+import headshot_abdullah from "#/assets/images/headshots/abdullah.jpeg"
+import headshot_connor from "#/assets/images/headshots/connor.jpg"
+import headshot_omar from "#/assets/images/headshots/omar.jpeg"
+import headshot_hussein from "#/assets/images/headshots/hussein.jpeg"
+import headshot_valentin from "#/assets/images/headshots/valentin.jpeg"
+import headshot_boris from "#/assets/images/headshots/boris.jpeg"
+
+import vc_galileo from "#/assets/images/investors/galileo.svg"
+import vc_nascent from "#/assets/images/investors/nascent.svg"
+import vc_tioga from "#/assets/images/investors/tioga.png"
+import vc_semantic from "#/assets/images/investors/semantic.png"
+import vc_lightshift from "#/assets/images/investors/lightshift.png"
+import vc_udhc from "#/assets/images/investors/udhc.svg"
+import vc_founderheads from "#/assets/images/investors/founderheads.svg"
+
+import team_spearbit from "#/assets/images/partners/spearbit.svg"
+import team_groomlake from "#/assets/images/partners/groomlake.png"
+import team_horizons from "#/assets/images/partners/horizons.svg"
+
+const profiles = [
+  {
+    name: "Karel",
+    title: "CEO",
+    x_name: "0xkaiserkarel",
+    profile_pic: headshot_karel
+  },
+  {
+    name: "Cor",
+    title: "CTO",
+    x_name: "corcoder",
+    profile_pic: headshot_cor
+  },
+  {
+    name: "Emir",
+    title: "Head of BD",
+    x_name: "EBeriker",
+    profile_pic: headshot_emir
+  },
+  {
+    name: "Sarah",
+    title: "Head of Operations",
+    x_name: "sarahkc07",
+    profile_pic: headshot_sarah
+  },
+  {
+    name: "Hussein",
+    title: "Principal Engineer",
+    x_name: "0xc0dejug",
+    profile_pic: headshot_hussein
+  },
+  {
+    name: "Abdullah",
+    title: "Founding Engineer",
+    x_name: "aeryz2",
+    profile_pic: headshot_abdullah
+  },
+  {
+    name: "Ben",
+    title: "Founding Engineer",
+    x_name: "0xbonlulu",
+    profile_pic: headshot_ben
+  },
+  {
+    name: "Connor",
+    title: "Founding Engineer",
+    x_name: "PoisonPhang",
+    profile_pic: headshot_connor
+  },
+  {
+    name: "Omar",
+    title: "Full Stack Engineer",
+    x_name: "awkroot",
+    profile_pic: headshot_omar
+  },
+  {
+    name: "Valentin",
+    title: "Advisor",
+    x_name: "valeyo777",
+    profile_pic: headshot_valentin
+  },
+  {
+    name: "Boris",
+    title: "Advisor",
+    x_name: "sprembo",
+    profile_pic: headshot_boris
+  }
+]
+
+const teams = [
+  {
+    name: "Spearbit",
+    logo: team_spearbit,
+    url: "https://spearbit.com"
+  },
+  {
+    name: "Groomlake",
+    logo: team_groomlake,
+    url: "https://groomla.ke"
+  },
+  {
+    name: "Horizons Law",
+    logo: team_horizons,
+    url: "https://www.horizonslaw.io/"
+  },
+  {
+    name: "Lightshift",
+    logo: vc_lightshift,
+    url: "https://www.semantic.vc/",
+    clazz: "h-[44px]"
+  },
+  {
+    name: "Galileo",
+    logo: vc_galileo,
+    url: "https://www.galileogroup.xyz/",
+    clazz: "h-[28px]"
+  },
+  {
+    name: "Nascent",
+    logo: vc_nascent,
+    url: "https://www.nascent.xyz/",
+    clazz: "h-16"
+  },
+  {
+    name: "Tioga",
+    logo: vc_tioga,
+    url: "https://tioga.capital/",
+    clazz: "h-16"
+  },
+  {
+    name: "Semantic",
+    logo: vc_semantic,
+    url: "https://www.semantic.vc/",
+    clazz: "h-[38px]"
+  },
+  {
+    name: "UDHC",
+    logo: vc_udhc,
+    url: "https://www.udhc.finance/",
+    clazz: "h-[38px]"
+  },
+  {
+    name: "Founderheads",
+    logo: vc_founderheads,
+    url: "https://founderheads.com/",
+    clazz: "h-[38px]"
+  }
+]
+---
+<SectionsLayout title="Union Team" gapless>
+  <LanderSection gradient="to-t">
+    <IntroHeading main title="Meet Union Labs">
+      We're a collective of engineers and researchers building the final state of interoperability.  
+    </IntroHeading>
+
+    <ul class="list-none grid grid-cols-1 sm:grid-cols-2 min-[884px]:grid-cols-3 p-0 auto-rows-[1fr] w-full gap-4 md:gap-6">
+      {
+        profiles.map(person => (
+          <Card>
+            <a 
+            href={`https://x.com/${person.x_name}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="w-full gap-4 items-center flex-1 flex flex-row  hover:bg-[#152325] transition-colors"
+            >
+                <img class="w-24 h-24 rounded-l" src={person.profile_pic.src}/>
+                <div class="leading-tight">
+                  <h3 class="text-2xl">{person.name}</h3>
+                  <div class="text-gray-400 -mt-1 text-lg">{person.title}</div>
+                  <div class="text-accent text-lg -mt-1 block">@{person.x_name}</div>
+                </div>
+            </a>
+          </Card>
+        ))
+      }
+    </ul>
+  </LanderSection>
+  <LanderSection gradient="to-b">
+    <IntroHeading title="Supporting Teams">Auditing, security, legal, funding.</IntroHeading>
+    <ul class="list-none grid grid-cols-1 sm:grid-cols-2 min-[884px]:grid-cols-3 p-0 auto-rows-[1fr] w-full gap-4 md:gap-6">
+      {
+        teams.map(team=> (
+          <Card>
+            <a 
+            href={team.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="w-full h-full gap-3 items-center flex-1 flex flex-row p-3 hover:bg-[#152325] transition-colors justify-center" 
+            >
+                <img class={team.clazz ? team.clazz : "p-4 h-16"} src={team.logo.src} alt={team.name}/>
+            </a>
+          </Card>
+        ))
+      }
+    </ul>
+  </LanderSection>
+</SectionsLayout>

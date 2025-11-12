@@ -1,0 +1,6 @@
+generics      0 matches | 0 files
+async     93444 matches | 1302 files
+const    135180 matches | 936 files
+nlcf      21351 matches | 1945 files
+hrtb        104 matches | 51 files
+dyn           0 matches | 0 files

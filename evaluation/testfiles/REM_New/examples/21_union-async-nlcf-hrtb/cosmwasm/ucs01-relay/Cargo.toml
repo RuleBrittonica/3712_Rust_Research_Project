@@ -1,0 +1,34 @@
+[package]
+authors      = ["Hussein Ait Lahcen <hussein.aitlahcen@gmail.com>"]
+edition      = { workspace = true }
+license-file = { workspace = true }
+name         = "ucs01-relay"
+publish      = false
+repository   = { workspace = true }
+version      = "1.0.1"
+
+[lints]
+workspace = true
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[features]
+library = []
+
+[dependencies]
+cosmwasm-schema   = { version = "2.0.0" }
+cosmwasm-std      = { version = "2.0.0", features = ["stargate", "cosmwasm_2_0"] }
+cw-controllers    = { version = "2.0.0" }
+cw-storage-plus   = { version = "2.0.0" }
+cw2               = { version = "2.0.0" }
+dlmalloc          = { workspace = true, features = ["global"] }
+ethabi            = { workspace = true }
+hex               = { workspace = true }
+schemars          = { workspace = true }
+semver            = "1"
+serde             = { workspace = true, features = ["derive"] }
+sha2              = { workspace = true }
+thiserror         = { workspace = true }
+token-factory-api = { workspace = true }
+ucs01-relay-api   = { workspace = true }

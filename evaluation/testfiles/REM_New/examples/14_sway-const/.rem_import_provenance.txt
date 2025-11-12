@@ -1,0 +1,5 @@
+Imported from: https://github.com/FuelLabs/sway
+Requested URL: https://github.com/FuelLabs/sway/commit/cdfc56c700ab32eefb84f75ed3048bd2a0ea22d2
+Captured commit: cdfc56c700ab
+Imported at: 2025-11-12T20:43:33+11:00
+Tool: import_repo (one-arg vendor)

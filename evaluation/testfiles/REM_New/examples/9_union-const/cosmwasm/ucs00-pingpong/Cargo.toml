@@ -1,0 +1,29 @@
+[package]
+authors      = ["Hussein Ait Lahcen <hussein.aitlahcen@gmail.com>"]
+edition      = { workspace = true }
+license-file = { workspace = true }
+name         = "ucs00-pingpong"
+repository   = "https://github.com/unionlabs/union"
+version      = "1.0.0"
+
+[lints]
+workspace = true
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[features]
+library = []
+
+[dependencies]
+cosmwasm-schema = { workspace = true }
+cosmwasm-std    = { workspace = true, features = ["stargate"] }
+cw-storage-plus = { workspace = true }
+dlmalloc        = { workspace = true, features = ["global"] }
+ethabi          = { workspace = true }
+serde           = { workspace = true, features = ["derive"] }
+thiserror       = { workspace = true }
+
+[dev-dependencies]
+hex        = { workspace = true }
+serde_json = { workspace = true }

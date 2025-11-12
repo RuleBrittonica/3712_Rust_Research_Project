@@ -1,0 +1,22 @@
+[package]
+name = "fuel-core-metrics"
+version = { workspace = true }
+authors = { workspace = true }
+categories = ["cryptography::cryptocurrencies"]
+edition = { workspace = true }
+homepage = { workspace = true }
+keywords = ["blockchain", "cryptocurrencies", "fuel-vm", "vm"]
+license = { workspace = true }
+repository = { workspace = true }
+description = "Fuel metrics"
+
+[dependencies]
+axum = { workspace = true }
+once_cell = { workspace = true }
+pin-project-lite = { workspace = true }
+prometheus-client = { workspace = true }
+regex = "1"
+tracing = { workspace = true }
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["macros"] }

@@ -1,0 +1,5 @@
+Imported from: https://github.com/zed-industries/zed
+Requested URL: https://github.com/zed-industries/zed/commit/fcc3d1092fc2c0323d6f06e93e06c5ed8fad2c0e
+Captured commit: fcc3d1092fc2
+Imported at: 2025-11-12T20:44:24+11:00
+Tool: import_repo (one-arg vendor)

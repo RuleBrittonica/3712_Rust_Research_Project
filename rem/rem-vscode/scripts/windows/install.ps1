@@ -57,20 +57,23 @@ Write-Host "==> Installing OCaml platform libraries via OPAM…"
 & opam upgrade --yes | Out-Null
 & opam install -y @opamPackages
 
-# Coq handling — skip if on OCaml 5.x
+# Coq handling — skip if on OCaml 5.x and install standalone Coq via WinGet
 $reqCoq = "8.18.0"
 $ocamlVer = (& ocamlc -version)
 if ($ocamlVer.Split('.')[0] -ge 5) {
   Write-Warn "OCaml $ocamlVer detected — skipping Coq $reqCoq (may not support OCaml 5.x)."
+  Write-Host "==> Installing standalone Coq (via WinGet)…"
+  winget install --exact --id coq.coq --silent --accept-package-agreements
+  Write-Ok "Coq installed via WinGet"
 } else {
   $coqVer = (& coqc --version 2>$null) -replace '[^\d\.]',''
   if ($coqVer -ne $reqCoq) {
-    Write-Host "==> Installing Coq $reqCoq…"
+    Write-Host "==> Installing Coq $reqCoq via OPAM…"
     & opam pin add coq $reqCoq --yes --no-action
     & opam install -y coq
   }
 }
-Write-Ok "OPAM, OCaml, and libraries ready"
+Write-Ok "OPAM, OCaml, Coq and libraries ready"
 
 # 4) Install Rust + nightly toolchain
 $rustupExe = "$env:USERPROFILE\.cargo\bin\rustup.exe"

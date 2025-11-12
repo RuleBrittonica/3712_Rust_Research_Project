@@ -1,0 +1,198 @@
+---
+source: crates/client/src/client/schema/tx.rs
+expression: operation.query
+---
+query($id: TransactionId!) {
+  transaction(id: $id) {
+    scriptGasLimit
+    id
+    txPointer
+    inputAssetIds
+    inputContracts
+    inputContract {
+      utxoId
+      balanceRoot
+      stateRoot
+      txPointer
+      contractId
+    }
+    inputs {
+      __typename
+      ... on InputCoin {
+        utxoId
+        owner
+        amount
+        assetId
+        txPointer
+        witnessIndex
+        maturity
+        predicateGasUsed
+        predicate
+        predicateData
+      }
+      ... on InputContract {
+        utxoId
+        balanceRoot
+        stateRoot
+        txPointer
+        contractId
+      }
+      ... on InputMessage {
+        sender
+        recipient
+        amount
+        nonce
+        witnessIndex
+        predicateGasUsed
+        data
+        predicate
+        predicateData
+      }
+    }
+    isScript
+    isCreate
+    isMint
+    outputs {
+      __typename
+      ... on CoinOutput {
+        to
+        amount
+        assetId
+      }
+      ... on ContractOutput {
+        inputIndex
+        balanceRoot
+        stateRoot
+      }
+      ... on ChangeOutput {
+        to
+        amount
+        assetId
+      }
+      ... on VariableOutput {
+        to
+        amount
+        assetId
+      }
+      ... on ContractCreated {
+        contract
+        stateRoot
+      }
+    }
+    outputContract {
+      inputIndex
+      balanceRoot
+      stateRoot
+    }
+    mintAmount
+    mintAssetId
+    receiptsRoot
+    status {
+      __typename
+      ... on SubmittedStatus {
+        time
+      }
+      ... on SuccessStatus {
+        transactionId
+        block {
+          height
+        }
+        time
+        programState {
+          returnType
+          data
+        }
+        receipts {
+          param1
+          param2
+          amount
+          assetId
+          gas
+          digest
+          id
+          is
+          pc
+          ptr
+          ra
+          rb
+          rc
+          rd
+          reason
+          receiptType
+          to
+          toAddress
+          val
+          len
+          result
+          gasUsed
+          data
+          sender
+          recipient
+          nonce
+          contractId
+          subId
+        }
+      }
+      ... on SqueezedOutStatus {
+        reason
+      }
+      ... on FailureStatus {
+        transactionId
+        block {
+          height
+        }
+        time
+        reason
+        programState {
+          returnType
+          data
+        }
+        receipts {
+          param1
+          param2
+          amount
+          assetId
+          gas
+          digest
+          id
+          is
+          pc
+          ptr
+          ra
+          rb
+          rc
+          rd
+          reason
+          receiptType
+          to
+          toAddress
+          val
+          len
+          result
+          gasUsed
+          data
+          sender
+          recipient
+          nonce
+          contractId
+          subId
+        }
+      }
+    }
+    witnesses
+    script
+    scriptData
+    policies {
+      gasPrice
+      maturity
+      witnessLimit
+      maxFee
+    }
+    salt
+    storageSlots
+    bytecodeWitnessIndex
+    bytecodeLength
+  }
+}
+
+

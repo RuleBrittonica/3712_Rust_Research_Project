@@ -1,0 +1,58 @@
+[package]
+name = "fuel-core-relayer"
+version = { workspace = true }
+authors = { workspace = true }
+edition = { workspace = true }
+homepage = { workspace = true }
+keywords = ["blockchain", "fuel", "fuel-vm"]
+license = { workspace = true }
+repository = { workspace = true }
+description = "Fuel Relayer"
+
+[dependencies]
+anyhow = { workspace = true }
+async-trait = { workspace = true }
+bytes = { version = "1.1", optional = true }
+enum-iterator = { workspace = true }
+ethers-contract = { version = "2", default-features = false, features = [
+  "abigen",
+] }
+ethers-core = { version = "2", default-features = false }
+ethers-providers = { version = "2", default-features = false, features = [
+  "ws",
+  "rustls",
+] }
+fuel-core-services = { workspace = true }
+fuel-core-storage = { workspace = true }
+fuel-core-types = { workspace = true }
+futures = { workspace = true }
+once_cell = { workspace = true }
+parking_lot = { workspace = true, optional = true }
+serde = { workspace = true, optional = true }
+serde_json = { workspace = true, optional = true }
+strum = { workspace = true }
+strum_macros = { workspace = true }
+thiserror = { workspace = true, optional = true }
+tokio = { workspace = true, features = ["macros"] }
+tracing = { workspace = true }
+url = "2.2"
+
+[dev-dependencies]
+fuel-core-relayer = { path = "", features = ["test-helpers"] }
+fuel-core-services = { path = "../../services", features = ["test-helpers"] }
+fuel-core-storage = { path = "../../storage", features = ["test-helpers"] }
+fuel-core-trace = { path = "../../trace" }
+mockall = { workspace = true }
+rand = { workspace = true }
+test-case = { workspace = true }
+tokio = { workspace = true, features = ["macros", "test-util"] }
+
+[features]
+test-helpers = [
+  "bytes",
+  "parking_lot",
+  "serde",
+  "serde_json",
+  "thiserror",
+  "fuel-core-types/test-helpers",
+]

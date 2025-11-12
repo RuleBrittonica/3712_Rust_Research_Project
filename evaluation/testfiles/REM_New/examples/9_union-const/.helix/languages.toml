@@ -1,0 +1,55 @@
+[language-server.astro-ls]
+args    = ["--stdio"]
+command = "astro-ls"
+config  = { "typescript" = { "tsdk" = "./site/node_modules/typescript/lib" }, "environment" = "node" }
+
+[language-server.biome]
+args    = ["lsp-proxy"]
+command = "biome"
+
+[[language]]
+file-types       = ["astro"]
+injection-regex  = "astro"
+language-servers = [{ name = "astro-ls", except-features = ["format"] }, "biome"]
+name             = "astro"
+scope            = "source.astro"
+# not yet released
+# block-comment-tokens = { start = "<!--", end = "-->" }
+roots = ["package.json", "astro.config.ts"]
+
+[[language]]
+auto-format      = true
+language-servers = [{ name = "typescript-language-server", except-features = ["format"] }, "biome"]
+name             = "javascript"
+
+[[language]]
+auto-format      = true
+language-servers = [{ name = "typescript-language-server", except-features = ["format"] }, "biome"]
+name             = "typescript"
+
+[[language]]
+auto-format      = true
+language-servers = [{ name = "typescript-language-server", except-features = ["format"] }, "biome"]
+name             = "tsx"
+
+[[language]]
+auto-format      = true
+language-servers = [{ name = "typescript-language-server", except-features = ["format"] }, "biome"]
+name             = "jsx"
+
+[[language]]
+language-servers = [{ name = "vscode-json-language-server", except-features = ["format"] }, "biome"]
+name             = "json"
+
+[[language]]
+auto-format      = true
+language-servers = [{ name = "svelteserver", except-features = ["format"] }, "biome"]
+name             = "svelte"
+
+[[grammar]]
+name   = "astro"
+source = { git = "https://github.com/virchau13/tree-sitter-astro", rev = "dfa0893bdc4bdfada102043404758c66e3580568" }
+
+# [[grammar]]
+# name   = "sql"
+# source = { git = "https://github.com/DerekStride/tree-sitter-sql", rev = "b6b1f7f7e70e869c655705c591cbdf3e8a807ad6" }

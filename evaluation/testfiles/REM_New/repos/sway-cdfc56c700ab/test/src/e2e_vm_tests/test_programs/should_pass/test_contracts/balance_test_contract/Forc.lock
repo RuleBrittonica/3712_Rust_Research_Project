@@ -1,0 +1,21 @@
+[[package]]
+name = 'balance_test_abi'
+source = 'path+from-root-58C52EDC3AE3855E'
+dependencies = ['core']
+
+[[package]]
+name = 'balance_test_contract'
+source = 'member'
+dependencies = [
+    'balance_test_abi',
+    'std',
+]
+
+[[package]]
+name = 'core'
+source = 'path+from-root-58C52EDC3AE3855E'
+
+[[package]]
+name = 'std'
+source = 'path+from-root-58C52EDC3AE3855E'
+dependencies = ['core']

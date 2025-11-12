@@ -1,0 +1,13 @@
+[[package]]
+name = 'b512_panic_test'
+source = 'member'
+dependencies = ['std']
+
+[[package]]
+name = 'core'
+source = 'path+from-root-668AEDF20AD093DA'
+
+[[package]]
+name = 'std'
+source = 'path+from-root-668AEDF20AD093DA'
+dependencies = ['core']
