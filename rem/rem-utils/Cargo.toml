@@ -1,6 +1,6 @@
 [package]
 name        = "rem-utils"
-version     = "0.2.0"
+version     = "0.2.1"
 description = "Utilities for Rusty Extraction Maestro"
 repository  = "https://github.com/RuleBrittonica/rem-utils.git"
 keywords    = ["utilities", "utils", "rem"]

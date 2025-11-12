@@ -59,23 +59,24 @@ ra_ap_hir              = "0.0.262"
 ra_ap_ide              = "0.0.262"
 ra_ap_ide_assists      = "0.0.262"
 ra_ap_ide_db           = "0.0.262"
-"ra_ap_load-cargo"     = "0.0.262"
+ra_ap_load-cargo       = "0.0.262"
 ra_ap_project_model    = "0.0.262"
-"ra_ap_rust-analyzer"  = "0.0.262"
+ra_ap_rust-analyzer    = "0.0.262"
 ra_ap_vfs              = "0.0.262"
 ra_ap_parser           = "0.0.262"
 ra_ap_syntax           = "0.0.262"
 rowan                  = "0.15.15"
 
 # REM member crates
-rem-utils         = { path = "rem-utils" }
+rem-utils         = "0.2.1"
+
+# [patch.crates-io]
+# rem-utils         = { path = "rem-utils" }
 rem-extract       = { path = "rem-extract" }
 rem-repairer      = { path = "rem-repairer" }
 rem-interface     = { path = "rem-interface" }
 rem-verification  = { path = "rem-verification" }
 
-# [patch.crates-io]
-# rem-utils = { path = "rem-utils" }
 
 
 [workspace.lints.rust]
