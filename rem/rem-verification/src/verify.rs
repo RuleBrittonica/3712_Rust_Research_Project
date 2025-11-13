@@ -11,9 +11,11 @@ use std::{
 use regex::Regex;
 
 use log::{
-    error, 
+    error,
     info
 };
+
+use crate::parser; 
 
 /// Returns the paths to:
 /// - The _CoQProject file
@@ -242,6 +244,8 @@ fn generate_equiv_check_proof(
     // Read the original Coq file as a string.
     let content = std::fs::read_to_string(original_coq)?;
 
+    println!("Top level function: {}", top_level_function);
+    println!("Original Coq content:\n{}", content);
 
     // Use a regex to locate the definition of the function.
     // We assume the definition looks like:
