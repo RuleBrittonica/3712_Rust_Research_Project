@@ -15,7 +15,7 @@ use log::{
     info
 };
 
-use crate::parser; 
+use crate::parser;
 
 /// Returns the paths to:
 /// - The _CoQProject file
@@ -236,82 +236,95 @@ struct CoqArgument {
 }
 
 /// Generates the proof for the equivalence check.
+use crate::parser::impls::parse_coq_file;
+use crate::parser::types::CoqDefinition;
 fn generate_equiv_check_proof(
     top_level_function: &str,
     original_coq: &PathBuf,
     refactored_coq: &PathBuf,
 ) -> Result<String, Box<dyn std::error::Error>> {
-    // Read the original Coq file as a string.
-    let content = std::fs::read_to_string(original_coq)?;
+    // load and parse both coq files
+    let original_src: String = std::fs::read_to_string(original_coq)?;
+    let refactored_src: String = std::fs::read_to_string(refactored_coq)?;
 
-    println!("Top level function: {}", top_level_function);
-    println!("Original Coq content:\n{}", content);
+    let original_defs: Vec<CoqDefinition> = parse_coq_file(&original_src);
+    let refactored_defs: Vec<CoqDefinition> = parse_coq_file(&refactored_src);
 
-    // Use a regex to locate the definition of the function.
-    // We assume the definition looks like:
-    //   Definition top_level_function (arg1 : type1) (arg2 : type2) ... : ...
-    let def_pattern = format!(r"Definition\s+{}\s+((?:\([^)]*\)\s*)+):", top_level_function);
-    let def_re = Regex::new(&def_pattern)?;
+    // Find the top level function in both files
+    let orig: &CoqDefinition = original_defs
+        .iter()
+        .find(|d| d.name == top_level_function)
+        .ok_or("Could not find the function in the original Coq file")?;
 
-    // Find the arguments portion.
-    let caps = def_re.captures(&content)
-        .ok_or("Could not find the function definition in the original Coq file")?;
-    let args_str = caps.get(1).unwrap().as_str();
+    let good: &CoqDefinition = refactored_defs
+        .iter()
+        .find(|d| d.name == top_level_function)
+        .ok_or("Could not find the function in the refactored Coq file")?;
 
-    // Now extract each argument of the form: (name : type)
-    let arg_re = Regex::new(r"\(\s*([^:\s]+)\s*:\s*([^)]+)\s*\)")?;
-    let mut args: Vec<CoqArgument> = Vec::new();
-    for cap in arg_re.captures_iter(args_str) {
-        let name = cap.get(1).unwrap().as_str().trim().to_string();
-        let ty = cap.get(2).unwrap().as_str().trim().to_string();
-        args.push(CoqArgument { name, ty });
-    }
-
-    // Build the "forall" part of the lemma and the argument list for function application.
-    let forall_part = args.iter()
-        .map(|arg| format!("({} : {})", arg.name, arg.ty))
-        .collect::<Vec<_>>()
-        .join(" ");
-    let args_names = args.iter()
-        .map(|arg| arg.name.clone())
+    // Extract argument list
+    let forall_part: String = orig.args
+        .iter()
+        .map(|a| format!("({} : {})", a.name, a.ty))
         .collect::<Vec<_>>()
         .join(" ");
 
-    // Name the Lemma
+    let args_names: String = orig.args
+        .iter()
+        .map(|a| a.name.clone())
+        .collect::<Vec<_>>()
+        .join(" ");
+
+    // Module names (file stems)
+    let original_module: &str = original_coq.file_stem().unwrap().to_str().unwrap();
+    let refactored_module: &str = refactored_coq.file_stem().unwrap().to_str().unwrap();
+
+    // Name the lemma
     let lemma_name = format!("{}_equiv_check", top_level_function);
 
-    // Get the module names for the original and refactored CoQ files.
-    let original_module = original_coq
-        .file_stem()
-        .unwrap()
-        .to_str()
-        .unwrap();
-    let refactored_module = refactored_coq
-        .file_stem()
-        .unwrap()
-        .to_str()
-        .unwrap();
+    // Build lemma header: with or without forall
+    let lemma_header = if forall_part.is_empty() {
+        format!("Lemma {} :", lemma_name)
+    } else {
+        format!("Lemma {} : forall {},", lemma_name, forall_part)
+    };
 
-    // Generate the proof script as a string.
-    let proof = format!(
-r"Lemma {} : forall {},
-  {}.{} {} = {}.{} {}.
-Proof.
-  intros {}.
-  unfold {}.{}.
-  unfold {}.{}.
-  reflexivity.
-Qed.",
-        lemma_name, forall_part, // Line 1
-        original_module, top_level_function, args_names, // Line 2
-        refactored_module, top_level_function, args_names, // Line 2
-        args_names, // Line 4
-        original_module, top_level_function, // Line 5
-        refactored_module, top_level_function, // Line 6
+    // Function application arguments (optional)
+    let args_suffix = if args_names.is_empty() {
+        "".to_string()
+    } else {
+        format!(" {}", args_names)
+    };
+
+    // Build the equality statement
+    let statement = format!(
+        "{}.{}{} = {}.{}{}.",
+        original_module, top_level_function, args_suffix,
+        refactored_module, top_level_function, args_suffix,
     );
 
-    // Log the generated proof script
-    info!("Proof script:\n{}", proof);
+    // Build intros line (optional)
+    let intros = if args_names.is_empty() {
+        "intros.".to_string()
+    } else {
+        format!("intros {}.", args_names)
+    };
+
+    // Generate final proof
+    let proof = format!(
+r"{}
+    {}
+Proof.
+    {}
+    unfold {}.{}.
+    unfold {}.{}.
+    reflexivity.
+Qed.",
+        lemma_header,
+        statement,
+        intros,
+        original_module, top_level_function,
+        refactored_module, top_level_function,
+    );
 
     Ok(proof)
 }
@@ -429,3 +442,83 @@ fn cleanup_directory(dir: &PathBuf) -> Result<(), Box<dyn std::error::Error>> {
 
     Ok(())
 }
+
+// fn generate_equiv_check_proof(
+//     top_level_function: &str,
+//     original_coq: &PathBuf,
+//     refactored_coq: &PathBuf,
+// ) -> Result<String, Box<dyn std::error::Error>> {
+//     // Read the original Coq file as a string.
+//     let content = std::fs::read_to_string(original_coq)?;
+
+//     println!("Top level function: {}", top_level_function);
+//     println!("Original Coq content:\n{}", content);
+
+//     // Use a regex to locate the definition of the function.
+//     // We assume the definition looks like:
+//     //   Definition top_level_function (arg1 : type1) (arg2 : type2) ... : ...
+//     let def_pattern = format!(r"Definition\s+{}\s+((?:\([^)]*\)\s*)+):", top_level_function);
+//     let def_re = Regex::new(&def_pattern)?;
+
+//     // Find the arguments portion.
+//     let caps = def_re.captures(&content)
+//         .ok_or("Could not find the function definition in the original Coq file")?;
+//     let args_str = caps.get(1).unwrap().as_str();
+
+//     // Now extract each argument of the form: (name : type)
+//     let arg_re = Regex::new(r"\(\s*([^:\s]+)\s*:\s*([^)]+)\s*\)")?;
+//     let mut args: Vec<CoqArgument> = Vec::new();
+//     for cap in arg_re.captures_iter(args_str) {
+//         let name = cap.get(1).unwrap().as_str().trim().to_string();
+//         let ty = cap.get(2).unwrap().as_str().trim().to_string();
+//         args.push(CoqArgument { name, ty });
+//     }
+
+//     // Build the "forall" part of the lemma and the argument list for function application.
+//     let forall_part = args.iter()
+//         .map(|arg| format!("({} : {})", arg.name, arg.ty))
+//         .collect::<Vec<_>>()
+//         .join(" ");
+//     let args_names = args.iter()
+//         .map(|arg| arg.name.clone())
+//         .collect::<Vec<_>>()
+//         .join(" ");
+
+//     // Name the Lemma
+//     let lemma_name = format!("{}_equiv_check", top_level_function);
+
+//     // Get the module names for the original and refactored CoQ files.
+//     let original_module = original_coq
+//         .file_stem()
+//         .unwrap()
+//         .to_str()
+//         .unwrap();
+//     let refactored_module = refactored_coq
+//         .file_stem()
+//         .unwrap()
+//         .to_str()
+//         .unwrap();
+
+//     // Generate the proof script as a string.
+//     let proof = format!(
+// r"Lemma {} : forall {},
+//   {}.{} {} = {}.{} {}.
+// Proof.
+//   intros {}.
+//   unfold {}.{}.
+//   unfold {}.{}.
+//   reflexivity.
+// Qed.",
+//         lemma_name, forall_part, // Line 1
+//         original_module, top_level_function, args_names, // Line 2
+//         refactored_module, top_level_function, args_names, // Line 2
+//         args_names, // Line 4
+//         original_module, top_level_function, // Line 5
+//         refactored_module, top_level_function, // Line 6
+//     );
+
+//     // Log the generated proof script
+//     info!("Proof script:\n{}", proof);
+
+//     Ok(proof)
+// }

@@ -24,6 +24,7 @@ mod logging;
 mod messages;
 
 mod exports;
+mod parser;
 
 
 mod convert;
