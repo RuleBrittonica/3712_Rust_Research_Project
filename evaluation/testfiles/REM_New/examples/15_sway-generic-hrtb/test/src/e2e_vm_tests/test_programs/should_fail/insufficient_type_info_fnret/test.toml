@@ -1,4 +1,0 @@
-category = "fail"
-
-# check: let b = foo::<Option>();
-# nextln: $()"Option" needs type arguments

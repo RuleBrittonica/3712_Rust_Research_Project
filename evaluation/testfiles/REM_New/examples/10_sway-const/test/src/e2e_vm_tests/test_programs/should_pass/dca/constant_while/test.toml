@@ -1,4 +1,0 @@
-category = "compile"
-
-# not: $()const COND = false;
-# not: $()This declaration is never used.

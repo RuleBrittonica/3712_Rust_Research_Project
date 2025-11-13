@@ -1,0 +1,5 @@
+Imported from: https://github.com/tauri-apps/tauri
+Requested URL: https://github.com/tauri-apps/tauri/commit/658e5f5d1dc1bd970ae572a42447448d064a7fee
+Captured commit: 658e5f5d1dc1
+Imported at: 2025-11-12T20:42:30+11:00
+Tool: import_repo (one-arg vendor)

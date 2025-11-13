@@ -1,0 +1,5 @@
+Imported from: https://github.com/dani-garcia/vaultwarden
+Requested URL: https://github.com/dani-garcia/vaultwarden/commit/952992c85bdf3147ddb8e663538e29c748b71f94
+Captured commit: 952992c85bdf
+Imported at: 2025-11-12T20:46:37+11:00
+Tool: import_repo (one-arg vendor)

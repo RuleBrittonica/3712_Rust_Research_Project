@@ -1,0 +1,5 @@
+Imported from: https://github.com/starship/starship
+Requested URL: https://github.com/starship/starship/commit/9093891acbe2c86b1615c37386dadbb0cc632199
+Captured commit: 9093891acbe2
+Imported at: 2025-11-12T20:46:25+11:00
+Tool: import_repo (one-arg vendor)

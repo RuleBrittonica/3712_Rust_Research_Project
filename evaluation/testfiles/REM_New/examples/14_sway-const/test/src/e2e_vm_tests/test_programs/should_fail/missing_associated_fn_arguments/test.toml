@@ -1,3 +1,0 @@
-category = "fail"
-
-# check: $()Function "add_values" expects 2 arguments but you provided 1.

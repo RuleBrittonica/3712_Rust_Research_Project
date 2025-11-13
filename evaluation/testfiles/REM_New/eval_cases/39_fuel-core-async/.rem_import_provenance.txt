@@ -1,0 +1,5 @@
+Imported from: https://github.com/FuelLabs/fuel-core
+Requested URL: https://github.com/FuelLabs/fuel-core/commit/ed92738280e068475682e220b93921bbbfebfdd7
+Captured commit: ed92738280e0
+Imported at: 2025-11-12T20:44:37+11:00
+Tool: import_repo (one-arg vendor)

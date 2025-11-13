@@ -1,3 +1,0 @@
-[[package]]
-name = 'asm_assign_to_initialized_reg'
-source = 'member'

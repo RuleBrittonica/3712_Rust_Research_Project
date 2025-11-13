@@ -1,0 +1,27 @@
+[package]
+name = "fuel-core-importer"
+version = { workspace = true }
+authors = { workspace = true }
+edition = { workspace = true }
+homepage = { workspace = true }
+keywords = ["blockchain", "fuel", "fuel-vm"]
+license = { workspace = true }
+repository = { workspace = true }
+description = "Fuel Block Importer"
+
+[dependencies]
+anyhow = { workspace = true }
+derive_more = { workspace = true }
+fuel-core-chain-config = { workspace = true }
+fuel-core-metrics = { workspace = true }
+fuel-core-storage = { workspace = true }
+fuel-core-types = { workspace = true }
+tokio = { workspace = true, features = ["full"] }
+tokio-rayon = { workspace = true }
+tracing = { workspace = true }
+
+[dev-dependencies]
+fuel-core-trace = { path = "./../../trace" }
+fuel-core-types = { path = "./../../types", features = ["test-helpers"] }
+mockall = { workspace = true }
+test-case = { workspace = true }

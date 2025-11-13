@@ -1,4 +1,0 @@
-category = "fail"
-
-# check: $()invalid int suffix
-# check: $()Mismatched types.

@@ -1,3 +1,0 @@
-category = "fail"
-
-# check: $()Payable attribute mismatch. The "payable" method implementation is missing #[payable] attribute specified in its signature in ABI "MyContract".

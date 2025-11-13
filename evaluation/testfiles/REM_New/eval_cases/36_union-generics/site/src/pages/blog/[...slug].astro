@@ -1,0 +1,122 @@
+---
+import Layout from "#/layouts/Layout.astro"
+import { getCollection } from "astro:content"
+import SocialsSection from "#/components/sections/SocialsSection.astro"
+import LanderSection from "#/components/LanderSection.astro"
+
+export async function getStaticPaths() {
+  const blogEntries = await getCollection("blog")
+  return blogEntries.map(entry => ({
+    params: { slug: entry.slug },
+    props: { entry }
+  }))
+}
+
+const { entry } = Astro.props
+const { Content } = await entry.render()
+---
+
+<Layout
+  url={Astro.url.href}
+  title={entry.data.title}
+  image={entry.data.cover?.src}
+  description={entry.data.description}
+>
+  <!-- <main
+    class="sm:text-xl flex-grow mt-2 sm:mt-12 pb-16 max-w-2xl self-center flex flex-col pt-6 sm:pt-0 mx-4"
+  > -->
+  <LanderSection gradient="to-t">
+    <div class="max-w-2xl self-center md:text-lg text-gray-300">
+      <div class="text-lg">
+        <time class="text-lg text-gray-400"  datetime={entry.data.date.toISOString()}>
+          {
+            entry.data.date.toLocaleDateString('fr-CA', {
+              year: 'numeric',
+              month: 'numeric',
+              day: 'numeric',
+            })
+          }
+        </time>
+      </div>
+      <h1 class="text-3xl sm:text-4xl font-extrabold mb-0">
+        {entry.data.title}
+      </h1>
+
+      <Content />
+    </div>
+    </LanderSection>
+  <SocialsSection />
+</Layout>
+
+<script is:inline type="module" src="/scripts/anchor-targets.js"></script>
+
+<style is:inline lang="postcss">
+  h1 {
+    color: white !important; 
+  }
+  img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    border-radius: 8px !important;
+  }
+
+  p > a {
+    text-decoration: underline;
+    text-decoration-color: #A0ECFD !important;
+    transition: border-bottom-color 0.2s ease-in-out;
+    color: #A0ECFD !important;
+  }
+
+  p, q, blockquote {
+    margin-bottom: 1rem;
+    color: #D1D5DB;
+  }
+
+
+  p > a:hover {
+    color: #A0ECFD;
+  }
+
+  ol {
+    li {
+      padding-top: 1rem;
+      color: #D1D5DB;
+    }
+    padding-bottom: 1rem;
+  }
+  @media (max-width: 640px) {
+    p > a:hover {
+      color: #A0ECFD;
+      text-decoration-color: #fff !important;
+    }
+    h2 {
+      font-size: 1.5rem !important;
+    }
+  }
+
+  h2,h3,h4,h5 {
+    margin-top: 2rem;
+    margin-bottom: 0rem;
+    font-size: 1.87rem;
+    color: #ffffff;
+  }
+
+  h2::after, h3::after, h4::after, h5::after {
+    content: '#';
+    color: #ffffff;
+    margin-left: 0.5rem;
+    font-size: 1.5rem;
+    position: relative;
+    visibility: hidden;
+  }
+
+  h2:hover::after, h3:hover::after, h4:hover::after, h5:hover::after {
+    visibility: visible;
+  }
+
+  *::selection {
+    background-color: #A0ECFD;
+    color: #000;
+  }
+</style>

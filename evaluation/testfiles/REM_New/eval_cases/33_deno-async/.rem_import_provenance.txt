@@ -1,0 +1,5 @@
+Imported from: https://github.com/denoland/deno
+Requested URL: https://github.com/denoland/deno/commit/093f3ba56518aba6e7844c17f9ba1fd09dafc6d1
+Captured commit: 093f3ba56518
+Imported at: 2025-11-12T20:19:54+11:00
+Tool: import_repo (one-arg vendor)

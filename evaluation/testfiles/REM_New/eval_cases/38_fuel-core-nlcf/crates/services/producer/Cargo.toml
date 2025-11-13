@@ -1,0 +1,29 @@
+[package]
+authors = { workspace = true }
+description = "Fuel Block Producer"
+edition = { workspace = true }
+homepage = { workspace = true }
+keywords = ["blockchain", "fuel", "fuel-vm"]
+license = { workspace = true }
+name = "fuel-core-producer"
+repository = { workspace = true }
+version = { workspace = true }
+
+[dependencies]
+anyhow = { workspace = true }
+async-trait = { workspace = true }
+derive_more = { workspace = true }
+fuel-core-storage = { workspace = true }
+fuel-core-types = { workspace = true }
+tokio = { workspace = true, features = ["full"] }
+tokio-rayon = { workspace = true }
+tracing = { workspace = true }
+
+[dev-dependencies]
+fuel-core-producer = { path = "", features = ["test-helpers"] }
+fuel-core-trace = { path = "../../trace" }
+fuel-core-types = { path = "../../types", features = ["test-helpers"] }
+rand = { workspace = true }
+
+[features]
+test-helpers = ["fuel-core-types/test-helpers"]

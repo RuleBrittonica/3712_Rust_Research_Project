@@ -1,5 +1,0 @@
-Imported from: https://github.com/astral-sh/uv
-Requested URL: https://github.com/astral-sh/uv/commit/9af989e30c86391767830aa588c32fcb7c9a76b5
-Captured commit: 9af989e30c86
-Imported at: 2025-11-12T20:45:01+11:00
-Tool: import_repo (one-arg vendor)

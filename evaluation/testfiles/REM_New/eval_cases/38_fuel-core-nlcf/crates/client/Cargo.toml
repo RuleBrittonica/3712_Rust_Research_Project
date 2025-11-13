@@ -1,0 +1,48 @@
+[package]
+name = "fuel-core-client"
+version = { workspace = true }
+authors = { workspace = true }
+categories = ["concurrency", "cryptography::cryptocurrencies", "emulators"]
+edition = { workspace = true }
+homepage = { workspace = true }
+keywords = ["blockchain", "cryptocurrencies", "fuel-vm", "vm"]
+license = { workspace = true }
+repository = { workspace = true }
+description = "Tx client and schema specification."
+
+[dependencies]
+anyhow = { workspace = true }
+cynic = { workspace = true }
+derive_more = { workspace = true }
+eventsource-client = { version = "0.10.2", optional = true }
+fuel-core-types = { workspace = true, features = ["serde"] }
+futures = { workspace = true, optional = true }
+hex = "0.4"
+# Included to enable webpki in the eventsource client
+hyper-rustls = { version = "0.24", features = [
+  "webpki-tokio",
+], optional = true }
+itertools = { workspace = true }
+reqwest = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+serde_json = { version = "1.0", features = ["raw_value"] }
+tai64 = { version = "4.0", features = ["serde"] }
+thiserror = "1.0"
+tracing = "0.1"
+
+[dev-dependencies]
+fuel-core-types = { workspace = true, features = [
+  "serde",
+  "std",
+  "test-helpers",
+] }
+insta = { workspace = true }
+
+[build-dependencies]
+schemafy_lib = { version = "0.5" }
+serde_json = { version = "1.0", features = ["raw_value"] }
+
+[features]
+default = ["subscriptions"]
+test-helpers = []
+subscriptions = ["eventsource-client", "futures", "hyper-rustls"]

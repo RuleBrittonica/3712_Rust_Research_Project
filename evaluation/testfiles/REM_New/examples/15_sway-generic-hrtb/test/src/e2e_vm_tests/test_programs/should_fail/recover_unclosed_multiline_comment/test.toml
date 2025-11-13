@@ -1,4 +1,0 @@
-category = "fail"
-
-# check: $()unclosed multiline comment
-# check: $()Mismatched types.

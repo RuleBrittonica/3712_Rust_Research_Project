@@ -1,5 +1,0 @@
-category = "fail"
-
-# check: $()let x = 0;
-# nextln: $()} 
-# nextln: $()unclosed multiline comment 

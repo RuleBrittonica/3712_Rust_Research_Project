@@ -1,0 +1,27 @@
+---
+source: crates/client/src/client/schema/message.rs
+expression: operation.query
+---
+query($owner: Address, $after: String, $before: String, $first: Int, $last: Int) {
+  messages(owner: $owner, after: $after, before: $before, first: $first, last: $last) {
+    edges {
+      cursor
+      node {
+        amount
+        sender
+        recipient
+        nonce
+        data
+        daHeight
+      }
+    }
+    pageInfo {
+      endCursor
+      hasNextPage
+      hasPreviousPage
+      startCursor
+    }
+  }
+}
+
+

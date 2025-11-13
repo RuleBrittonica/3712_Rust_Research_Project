@@ -1,4 +1,0 @@
-category = "compile"
-
-# not: $()value: u64
-# not: $()This struct field is never accessed.

@@ -1,0 +1,10 @@
+[package]
+name = "fuel-core-bft"
+version = { workspace = true }
+authors = { workspace = true }
+edition = { workspace = true }
+homepage = { workspace = true }
+keywords = ["blockchain", "fuel", "consensus", "bft"]
+license = { workspace = true }
+repository = { workspace = true }
+description = "Fuel Core BFT"

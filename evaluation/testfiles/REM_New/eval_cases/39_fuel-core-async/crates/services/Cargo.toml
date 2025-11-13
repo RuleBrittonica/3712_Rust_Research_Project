@@ -1,0 +1,25 @@
+[package]
+authors = { workspace = true }
+description = "The common code for fuel core services."
+edition = { workspace = true }
+homepage = { workspace = true }
+keywords = ["bft", "blockchain", "consensus", "fuel"]
+license = { workspace = true }
+name = "fuel-core-services"
+repository = { workspace = true }
+version = { workspace = true }
+
+[dependencies]
+anyhow = { workspace = true }
+async-trait = { workspace = true }
+fuel-core-metrics = { workspace = true }
+futures = { workspace = true }
+parking_lot = { workspace = true }
+tokio = { workspace = true, features = ["full"] }
+tracing = { workspace = true }
+
+[dev-dependencies]
+mockall = { workspace = true }
+
+[features]
+test-helpers = []

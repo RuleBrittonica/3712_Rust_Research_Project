@@ -1,5 +1,0 @@
-{
-  "args": "check --quiet dts/check_dts.d.ts",
-  "output": "dts/check_dts.out",
-  "exitCode": 1
-}

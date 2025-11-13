@@ -1,5 +1,0 @@
-{
-  "tempDir": true,
-  "args": "fmt --unstable-component",
-  "output": "[WILDLINE]badly_formatted.vto\nChecked 1 file\n"
-}

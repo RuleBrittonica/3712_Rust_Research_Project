@@ -1,0 +1,21 @@
+[package]
+authors = { workspace = true }
+description = "The common code for fuel core consensuses."
+edition = { workspace = true }
+homepage = { workspace = true }
+keywords = ["blockchain", "consensus", "fuel"]
+license = { workspace = true }
+name = "fuel-core-consensus-module"
+repository = { workspace = true }
+version = { workspace = true }
+
+[dependencies]
+anyhow = { workspace = true }
+fuel-core-chain-config = { workspace = true }
+fuel-core-poa = { workspace = true }
+fuel-core-storage = { workspace = true }
+fuel-core-types = { workspace = true }
+
+[dev-dependencies]
+fuel-core-types = { path = "../../types", features = ["test-helpers"] }
+test-case = { workspace = true }
