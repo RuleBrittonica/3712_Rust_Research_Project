@@ -179,7 +179,7 @@ impl<'de> Deserialize<'de> for BundleType {
   where
     D: Deserializer<'de>,
   {
-    // START EXTRACTION //
+    // START SELECTION //
     let s = String::deserialize(deserializer)?;
     match s.to_lowercase().as_str() {
       "deb" => Ok(Self::Deb),
@@ -191,7 +191,7 @@ impl<'de> Deserialize<'de> for BundleType {
       "dmg" => Ok(Self::Dmg),
       _ => Err(DeError::custom(format!("unknown bundle target '{s}'"))),
     }
-    // END EXTRACTION //
+    // END SELECTION //
   }
 }
 

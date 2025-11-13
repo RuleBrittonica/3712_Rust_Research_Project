@@ -1,0 +1,5 @@
+# Auto-generated selection metadata
+file_path = "REM_New/eval_cases/4_meilisearch-generic/crates/milli/src/update/index_documents/helpers/mod.rs"
+cargo_path = "REM_New/eval_cases/4_meilisearch-generic/crates/milli/Cargo.toml"
+start_index = 1128
+end_index = 1243

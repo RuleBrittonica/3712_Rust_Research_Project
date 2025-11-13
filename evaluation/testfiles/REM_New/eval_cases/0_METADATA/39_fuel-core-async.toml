@@ -1,0 +1,5 @@
+# Auto-generated selection metadata
+file_path = "REM_New/eval_cases/39_fuel-core-async/crates/services/relayer/src/service/test.rs"
+cargo_path = "REM_New/eval_cases/39_fuel-core-async/crates/services/relayer/Cargo.toml"
+start_index = 901
+end_index = 1109

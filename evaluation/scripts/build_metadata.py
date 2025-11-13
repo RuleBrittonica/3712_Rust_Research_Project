@@ -5,8 +5,11 @@ from typing import Optional, Tuple
 
 
 TESTFILES_ROOT = Path("evaluation/testfiles")
-REM_ORIGINAL = TESTFILES_ROOT / "REM_Original"
-METADATA_DIR = REM_ORIGINAL / "0_METADATA"
+# REM_ORIGINAL = TESTFILES_ROOT / "REM_Original"
+# METADATA_DIR = REM_ORIGINAL / "0_METADATA"
+
+REM_NEW = TESTFILES_ROOT / "REM_New" / "eval_cases"
+METADATA_DIR_NEW = REM_NEW / "0_METADATA"
 
 START_MARKERS = [
     b"// START SELECTION //",
@@ -109,7 +112,8 @@ def process_project_dir(project_dir: Path) -> None:
                 raise RuntimeError(f"No Cargo.toml found above {rs_path}")
             cargo_rel = cargo.relative_to(TESTFILES_ROOT)
 
-            out_toml = METADATA_DIR / f"{project_name}.toml"
+            # out_toml = METADATA_DIR / f"{project_name}.toml"
+            out_toml = METADATA_DIR_NEW / f"{project_name}.toml"
             write_toml(out_toml, file_rel, cargo_rel, start_idx, end_idx)
 
             print(f"[ok] {project_name}:")
@@ -123,10 +127,13 @@ def process_project_dir(project_dir: Path) -> None:
 
 
 def main() -> None:
-    if not REM_ORIGINAL.exists():
-        raise SystemExit(f"Missing directory: {REM_ORIGINAL}")
+    if not REM_NEW.exists():
+        raise SystemExit(f"Missing directory: {REM_NEW}")
+    # if not REM_ORIGINAL.exists():
+        # raise SystemExit(f"Missing directory: {REM_ORIGINAL}")
 
-    for entry in sorted(REM_ORIGINAL.iterdir()):
+    # for entry in sorted(REM_ORIGINAL.iterdir()):
+    for entry in sorted(REM_NEW.iterdir()):
         if not entry.is_dir():
             continue
         if entry.name == "0_METADATA":

@@ -1,3 +1,4 @@
+use core::panic;
 use config::{
     Config,
     File,
@@ -21,6 +22,8 @@ use args::{
 mod error;
 mod logging;
 mod messages;
+
+mod exports;
 
 
 mod convert;
@@ -103,9 +106,48 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             } else {
                 std::process::exit(1);
             }
-
-            Ok(())
         },
+
+        CLICommands::RunAll {
+            original_file,
+            refactored_file,
+            top_level_function,
+            charon_path,
+            aeneas_path
+        } => {
+            let charon_path = match charon_path {
+                Some(path) => path.clone(),
+                None => panic!("CHARON path must be provided for RunAll command."),
+            };
+            let aeneas_path = match aeneas_path {
+                Some(path) => path.clone(),
+                None => panic!("AENEAS path must be provided for RunAll command."),
+            };
+            let fn_name = top_level_function.clone();
+            let programs = exports::ProgramPaths {
+                charon: charon_path,
+                aeneas: aeneas_path,
+            };
+            let original_file = exports::FileContent::from_path(original_file.to_path_buf())?;
+            let refactored_file = exports::FileContent::from_path(refactored_file.to_path_buf())?;
+            let input = exports::VerificationInput::new(
+                original_file,
+                refactored_file,
+                fn_name,
+                programs,
+            );
+            let output: Result<exports::VerificationReturn, exports::VerificationError> = exports::call_verifier(input);
+            match output {
+                Ok(result) => {
+                    info!("RunAll completed successfully: {:?}", result);
+                    Ok(())
+                },
+                Err(e) => {
+                    info!("RunAll failed: {:?}", e);
+                    Err(Box::new(e))
+                }
+            }
+        }
 
         CLICommands::Verify {
             original_coq,

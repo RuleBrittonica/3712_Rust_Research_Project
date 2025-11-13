@@ -1,0 +1,5 @@
+# Auto-generated selection metadata
+file_path = "REM_New/eval_cases/38_fuel-core-nlcf/crates/services/txpool/src/service/update_sender/tests/test_sending.rs"
+cargo_path = "REM_New/eval_cases/38_fuel-core-nlcf/crates/services/txpool/Cargo.toml"
+start_index = 3928
+end_index = 4404

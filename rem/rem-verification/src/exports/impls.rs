@@ -50,10 +50,12 @@ impl std::fmt::Display for ProgramPaths {
 }
 
 impl ProgramPaths {
+    #[allow(dead_code)]
     pub fn new(charon: PathBuf, aeneas: PathBuf) -> Self {
         Self { charon, aeneas }
     }
 
+    #[allow(dead_code)]
     pub fn new_from_directory(base_dir: &PathBuf) -> Result<Self, VerificationError> {
         let charon = base_dir.join("charon");
         let aeneas = base_dir.join("aeneas");
@@ -78,10 +80,12 @@ pub struct FileContent {
 }
 
 impl FileContent {
+    #[allow(dead_code)]
     pub fn new(path: PathBuf, content: String) -> Self {
         Self { path, content }
     }
 
+    #[allow(dead_code)]
     pub fn from_path(path: PathBuf) -> Result<Self, VerificationError> {
         let content = std::fs::read_to_string(&path)
             .map_err(|e| VerificationError { msg: format!("Failed to read file {}: {}", path.display(), e) })?;

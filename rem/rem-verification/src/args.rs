@@ -44,6 +44,23 @@ pub enum CLICommands {
         aeneas_path: Option<PathBuf>,
     },
 
+    RunAll {
+        #[arg(help = "Path to the original file")]
+        original_file: PathBuf,
+
+        #[arg(help = "Path to the refactored file")]
+        refactored_file: PathBuf,
+
+        #[arg(help = "Top Level Function Name")]
+        top_level_function: String,
+
+        #[arg(help = "Path to charon binary", default_value="charon")]
+        charon_path: Option<PathBuf>,
+
+        #[arg(help = "Path to aeneas binary", default_value="aeneas")]
+        aeneas_path: Option<PathBuf>,
+    },
+
     /// Run various verification checks on the CoQ files.
     Verify {
         #[arg(help = "Path to the CoQ of the original program.")]

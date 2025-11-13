@@ -1,0 +1,5 @@
+# Auto-generated selection metadata
+file_path = "REM_New/eval_cases/28_uv-generics/crates/uv/src/commands/pip/list.rs"
+cargo_path = "REM_New/eval_cases/28_uv-generics/crates/uv/Cargo.toml"
+start_index = 11117
+end_index = 11295

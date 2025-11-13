@@ -1,0 +1,5 @@
+# Auto-generated selection metadata
+file_path = "REM_New/eval_cases/32_ripgrep-nlcf/crates/pcre2/src/matcher.rs"
+cargo_path = "REM_New/eval_cases/32_ripgrep-nlcf/crates/pcre2/Cargo.toml"
+start_index = 13627
+end_index = 13799
