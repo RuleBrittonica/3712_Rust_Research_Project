@@ -7,10 +7,10 @@ Local Open Scope Primitives_scope.
 
 
 Lemma main_equiv_check :
-    Orig.main = Bad.main.
+Orig.main = Bad.main.
 Proof.
-    intros.
-    unfold Orig.main.
-    unfold Bad.main.
-    reflexivity.
+intros.
+unfold Orig.main.
+unfold Bad.main.
+reflexivity.
 Qed.

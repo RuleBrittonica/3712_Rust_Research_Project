@@ -2,15 +2,15 @@
 Require Import Primitives.
 Import Primitives.
 Require Import Orig.
-Require Import Bad.
+Require Import Good.
 Local Open Scope Primitives_scope.
 
 
 Lemma main_equiv_check :
-    Orig.main = Bad.main.
-Proof.
+    Orig.main = Good.main.
+    Proof.
     intros.
     unfold Orig.main.
-    unfold Bad.main.
+    unfold Good.main.
     reflexivity.
-Qed.
+    Qed.

@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+cd #!/usr/bin/env bash
 set -euo pipefail
 
 # 0) Load config from config.toml
