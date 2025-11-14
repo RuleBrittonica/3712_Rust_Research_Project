@@ -34,10 +34,14 @@ anyhow        = { workspace = true }
 sha2          = { workspace = true }
 serde         = { workspace = true, features = ["derive"] }
 triomphe      = { workspace = true }
+once_cell     = { workspace = true }
+rustc-hash = "2.1.1"
 
+# Rem Crates
 rem-utils     = { workspace = true }
 rem-interface = { workspace = true }
 
+# Rust Analyzer crates. Note ROWAN must be the same version as used by RA crates
 ra_ap_hir              = { workspace = true }
 ra_ap_ide              = { workspace = true }
 ra_ap_ide_assists      = { workspace = true }
@@ -49,7 +53,8 @@ ra_ap_vfs              = { workspace = true }
 ra_ap_parser           = { workspace = true }
 ra_ap_syntax           = { workspace = true }
 ra_ap_cfg              = { workspace = true }
-
+ra_ap_paths            = { workspace = true }
+ra_ap_base_db          = { workspace = true }
 
 [build-dependencies]
 

@@ -1,9 +1,9 @@
-2025-11-03 20:46:46 [INFO] - Application Started
-2025-11-03 20:46:46 [INFO] - Running 'extract' subcommand
-2025-11-03 20:46:46 [INFO] - File Path: "/home/matt/3712_Rust_Research_Project/evaluation/testfiles/REM_Original/gitoxide-ext-com2/git-config/src/file/resolve_includes.rs"
-2025-11-03 20:46:46 [INFO] - New Function Name: extracted_fn
-2025-11-03 20:46:46 [INFO] - Start Index: 2149
-2025-11-03 20:46:46 [INFO] - End Index: 2422
-2025-11-03 20:46:46 [INFO] - Verbose: no
-2025-11-03 20:46:46 [INFO] - Metrics: yes
-2025-11-03 20:46:46 [INFO] - JSON: no
+2025-11-14 18:12:01 [INFO] - Application Started
+2025-11-14 18:12:01 [INFO] - Running 'extract' subcommand
+2025-11-14 18:12:01 [INFO] - File Path: "test_crates/sample_project/src/main.rs"
+2025-11-14 18:12:01 [INFO] - New Function Name: new_fn
+2025-11-14 18:12:01 [INFO] - Start Index: 63
+2025-11-14 18:12:01 [INFO] - End Index: 75
+2025-11-14 18:12:01 [INFO] - Verbose: no
+2025-11-14 18:12:01 [INFO] - Metrics: no
+2025-11-14 18:12:01 [INFO] - JSON: no

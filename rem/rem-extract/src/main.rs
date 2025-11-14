@@ -1,5 +1,6 @@
 mod logging;
 mod messages;
+mod startup;
 
 use extract::extraction::{
     extract_method,
@@ -26,6 +27,8 @@ use extract::extract_tests::{
     test_spammy,
 };
 
+use ra_ap_ide::Analysis;
+use ra_ap_vfs::FileId as VfsFileId;
 use rem_interface::metrics as mx;
 use rem_interface::vscode::{
     self as wire, Timing, Diagnostic, Severity,
@@ -38,7 +41,7 @@ mod error;
 
 use clap::Parser;
 
-use crate::extract::extraction::extract_method_file;
+use crate::extract::extraction::{analysis_from_single_file_std, extract_method_file};
 
 fn main() {
     logging::init_logging();
@@ -149,7 +152,85 @@ fn main() {
                 test();
             }
 
-        }
+        },
+
+        EXTRACTCommands::Ctx {} => {
+            println!("Running 'ctx' subcommand");
+            // Quickly test that we are building the startup context properly.
+            let ctx = startup::single_file_std_context();
+            for crate_id in ctx.base_graph.iter() {
+                let name = ctx.base_graph[crate_id].display_name.as_ref()
+                    .map(|n| n.canonical_name().to_string())
+                    .unwrap_or_else(|| "<unnamed>".to_string());
+                eprintln!("crate {crate_id:?} -> {name}");
+            }
+        },
+
+
+        EXTRACTCommands::StdAnalysis {} => {
+            println!("Running 'std-analysis' subcommand");
+
+            // 1) Some code that actually uses std / core so we can see if inference works.
+            let src = r#"
+pub fn sum_vec(xs: Vec<i32>) -> i32 {
+    xs.iter().sum()
+}
+
+pub fn use_result() -> Result<i32, std::io::Error> {
+    Ok(sum_vec(vec![1, 2, 3]))
+}"#.to_string();
+
+            // 2) Run your new single-file+std analysis helper.
+            let (analysis, file_id): (Analysis, VfsFileId) = analysis_from_single_file_std(src.clone());
+            println!("File ID: {:?}", file_id);
+
+
+            // 3) Print status for this file.
+            match analysis.status(Some(file_id)) {
+                Ok(status) => {
+                    println!("=== analysis.status(Some(file_id)) ===");
+                    println!("{status}");
+                }
+                Err(_) => {
+                    println!("=== analysis.status(Some(file_id)) ===");
+                    println!("<canceled>");
+                }
+            }
+
+            // 4) Print a short crate graph (dot syntax).
+            match analysis.view_crate_graph(false) {
+                Ok(Ok(dot)) => {
+                    println!();
+                    println!("=== analysis.view_crate_graph(false) ===");
+                    println!("{dot}");
+                }
+                Ok(Err(err)) => {
+                    println!();
+                    println!("=== analysis.view_crate_graph(false) ===");
+                    println!("error: {err}");
+                }
+                Err(_) => {
+                    println!();
+                    println!("=== analysis.view_crate_graph(false) ===");
+                    println!("<canceled>");
+                }
+            }
+
+            // 5) Print the syntax tree for /main.rs so you can eyeball it.
+            match analysis.view_syntax_tree(file_id) {
+                Ok(tree) => {
+                    println!();
+                    println!("=== analysis.view_syntax_tree(file_id) ===");
+                    println!("{tree}");
+                }
+                Err(_) => {
+                    println!();
+                    println!("=== analysis.view_syntax_tree(file_id) ===");
+                    println!("<canceled>");
+                }
+            }
+
+        },
 
     }
 }

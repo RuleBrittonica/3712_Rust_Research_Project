@@ -50,4 +50,8 @@ pub enum EXTRACTCommands {
         # [arg(short, long, help = "Enable spammy output - rustc will yell at you", action = ArgAction::SetTrue)]
         spammy: bool,
     },
+
+    Ctx {},
+    StdAnalysis {},
+
 }

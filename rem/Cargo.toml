@@ -68,6 +68,8 @@ ra_ap_cfg              = "0.0.262"
 ra_ap_vfs              = "0.0.262"
 ra_ap_parser           = "0.0.262"
 ra_ap_syntax           = "0.0.262"
+ra_ap_paths            = "0.0.262"
+ra_ap_base_db          = "0.0.262"
 rowan                  = "0.15.15"
 
 # REM member crates

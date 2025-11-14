@@ -4,8 +4,13 @@ use std::{
         self,
         ErrorKind
     },
-    path::PathBuf,
+    path::PathBuf, sync::atomic::AtomicU32,
+    sync::atomic::Ordering,
 };
+
+use proc_macro2::Span;
+use syn::spanned::Spanned;
+use syn::visit::Visit;
 
 use triomphe::Arc;
 
@@ -26,14 +31,16 @@ use ra_ap_project_model::{
 };
 
 use ra_ap_ide::{
+    Edition,
     Analysis,
     AnalysisHost,
     AssistConfig,
     AssistResolveStrategy,
-    CrateGraph,
     TextSize,
     SourceRoot,
 };
+
+use ra_ap_base_db::CrateGraph;
 
 use ra_ap_syntax::{
     algo,
@@ -48,14 +55,17 @@ use ra_ap_vfs::{
     AbsPathBuf,
     VfsPath,
     file_set::FileSet,
+    FileId as VfsFileId,
 };
 
 use crate::{
     error::ExtractionError,
     extract::extraction_utils::{
         apply_edits, apply_extract_function, check_braces, check_comment, convert_to_abs_path_buf, filter_extract_function_assist, fixup_controlflow, generate_frange, generate_frange_from_fileid, get_assists, get_cargo_config, get_cargo_toml, get_manifest_dir, load_project_manifest, load_project_workspace, load_workspace_data, rename_function, trim_range
-    },
+    }, startup::identify::add_sysroot_deps,
 };
+
+use crate::startup;
 
 use rem_interface::metrics as mx;
 
@@ -144,14 +154,15 @@ pub fn extract_method_file(input: ExtractionInput) -> Result<(String, String), E
     let start_idx: u32 = input.start_idx;
     let end_idx: u32 = input.end_idx;
 
-    let text: String = fs::read_to_string(&input.file_path).unwrap();
+    let text: String = fs::read_to_string(input_path).unwrap();
 
     // Verify the input data
     verify_input(&input)?;
 
     mx::mark("Load the analysis");
 
-    let (analysis,file_id) = analysis_from_single_file( text.clone() );
+    // let (analysis,file_id) = analysis_from_single_file_no_std( text.clone() );
+    let (analysis, file_id) = analysis_from_single_file_std( text.clone() );
 
     mx::mark("Analysis Loaded");
 
@@ -211,10 +222,6 @@ pub fn extract_method_file(input: ExtractionInput) -> Result<(String, String), E
 
     Ok( (fixed_cf_text, parent_method) )
 }
-
-// ========================================
-// Performs the method extraction
-// ========================================
 
 /// Function to extract the code segment based on cursor positions
 /// If successful, returns the `String` of the output code, followed by a
@@ -328,9 +335,9 @@ pub fn extract_method(input: ExtractionInput) -> Result<(String, String), Extrac
 /// Constructs an analysis from the text of a single file
 /// Returns the Analysis object and the FileId of the file (which is just zero),
 /// but needed later down the line
-pub fn analysis_from_single_file(
+fn analysis_from_single_file_no_std(
     src: String
-) -> (Analysis, ra_ap_vfs::FileId) {
+) -> (Analysis, VfsFileId) {
     // Create a single "virtual" file and systemm
     let mut files = FileSet::default();
     let file_id = ra_ap_vfs::FileId::from_raw(0);
@@ -380,6 +387,106 @@ pub fn analysis_from_single_file(
 
 }
 
+/// Constructs the analysis from a single file. Imports the standard library and
+/// core into the crate graph of the analysis.
+pub fn analysis_from_single_file_std(
+    src: String
+) -> (Analysis, VfsFileId) {
+    // 1) Grab the cached sysroot context
+    let ctx = startup::single_file_std_context();
+
+
+    // 2) Clone the base graph that already has core/std/etc.
+    let file_id: VfsFileId = alloc_vfs_file_id();
+    let mut graph: CrateGraph = ctx.base_graph.clone();
+
+    // 3) Add a crate rooted at this file.
+    let mut cfg: CfgOptions = CfgOptions::default();
+    cfg.insert_atom(ra_ap_hir::sym::test.clone());
+
+    let my_crate = graph.add_crate_root(
+        file_id,
+        Edition::CURRENT,
+        None,           // no display name override
+        None,           // no cfg_explicitly_set
+        Arc::new(cfg),  // cfg options
+        None,           // no out-dir
+        Env::default(), // empty env
+        false,          // is_proc_macro
+        CrateOrigin::Local { repo: None, name: None },
+    );
+
+    // 2) Clone the base graph that already has core/std/etc.
+    let mut graph = ctx.base_graph.clone();
+
+    // 3) Add a crate rooted at this file.
+    let mut cfg = CfgOptions::default();
+    cfg.insert_atom(ra_ap_hir::sym::test.clone());
+
+    let my_crate = graph.add_crate_root(
+        file_id,
+        Edition::CURRENT,
+        None,
+        None,
+        Arc::new(cfg),
+        None,
+        Env::default(),
+        false,
+        CrateOrigin::Local { repo: None, name: None },
+    );
+
+    // 4) Wire this crate to core/std.
+    add_sysroot_deps(&mut graph, my_crate);
+
+    // 5) Workspace data for all crates.
+    let ws_data =
+        startup::identify::build_ws_data(&graph);
+
+    // 6) Build source roots:
+    //    - local root for /main.rs
+    //    - library root for all sysroot files
+    let mut local_files = FileSet::default();
+    local_files.insert(file_id, VfsPath::new_virtual_path("/main.rs".to_owned()));
+    let local_root = SourceRoot::new_local(local_files);
+
+    let sysroot_files = ctx.sysroot_files.to_file_set();
+    let sysroot_root = SourceRoot::new_library(sysroot_files);
+
+    // 7) Build change: roots + crate graph + file contents.
+    let mut change = ChangeWithProcMacros::new();
+    change.set_roots(vec![local_root, sysroot_root]);
+    change.set_crate_graph(graph, ws_data);
+
+        // 7a) Set text for the sysroot files.
+    for (abs_path, id) in ctx.sysroot_files.entries() {
+        // Best-effort I/O; if it fails, log and skip.
+        match fs::read_to_string(abs_path.as_path()) {
+            Ok(text) => {
+                change.change_file(*id, Some(text));
+            }
+            Err(err) => {
+                eprintln!("warn: failed to read sysroot file {:?}: {err}", abs_path);
+            }
+        }
+    }
+
+    // 7b) Set text for our single file.
+    change.change_file(file_id, Some(src));
+
+    // 8) Host + analysis.
+    let mut host = AnalysisHost::default();
+    host.apply_change(change);
+    (host.analysis(), file_id)
+
+}
+
+static NEXT_VFS_FILE_ID: AtomicU32 = AtomicU32::new(1_000_000);
+
+fn alloc_vfs_file_id() -> VfsFileId {
+    let raw = NEXT_VFS_FILE_ID.fetch_add(1, Ordering::Relaxed);
+    VfsFileId::from_raw(raw)
+}
+
 /// Gets the caller method, based on the input code and the cursor positions
 /// If successful, returns the `String` of the caller method
 /// If unsuccessful, returns an `ExtractionError`
@@ -406,10 +513,6 @@ pub fn parent_method(
 
     Ok( fn_name.trim().to_string() )
 }
-
-use proc_macro2::Span;
-use syn::spanned::Spanned;
-use syn::visit::Visit;
 
 /// Return the name of the function/method that contains the given [start, end)
 /// byte range in `text`. Returns empty string if none found.
