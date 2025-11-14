@@ -2554,6 +2554,7 @@ dependencies = [
  "notify",
  "proc-macro2",
  "quote",
+ "ra_ap_cfg",
  "ra_ap_hir",
  "ra_ap_ide",
  "ra_ap_ide_assists",
@@ -2573,6 +2574,7 @@ dependencies = [
  "sha2",
  "syn",
  "tempfile",
+ "triomphe",
  "walkdir",
 ]
 
@@ -3362,6 +3364,10 @@ name = "triomphe"
 version = "0.1.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "dd69c5aa8f924c7519d6372789a74eac5b94fb0f8fcf0d4a97eb0bfc3e785f39"
+dependencies = [
+ "serde",
+ "stable_deref_trait",
+]
 
 [[package]]
 name = "typed-arena"

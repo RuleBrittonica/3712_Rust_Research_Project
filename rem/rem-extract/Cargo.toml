@@ -33,6 +33,7 @@ ctrlc         = { workspace = true }
 anyhow        = { workspace = true }
 sha2          = { workspace = true }
 serde         = { workspace = true, features = ["derive"] }
+triomphe      = { workspace = true }
 
 rem-utils     = { workspace = true }
 rem-interface = { workspace = true }
@@ -47,6 +48,7 @@ ra_ap_project_model    = { workspace = true }
 ra_ap_vfs              = { workspace = true }
 ra_ap_parser           = { workspace = true }
 ra_ap_syntax           = { workspace = true }
+ra_ap_cfg              = { workspace = true }
 
 
 [build-dependencies]

@@ -4,10 +4,21 @@ use std::{
         self,
         ErrorKind
     },
-    path::PathBuf
+    path::PathBuf,
 };
 
-use ra_ap_ide_db::EditionedFileId;
+use triomphe::Arc;
+
+use ra_ap_hir::{
+    CfgOptions,
+    Semantics,
+};
+
+use ra_ap_ide_db::{
+    EditionedFileId,
+    base_db::{CrateOrigin, CrateWorkspaceData, Env},
+    ChangeWithProcMacros,
+};
 use ra_ap_project_model::{
     CargoConfig,
     ProjectWorkspace,
@@ -15,18 +26,29 @@ use ra_ap_project_model::{
 };
 
 use ra_ap_ide::{
-    Analysis, AssistConfig, AssistResolveStrategy, TextSize
+    Analysis,
+    AnalysisHost,
+    AssistConfig,
+    AssistResolveStrategy,
+    CrateGraph,
+    TextSize,
+    SourceRoot,
 };
 
 use ra_ap_syntax::{
-    algo, ast::HasName, AstNode, SourceFile
+    algo,
+    ast::HasName,
+    AstNode,
+    SourceFile
 };
-
-use ra_ap_hir::Semantics;
 
 use ra_ap_ide_assists::Assist;
 
-use ra_ap_vfs::AbsPathBuf;
+use ra_ap_vfs::{
+    AbsPathBuf,
+    VfsPath,
+    file_set::FileSet,
+};
 
 use crate::{
     error::ExtractionError,
@@ -129,7 +151,7 @@ pub fn extract_method_file(input: ExtractionInput) -> Result<(String, String), E
 
     mx::mark("Load the analysis");
 
-    let (analysis,file_id) = Analysis::from_single_file(text.clone());
+    let (analysis,file_id) = analysis_from_single_file( text.clone() );
 
     mx::mark("Analysis Loaded");
 
@@ -301,6 +323,61 @@ pub fn extract_method(input: ExtractionInput) -> Result<(String, String), Extrac
     mx::mark("Extraction End");
 
     Ok( (modified_code, parent_method) )
+}
+
+/// Constructs an analysis from the text of a single file
+/// Returns the Analysis object and the FileId of the file (which is just zero),
+/// but needed later down the line
+pub fn analysis_from_single_file(
+    src: String
+) -> (Analysis, ra_ap_vfs::FileId) {
+    // Create a single "virtual" file and systemm
+    let mut files = FileSet::default();
+    let file_id = ra_ap_vfs::FileId::from_raw(0);
+    let path = VfsPath::new_virtual_path("/main.rs".to_owned());
+    files.insert(file_id, path);
+
+    // Build out the crate graph for that file
+    let mut config = CfgOptions::default();
+    config.insert_atom(ra_ap_hir::sym::test.clone()); // Probably not needed but enables cfg(test)
+
+    let mut graph = CrateGraph::default();
+    graph.add_crate_root(
+        file_id,
+        ra_ap_ide::Edition::CURRENT,
+        None,
+        None,
+        Arc::new(config.clone()),
+        None,
+        Env::default(),
+        false,
+        CrateOrigin::Local { repo: None, name: None},
+    );
+
+    // Prepare the workspace for this "crate"
+    let shared_ws = Arc::new(CrateWorkspaceData {
+        proc_macro_cwd: None,
+        data_layout: Err("There is no data layout for a single file analysis".into()),
+        toolchain: None,
+    });
+
+    let workspace = graph
+        .iter()
+        .map(|crate_id| (crate_id, shared_ws.clone()))
+        .collect();
+
+    // Describe the change to the host
+    let mut change = ChangeWithProcMacros::new();
+    let root = SourceRoot::new_local(files);
+    change.set_roots(vec![root]);
+    change.change_file(file_id, Some(src));
+    change.set_crate_graph(graph, workspace);
+
+    // Create the change that instantiates the analysis
+    let mut analysis = AnalysisHost::default();
+    analysis.apply_change(change);
+    (analysis.analysis(), file_id)
+
 }
 
 /// Gets the caller method, based on the input code and the cursor positions
