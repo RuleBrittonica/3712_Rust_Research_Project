@@ -91,6 +91,10 @@ pub fn run_stdio_server() -> Result<()> {
 
     let mut state: Option<State> = None;
 
+    // Initialise the base context (for std + core) once - stored statically in
+    // a OnceCell in rem-extract
+    let _ = rem_extract::startup::single_file_std_context(); 
+
     while let Some(Ok(line)) = lines.next() {
         if line.trim().is_empty() {
             continue;

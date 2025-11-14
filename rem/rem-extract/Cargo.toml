@@ -1,6 +1,6 @@
 [package]
 name        = "rem-extract"
-version     = "0.1.4"
+version     = "0.1.5"
 description = "Providing extract method capability for the REM toolchain"
 repository  = "https://github.com/RuleBrittonica/rem-extract"
 readme      = "README.md"

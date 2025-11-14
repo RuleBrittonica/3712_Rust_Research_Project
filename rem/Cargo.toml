@@ -76,7 +76,7 @@ rowan                  = "0.15.15"
 rem-utils         = "0.2.1"
 rem-repairer      = "0.1.4"
 rem-interface     = "0.1.0"
-rem-extract       = "0.1.4"
+rem-extract       = "0.1.5"
 rem-verification  = "0.1.1"
 
 # [patch.crates-io]

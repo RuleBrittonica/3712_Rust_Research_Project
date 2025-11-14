@@ -404,7 +404,7 @@ pub fn analysis_from_single_file_std(
     let mut cfg: CfgOptions = CfgOptions::default();
     cfg.insert_atom(ra_ap_hir::sym::test.clone());
 
-    let my_crate = graph.add_crate_root(
+    let _ = graph.add_crate_root(
         file_id,
         Edition::CURRENT,
         None,           // no display name override

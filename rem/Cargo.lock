@@ -2529,7 +2529,7 @@ dependencies = [
  "log",
  "once_cell",
  "ra_ap_vfs",
- "rem-extract 0.1.4 (registry+https://github.com/rust-lang/crates.io-index)",
+ "rem-extract 0.1.5 (registry+https://github.com/rust-lang/crates.io-index)",
  "rem-repairer 0.1.4 (registry+https://github.com/rust-lang/crates.io-index)",
  "rem-utils 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_json",
@@ -2539,7 +2539,7 @@ dependencies = [
 
 [[package]]
 name = "rem-extract"
-version = "0.1.4"
+version = "0.1.5"
 dependencies = [
  "anyhow",
  "camino",
@@ -2584,9 +2584,9 @@ dependencies = [
 
 [[package]]
 name = "rem-extract"
-version = "0.1.4"
+version = "0.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f73cf5c89476f0a5ade1e96379f8854f9a9fdfefd1a8c429c18922bf74bd7fd3"
+checksum = "b1c28507bb830b3654d4100c396deebfeb1f719353b1fa4a9af72a04b85ffc9a"
 dependencies = [
  "anyhow",
  "camino",
@@ -2599,14 +2599,18 @@ dependencies = [
  "lazy_static",
  "log",
  "notify",
+ "once_cell",
  "proc-macro2",
  "quote",
+ "ra_ap_base_db",
+ "ra_ap_cfg",
  "ra_ap_hir",
  "ra_ap_ide",
  "ra_ap_ide_assists",
  "ra_ap_ide_db",
  "ra_ap_load-cargo",
  "ra_ap_parser",
+ "ra_ap_paths",
  "ra_ap_project_model",
  "ra_ap_rust-analyzer",
  "ra_ap_syntax",
@@ -2615,10 +2619,12 @@ dependencies = [
  "rem-interface 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "rem-utils 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "rowan",
+ "rustc-hash 2.1.1",
  "serde",
  "serde_json",
  "sha2",
  "syn",
+ "triomphe",
  "walkdir",
 ]
 
@@ -2694,7 +2700,7 @@ dependencies = [
  "ra_ap_project_model",
  "ra_ap_syntax",
  "ra_ap_vfs",
- "rem-extract 0.1.4 (registry+https://github.com/rust-lang/crates.io-index)",
+ "rem-extract 0.1.5 (registry+https://github.com/rust-lang/crates.io-index)",
  "rem-repairer 0.1.4 (registry+https://github.com/rust-lang/crates.io-index)",
  "rem-verification 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde",
