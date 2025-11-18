@@ -1,0 +1,14 @@
+[package]
+name = "business_logic"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+# bitflags = "2.10.0"
+# chrono = "0.4.42"
+# regex = "1.12.2"
+# smallvec = "1.15.1"
+# thiserror = "2.0.17"
+# uuid = "1.18.1"
+
+[workspace]

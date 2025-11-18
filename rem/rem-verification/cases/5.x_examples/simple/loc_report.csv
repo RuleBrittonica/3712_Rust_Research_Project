@@ -1,0 +1,11 @@
+project,input_main_rs_loc,out_main_rs_loc
+argument_and_locals,9,11
+break_stmt,5,9
+copy_custom_used_after,11,13
+extract_from_nested,7,11
+extract_function_from_trait_with_existing_non_empty_impl_block,19,21
+extract_partial_block,12,15
+mut_method_call,14,18
+nested_where_clauses,11,25
+return_to_parent,11,17
+struct_with_two_fields,9,14
