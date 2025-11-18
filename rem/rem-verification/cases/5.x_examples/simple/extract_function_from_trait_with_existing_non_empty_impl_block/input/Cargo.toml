@@ -1,0 +1,7 @@
+[package]
+name = "extract_function_from_trait_with_existing_non_empty_impl_block"
+version = "0.1.0"
+
+[dependencies]
+
+[workspace]

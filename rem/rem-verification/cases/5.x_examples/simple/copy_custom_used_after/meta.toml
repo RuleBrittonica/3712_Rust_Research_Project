@@ -1,0 +1,4 @@
+name = "copy_custom_used_after"
+start = 87
+end = 99
+new_fn_name = "fun_name"

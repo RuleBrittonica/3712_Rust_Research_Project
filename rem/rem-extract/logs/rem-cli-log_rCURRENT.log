@@ -1,9 +1,1 @@
-2025-11-14 18:12:01 [INFO] - Application Started
-2025-11-14 18:12:01 [INFO] - Running 'extract' subcommand
-2025-11-14 18:12:01 [INFO] - File Path: "test_crates/sample_project/src/main.rs"
-2025-11-14 18:12:01 [INFO] - New Function Name: new_fn
-2025-11-14 18:12:01 [INFO] - Start Index: 63
-2025-11-14 18:12:01 [INFO] - End Index: 75
-2025-11-14 18:12:01 [INFO] - Verbose: no
-2025-11-14 18:12:01 [INFO] - Metrics: no
-2025-11-14 18:12:01 [INFO] - JSON: no
+2025-11-14 18:31:32 [INFO] - Application Started

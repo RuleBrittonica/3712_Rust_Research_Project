@@ -1,7 +1,7 @@
 pub mod error;
 pub mod convert;
-pub mod verify;
 mod parser;
+pub mod verify;
 
 mod exports;
 pub use exports::{

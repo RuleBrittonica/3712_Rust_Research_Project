@@ -1,0 +1,11 @@
+case_name,llbc_fresh,llbc_cached,coq,equiv
+extract_partial_block,293.04,198.40,308.25,1361.46
+extract_function_from_trait_with_existing_non_empty_impl_block,318.51,211.99,324.04,1638.93
+extract_from_nested,275.00,175.96,295.95,1493.59
+copy_custom_used_after,333.63,236.36,331.67,1314.47
+argument_and_locals,289.29,176.14,326.38,1274.78
+return_to_parent,289.88,194.97,316.42,1268.78
+break_stmt,272.51,170.92,294.54,1267.48
+mut_method_call,308.61,211.39,321.55,1216.28
+struct_with_two_fields,269.91,192.37,325.98,1298.64
+nested_where_clauses,349.53,242.97,327.96,1363.15

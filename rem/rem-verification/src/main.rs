@@ -38,19 +38,19 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     info!("Application Started");
 
-    let config = Config::builder()
-        // "Config" here means it will look for a file named "Config.toml" by default.
-        .add_source(File::with_name("Config")
-        .required(true))
-        .build()?;
+    // let config = Config::builder()
+    //     // "Config" here means it will look for a file named "Config.toml" by default.
+    //     .add_source(File::with_name("Config")
+    //     .required(true))
+    //     .build()?;
 
-    // log the settings
-    // The settings shouldn't be acessed after this point unless we do not
-    // provide an aeneas path in the CLI (or have a AENEAS_PATH in the environment).
-    let s: Settings = config.try_deserialize()?;
-    info!("AENEAS path: {}", s.programs.aeneas);
-    info!("CHARON path: {}", s.programs.charon);
-    info!("Primitives path: {}", s.files.primitives);
+    // // log the settings
+    // // The settings shouldn't be acessed after this point unless we do not
+    // // provide an aeneas path in the CLI (or have a AENEAS_PATH in the environment).
+    // let s: Settings = config.try_deserialize()?;
+    // info!("AENEAS path: {}", s.programs.aeneas);
+    // info!("CHARON path: {}", s.programs.charon);
+    // info!("Primitives path: {}", s.files.primitives);
 
     let args: CLIArgs = CLIArgs::parse();
     match &args.command {

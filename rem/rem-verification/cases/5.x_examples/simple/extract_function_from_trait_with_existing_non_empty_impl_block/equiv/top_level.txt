@@ -1,0 +1,1 @@
+traitoutputStruct_bar

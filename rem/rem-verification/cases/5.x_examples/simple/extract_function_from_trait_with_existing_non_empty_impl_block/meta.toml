@@ -1,0 +1,4 @@
+name = "extract_function_from_trait_with_existing_non_empty_impl_block"
+start = 186
+end = 191
+new_fn_name = "fun_name"

@@ -1,0 +1,4 @@
+name = "extract_from_nested"
+start = 76
+end = 81
+new_fn_name = "fun_name"
