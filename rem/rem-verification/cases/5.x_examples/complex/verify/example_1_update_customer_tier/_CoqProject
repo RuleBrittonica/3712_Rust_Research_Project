@@ -1,6 +1,0 @@
--R . AutoEquiv
-
-Primitives.v
-BusinessLogic.v
-BusinessLogicRefactored.v
-EquivCheck.v

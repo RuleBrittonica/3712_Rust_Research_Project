@@ -14,3 +14,6 @@ Proof.
     unfold BusinessLogicRefactored.example1_loyalty_update_customer_tier.
     reflexivity.
 Qed.
+
+Print BusinessLogic.example1_loyalty_update_customer_tier.
+Print BusinessLogic.example1_loyalty_compute_tier.

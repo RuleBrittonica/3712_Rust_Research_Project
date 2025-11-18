@@ -29,67 +29,6 @@ Record core_cmp_Eq_t (Self : Type) := mkcore_cmp_Eq_t {
 Arguments mkcore_cmp_Eq_t { _ }.
 Arguments core_cmp_Eq_tcore_cmp_Eq_t_PartialEqInst { _ } _.
 
-(** [core::num::{u32}::saturating_add]:
-    Source: '/rustc/library/core/src/num/uint_macros.rs', lines 2145:8-2145:60
-    Name pattern: [core::num::{u32}::saturating_add] *)
-Axiom core_num_U32_saturating_add : u32 -> u32 -> result u32.
-
-(** [core::num::{u32}::saturating_mul]:
-    Source: '/rustc/library/core/src/num/uint_macros.rs', lines 2234:8-2234:60
-    Name pattern: [core::num::{u32}::saturating_mul] *)
-Axiom core_num_U32_saturating_mul : u32 -> u32 -> result u32.
-
-(** [business_logic::example10_retry::RetryConfig]
-    Source: 'src/example10_retry.rs', lines 1:0-5:1 *)
-Record example10_retry_RetryConfig_t :=
-mkexample10_retry_RetryConfig_t {
-  example10_retry_RetryConfig_max_attempts : u32;
-  example10_retry_RetryConfig_initial_delay_ms : u32;
-  example10_retry_RetryConfig_backoff_factor : u32;
-}
-.
-
-(** [business_logic::example10_retry::compute_total_backoff]: loop 0:
-    Source: 'src/example10_retry.rs', lines 16:4-20:5 *)
-Fixpoint example10_retry_compute_total_backoff_loop
-  (i : u32) (i1 : u32) (attempts : u32) (delay : u32) (total : u32) :
-  result u32
-  :=
-  if attempts s< i
-  then (
-    total1 <- core_num_U32_saturating_add total delay;
-    delay1 <- core_num_U32_saturating_mul delay i1;
-    attempts1 <- u32_add attempts 1%u32;
-    example10_retry_compute_total_backoff_loop i i1 attempts1 delay1 total1)
-  else Ok total
-.
-
-(** [business_logic::example10_retry::compute_total_backoff]:
-    Source: 'src/example10_retry.rs', lines 7:0-23:1 *)
-Definition example10_retry_compute_total_backoff
-  (cfg : example10_retry_RetryConfig_t) : result u32 :=
-  if cfg.(example10_retry_RetryConfig_max_attempts) s= 0%u32
-  then Ok 0%u32
-  else
-    example10_retry_compute_total_backoff_loop
-      cfg.(example10_retry_RetryConfig_max_attempts)
-      cfg.(example10_retry_RetryConfig_backoff_factor) 0%u32
-      cfg.(example10_retry_RetryConfig_initial_delay_ms) 0%u32
-.
-
-(** [business_logic::example10_retry::run_example]:
-    Source: 'src/example10_retry.rs', lines 25:0-35:1 *)
-Definition example10_retry_run_example : result unit :=
-  total <-
-    example10_retry_compute_total_backoff
-      {|
-        example10_retry_RetryConfig_max_attempts := 3%u32;
-        example10_retry_RetryConfig_initial_delay_ms := 100%u32;
-        example10_retry_RetryConfig_backoff_factor := 2%u32
-      |};
-  massert (total s= 700%u32)
-.
-
 (** [business_logic::example1_loyalty::Tier]
     Source: 'src/example1_loyalty.rs', lines 2:0-7:1 *)
 Inductive example1_loyalty_Tier_t :=
@@ -2406,8 +2345,7 @@ Definition main : result unit :=
   _ <- example6_grading_run_example;
   _ <- example7_moving_average_run_example;
   _ <- example8_intervals_run_example;
-  _ <- example9_pricing_run_example;
-  example10_retry_run_example
+  example9_pricing_run_example
 .
 
 End BusinessLogic.

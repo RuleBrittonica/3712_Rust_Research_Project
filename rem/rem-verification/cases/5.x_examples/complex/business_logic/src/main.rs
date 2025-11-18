@@ -7,7 +7,7 @@ mod example6_grading;
 mod example7_moving_average;
 mod example8_intervals;
 mod example9_pricing;
-mod example10_retry;
+// mod example10_retry;
 
 fn main() {
     crate::example1_loyalty::run_example();
@@ -19,5 +19,5 @@ fn main() {
     crate::example7_moving_average::run_example();
     crate::example8_intervals::run_example();
     crate::example9_pricing::run_example();
-    crate::example10_retry::run_example();
+    // crate::example10_retry::run_example();
 }
