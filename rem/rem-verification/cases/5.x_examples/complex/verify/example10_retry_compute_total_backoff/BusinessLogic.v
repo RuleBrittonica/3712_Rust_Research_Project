@@ -1810,7 +1810,7 @@ Definition example6_grading_run_example : result unit :=
 .
 
 (** [business_logic::example7_moving_average::moving_average_3]: loop 0:
-    Source: 'src/example7_moving_average.rs', lines 13:4-38:5 *)
+    Source: 'src/example7_moving_average.rs', lines 13:4-34:5 *)
 Fixpoint example7_moving_average_moving_average_3_loop
   (n : usize) (m : usize) (data : slice i32) (out : slice i32) (i : usize) :
   result (slice i32)
@@ -1863,7 +1863,7 @@ Fixpoint example7_moving_average_moving_average_3_loop
 .
 
 (** [business_logic::example7_moving_average::moving_average_3]:
-    Source: 'src/example7_moving_average.rs', lines 4:0-39:1 *)
+    Source: 'src/example7_moving_average.rs', lines 4:0-35:1 *)
 Definition example7_moving_average_moving_average_3
   (data : slice i32) (out : slice i32) : result (slice i32) :=
   let n := slice_len data in
@@ -1877,7 +1877,7 @@ Definition example7_moving_average_moving_average_3
 .
 
 (** [business_logic::example7_moving_average::run_example]:
-    Source: 'src/example7_moving_average.rs', lines 42:0-57:1 *)
+    Source: 'src/example7_moving_average.rs', lines 38:0-53:1 *)
 Definition example7_moving_average_run_example : result unit :=
   let out := array_repeat 4%usize 0%i32 in
   let s := array_to_slice (mk_array 4%usize [ 1%i32; 3%i32; 5%i32; 7%i32 ]) in

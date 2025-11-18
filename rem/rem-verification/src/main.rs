@@ -157,11 +157,34 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             verbose: _,
             aeneas_path,
         } => {
-            let paths: (std::path::PathBuf, std::path::PathBuf, std::path::PathBuf, bool) = coq_verification(
+            let paths = coq_verification(
                 &original_coq,
                 &refactored_coq,
                 &top_level_function,
-            )?;
+            );
+
+            match paths {
+                Ok((coq_project, equivcheck, primitives, success)) => {
+                    if success {
+                        info!("Verification completed successfully.");
+                    } else {
+                        info!("Verification failed.");
+                    }
+
+                    eprintln!("COQ_PROJECT: {}", coq_project.display());
+                    eprintln!("EQUIVCHECK: {}", equivcheck.display());
+                    eprintln!("PRIMITIVES: {}", primitives.display());
+                    eprintln!("SUCCESS: {}", success);
+                    eprintln!("OUTPUT_END");
+
+                    std::process::exit(0);
+                },
+                Err(e) => {
+                    info!("Verification failed with error: {:?}", e);
+                    eprintln!("ERROR: {:?}", e);
+                    std::process::exit(0);
+                }
+            }
 
             Ok(())
         },

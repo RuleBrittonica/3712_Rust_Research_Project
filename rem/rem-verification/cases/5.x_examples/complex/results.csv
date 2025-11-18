@@ -1,1 +1,11 @@
 fn,charon_fresh_ms,charon_cached_ms,aeneas_ms,verifyer_ms
+example1_loyalty_update_customer_tier,9128.218,1787.542,1078.749,754.535
+example2_transfer_transfer,9191.993,1717.900,1087.503,844.516
+example3_inventory_apply_stock_change,9523.406,1746.013,1118.594,777.329
+example4_order_apply_event,9566.533,1722.951,1087.493,785.413
+example5_config_normalise_config,9244.835,1769.304,1087.811,782.157
+example6_grading_compute_final_mark,9515.919,1791.260,1026.564,782.788
+example7_moving_averages_moving_average_3,9063.935,1799.443,1071.895,3.140
+example8_intervals_merge_intervals,9802.019,1864.880,1273.980,773.523
+example9_pricing_compute_total_price_cents,9324.951,1726.388,1073.389,783.018
+example10_retry_compute_total_backoff,9337.030,1880.028,1166.898,797.610
