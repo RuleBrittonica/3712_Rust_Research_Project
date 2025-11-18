@@ -1,75 +1,83 @@
 \section{Appendix 1: Passing by Value and Reference}
 \label{sec:appendix1}
 
-This appendix provides three short, self-containted examples of ``na\"ive''
+This appendix provides three short, self-contained examples of ``na\"ive''
 function hoisting in Rust. In each example, we will define a function that is
 getting refactored, and we will demonstrate the case where the arguments to the
 function are passed by value and the case where they are passed by reference. To
 achieve this, we are imagining an automated refactoring tool that initially
 takes an inline block of code and moves it into a new function. The compilation
 errors (if any) guide a subsequent ownership analysis, which deduces how each
-variable should be passed: by value (\texttt{T}), by shared reference
-(\texttt{\&T}), or by mutable reference (\texttt{\&mut T}).
+variable should be passed: by value (\icodeverb{T}), by shared reference
+(\icodeverb{&T}), or by mutable reference (\icodeverb{&mut T}).
 
 \subsection{Example 1: Passing by Value}
 \subsubsection*{Original Code (inline)}
 \inputminted{rust}{6_appendices/app1_code/ex1_oc.rs}
+{\captionsetup{justification=centering}\captionof{listing}{Passing by value: Original}}
 
 \subsubsection*{Na\"ive Hoisted Code (before fixes)}
 Suppose an automated refactoring tool decides to “hoist” the multiplication
 logic into a new function: \newline
 \inputminted{rust}{6_appendices/app1_code/ex1_nhc.rs}
+{\captionsetup{justification=centering}\captionof{listing}{Passing by value: Na\"ive extraction}}
 In this example, no errors occur because after calling
-\texttt{hoisted\_block(x)}, we do not need \texttt{x} again in \texttt{main}, so
+\icodeverb{hoisted_block(x)}, we do not need \icodeverb{x} again in \icodeverb{main}, so
 moving (passing ownership) is safe. The automated repair analysis detects that
-\texttt{x} is no longer needed in \texttt{main} and decides it can be passed by
+\icodeverb{x} is no longer needed in \icodeverb{main} and decides it can be passed by
 value.
 
 \subsection{Example 2: Passing by Shared Reference}
 \subsubsection*{Original Code (inline)}
 \inputminted{rust}{6_appendices/app1_code/ex2_oc.rs}
+{\captionsetup{justification=centering}\captionof{listing}{Passing by shared reference: Original}}
 
 \subsubsection*{Na\"ive Hoisted Code (before fixes)}
-Let's say the refactoring tool decides to hoist the usage of \texttt{get\_first\_word} (or
+Let's say the refactoring tool decides to hoist the usage of \icodeverb{get_first_word} (or
 a bit more logic around it) into a new helper function:
 \inputminted{rust}{6_appendices/app1_code/ex2_nhc.rs}
+{\captionsetup{justification=centering}\captionof{listing}{Passing by shared reference: Na\"ive extraction}}
 This version won't compile as expected if the function
-\texttt{print\_first\_word\_block} takes \texttt{text} by value. Once \texttt{text}
-is moved into \texttt{print\_first\_word\_block}, we can no longer use
-\texttt{text} afterward in \texttt{main}. The compiler will complain that
-\texttt{text} is moved, thus invalidating the line \texttt{println!("Total
-length is: {}", length);} if we needed \texttt{text} for anything else.
+\icodeverb{print_first_word_block} takes \icodeverb{text} by value. Once \icodeverb{text}
+is moved into \icodeverb{print_first_word_block}, we can no longer use
+\icodeverb{text} afterward in \icodeverb{main}. The compiler will complain that
+\icodeverb{text} is moved, thus invalidating the line \texttt{println!("Total
+length is: {}", length);} if we needed \icodeverb{text} for anything else.
 
 \subsubsection*{Automated Repair Yields}
 \inputminted{rust}{6_appendices/app1_code/ex2_ar.rs}
+{\captionsetup{justification=centering}\captionof{listing}{Passing by shared reference: Automated Repair}}
 \noindent What's going on?
 \begin{itemize}
-    \item \textbf{Read-only usage}: The function \texttt{print\_first\_word\_block}
+    \item \textbf{Read-only usage}: The function \icodeverb{print_first_word_block}
     just needs to read the string (in order to print the first word).
     \item \textbf{Shared reference}: Because the string must remain valid
-    afterward in \texttt{main}, the ownership analysis decides that passing by
-    shared reference (\texttt{\&String}) is correct.
+    afterward in \icodeverb{main}, the ownership analysis decides that passing by
+    shared reference (\icodeverb{&String}) is correct.
 \end{itemize}
 
 \subsection{Example 3: Passing by Mutable Reference}
 \subsubsection*{Original Code (inline)}
 \inputminted{rust}{6_appendices/app1_code/ex3_oc.rs}
+{\captionsetup{justification=centering}\captionof{listing}{Passing by mutable reference: Original}}
 
 \subsubsection*{Na\"ive Hoisted Code (before fixes)}
 Hoisting the push operation into a new function could look like this:
 \inputminted{rust}{6_appendices/app1_code/ex3_nhc.rs}
-Here, we have a compilation error similar to Example 2: once \texttt{values} is
-passed by value, ownership is transferred, and we cannot use \texttt{values}
-again in \texttt{main}. However, in this case, we truly do need to mutate
-\texttt{values}, and we want \texttt{main} to see the updated vector.
+{\captionsetup{justification=centering}\captionof{listing}{Passing by mutable reference: Na\"ive extraction}}
+Here, we have a compilation error similar to Example 2: once \icodeverb{values} is
+passed by value, ownership is transferred, and we cannot use \icodeverb{values}
+again in \icodeverb{main}. However, in this case, we truly do need to mutate
+\icodeverb{values}, and we want \icodeverb{main} to see the updated vector.
 
 \subsubsection*{Automated Repair Yields}
 \inputminted{rust}{6_appendices/app1_code/ex3_ar.rs}
+{\captionsetup{justification=centering}\captionof{listing}{Passing by mutable reference: Automated Repair}}
 \noindent What's going on?
 \begin{itemize}
     \item \textbf{Mutation required}: The code needs to modify the original
     vector.
-    \item \textbf{Mutable reference}: By passing \texttt{\&mut Vec<i32>}, the
-    function can mutate \texttt{values} in place, and \texttt{main} retains
-    ownership of \texttt{values} to use afterward.
+    \item \textbf{Mutable reference}: By passing \icodeverb{&mut Vec<i32>}, the
+    function can mutate \icodeverb{values} in place, and \icodeverb{main} retains
+    ownership of \icodeverb{values} to use afterward.
 \end{itemize}

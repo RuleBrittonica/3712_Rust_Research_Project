@@ -1,119 +1,487 @@
 \chapter{Evaluation and Experimental Results}
 \label{chap:evaluation_experimental_results}
+\vspace*{-20mm}
 
-% No more than 1 page
-\section{Experimental Setup}
-\label{sec:experimental_setup}
+This chapter evaluates the new REM2.0 in two separate directions: its ability to perform extract-function refactorings on realistic Rust code, and its ability to verify that those refactorings preserve behaviour. We first describe the benchmark corpora and experimental setup, then define the metrics and criteria we use to judge success. We then present results for the extraction pipeline and, subsequently, for the optional verification pipeline built on \texttt{CHARON} and \texttt{AENEAS}, highlighting both the gains over the original REM prototype and the remaining limitations.
 
-% Describe how I scraped the repositories from github.
-% Describe how I selected the files / functions that would be analysed
-% Describe how I interface the repositories with the tool
+\vspace{-5mm}
+\section{Evaluation Goals and Research Questions}
+\label{sec:eval_goals}
+% 0.5-1 page
 
-% Two experiments for the extraction toolchain
-% Ensure we are at least as capable as REM 
-% Determine what else we can do (r.e. generics, async, etc)
+The overall goal of the evaluation is to determine how REM2.0 behaves on realistic Rust code: both as a fast, everyday extract-function refactoring tool, and as an optional source of formal guarantees when paired with the verification pipeline. In particular, we are interested in characterising its correctness, feature coverage, and performance, and in understanding the trade-offs introduced by the verifier. We frame this in terms of the following research questions:
 
+\begin{itemize}[leftmargin=*, topsep=2pt, itemsep=0pt]
+  \item \textbf{RQ1 (Extraction correctness and coverage).} 
+  \emph{How accurately does the new extraction toolchain preserve typing and behaviour on the original REM benchmark suite, and are there any they both fail on?}
 
-\section{Evaluation Criteria}
-\label{sec:evaluation_criteria}
+  \item \textbf{RQ2 (New feature support).}
+  \emph{How does the new extraction engine extend coverage to modern Rust features---such as }\icodeverb{async}/\icodeverb{await}, \icodeverb{const fn}\emph{, generics, higher-ranked trait bounds, dynamic trait objects, and non-local control flow---and what patterns of success and failure emerge across these features?}
 
-\section{Extraction: Results and Analysis}
-\label{sec:results_analysis}
+  \item \textbf{RQ3 (Performance).}
+  \emph{What extraction latencies does the new architecture achieve on realistic projects, and how do these compare quantitatively with the original REM prototype?}
 
-\subsection{Complete Results Table}
-\label{subsec:extraction_results_table}
+  \item \textbf{RQ4 (Verification).}
+  \emph{Within the subset of Rust currently supported by \texttt{CHARON} and \texttt{AENEAS}, how effective is the verification pipeline at establishing equivalence, and what are its performance characteristics?}
+\end{itemize}
+
+Sections~\ref{sec:experiment_setup}--\ref{sec:extract_eval} primarily address RQ1--RQ3 through extraction-focused experiments, while Section~\ref{sec:verif_eval} answers RQ4 by evaluating the optional verification pipeline on a curated set of trivial and real-world cases.
+
+\vspace{-5mm}
+\section{Benchmark Corpora and Experimental Setup}
+\label{sec:experiment_setup}
+% 3 pages
+\vspace{-2.5mm}
+This section describes the benchmark corpora and experimental setup used to evaluate the extraction and verification components of REM2.0. We first give a high-level overview of the experiments, then introduce the three corpora used in the remainder of the chapter: the original REM benchmark suite, a new set of real-world feature-focused cases, and a verification benchmark tailored to the current capabilities of \texttt{CHARON} and \texttt{AENEAS}.
+
+\vspace{-2.5mm}
+\subsection{Overview of Experiments}
+
+To cover both backwards compatibility and new functionality, we designed three complementary experiments:
+
+\begin{enumerate}[leftmargin=*, itemsep=0pt, topsep=2pt]
+  \item \textbf{Original REM cases (baseline extraction).}
+  We re-run the new extraction pipeline on the full suite of benchmark cases used in the evaluation of the original REM prototype. This experiment is primarily used to answer RQ1 and RQ3 by comparing correctness and latency against the baseline design.
+
+  \item \textbf{New real-world feature cases (extended extraction).}
+  We construct a new corpus of forty extraction sites drawn from large, actively maintained Rust repositories. Each case is chosen because it exercises at least one modern Rust feature that the original REM could not reliably support. This experiment targets RQ2 and RQ3.
+
+  \item \textbf{Verification benchmark (equivalence checking).}
+  We assemble a set of twenty examples for the verification pipeline: ten small ``trivial'' programs that isolate core correctness properties, and ten simple but real-world functions drawn from open-source code. These are selected to fall within the fragment of Rust currently supported by \texttt{CHARON} and \texttt{AENEAS}, and are used to answer RQ4.
+\end{enumerate}
+
+\vspace{-2.5mm}
+\subsection{Original REM Benchmark suite}
+\label{subsec:original_rem_benchmarks}
+
+To provide a baseline for comparison, we re-used the full suite of extraction cases from the original REM evaluation.\footnote{The test repositories were copied directly from the artefact published by the VerseLab group at \url{https://github.com/verse-lab/rem}.} Each case consists of a Rust project containing an annotated source file, where the intended extraction region is marked by either line comments (\icodeverb{// START SELECTION //} and \icodeverb{// END SELECTION //}) or block comments (\icodeverb{/* START SELECTION */} and \icodeverb{/* END SELECTION */}). 
+
+Each benchmark case is defined by the selection markers in the original REM artefact, which we reuse  to ensure that both the original prototype and the new extraction pipeline are run on exactly the same inputs. One case in the original suite (case~\#16) contained no selection markers and is therefore excluded from our quantitative comparison; outcomes and timings for the remaining cases are reported in Table~\ref{tab:rem_original_results}.
+
+\vspace{-2.5mm}
+\subsection{New Real-World Cases}
+\label{subsec:new_feature_cases}
+
+To evaluate the new extraction engine on patterns that arise in modern Rust code ``in the wild'', we constructed a second corpus of forty extraction sites drawn from large, popular open-source projects. The goal of this corpus is to stress language features that the original REM prototype could not support, while ensuring that as many examples as possible reflect extractions that developers actually performed (or could plausibly have performed) in practice.
+
+We began by selecting a sample of the most highly starred Rust repositories, using the GitHub rankings maintained by Evan Li~\cite{EvanLi_GithubRanking_Rust2025} as our baseline. A summary of the selected repositories (including stars, forks, and open issues at the time of sampling) is provided in Appendix~\ref{sec:appendix2_details_of_each_repository}, Table~\ref{tab:repo_summary}.
+
+% \begin{table}[h]
+% \centering
+% \small
+
+% \begin{tabular}{|c|c|c|c|c|}
+% \hline
+% \textbf{Ranking} & \textbf{Project Repo}        & \textbf{Stars} & \textbf{Forks} & \textbf{Open Issues} \\ \hline
+% 2  & denoland/deno                & 105077 & 5768  & 2384 \\
+% 3  & rustdesk/rustdesk            & 102158 & 14993 & 61   \\
+% 4  & tauri-apps/tauri             & 98717  & 3155  & 1161 \\
+% 5  & unionlabs/union              & 74500  & 3835  & 155  \\
+% 6  & astral-sh/uv                 & 72353  & 2212  & 2136 \\
+% 7  & zed-industries/zed           & 69398  & 5885  & 3054 \\
+% 8  & FuelLabs/sway                & 62106  & 5428  & 862  \\
+% 9  & alacritty/alacritty          & 60977  & 3227  & 323  \\
+% 10 & rust-lang/rustlings          & 60569  & 10978 & 46   \\
+% 11 & FuelLabs/fuel-core           & 57463  & 2856  & 149  \\
+% 12 & BurntSushi/ripgrep           & 57159  & 2304  & 85   \\
+% 13 & topjohnwu/Magisk             & 56856  & 15853 & 36   \\
+% 14 & sharkdp/bat                  & 55755  & 1409  & 318  \\
+% 15 & meilisearch/meilisearch      & 54438  & 2254  & 221  \\
+% 16 & lencx/ChatGPT                & 54214  & 6192  & 856  \\
+% 17 & rust-unofficial/awesome-rust & 53670  & 3064  & 10   \\
+% 18 & starship/starship            & 52113  & 2284  & 762  \\
+% 19 & dani-garcia/vaultwarden      & 50694  & 2374  & 17   \\
+% 20 & openai/codex                 & 50131  & 6215  & 1164 \\
+% 21 & types/typst                  & 47876  & 1305  & 1007 \\ \hline
+% \end{tabular}
+
+% \captionsetup{justification=centering}
+% \caption{Brief summary of the 20 repositories searched to find real-world examples. \#1 is the Rust project itself.}
+% \label{tab:repo_summary}
+% \end{table}
+
+For each repository in this group, we performed a scan of its Git history to locate commits likely related to method or function extraction. The automated scan searched commit messages for characteristic phrases such as \texttt{extract}, \texttt{extract method}, \texttt{factor out}, and \texttt{refactor: extract}, and then used a combination of regular expressions and \icodeverb{git grep} queries to flag any candidate files. We limited the depth of this search to at most $100$ commits across the three most active branches per repository. This heuristic process inevitably produced false positives (for example, commits mentioning ``extract'' in an unrelated context), but provided an efficient starting point. We then manually inspected each flagged commit/file for suitable extraction sites and annotated the regions with the selection markers described earlier.
+
+The full list of identified commits, along with per-repository details, appears in Appendix~\ref{sec:appendix2_details_of_each_repository}. The complete set of extraction outcomes and timing results for these cases is later on in this report, in Table~\ref{tab:new_capabilities_results}, Section~\ref{subsec:new_language_features}.
+
+\vspace{-2.5mm}
+\subsection{Verification Benchmarks}
+\label{subsec:verification_benchmarks}
+
+The third corpus targets the verification pipeline, which builds on \texttt{CHARON} and \texttt{AENEAS} to prove that an extracted function is behaviourally equivalent to its original version. Since these tools currently support only a subset of Rust, we deliberately construct a small benchmark set that fits within their supported fragment while still exercising non-trivial reasoning. See Section~\ref{sec:limitations_verification} for the complete set of limitations. From there, the verification corpus comprises twenty examples split into two groups:
+
+\begin{itemize}[leftmargin=*, itemsep=2pt, topsep=2pt]
+  \item \textbf{Trivial/targeted cases (10 examples).}
+  Small, self-contained Rust functions that isolate core properties such as pure computations on integers, simple mutation through references, or basic control-flow patterns without heap allocation or complex borrowing. These examples are designed to expose bugs in the translation or proof generation pipeline, rather than in the extraction engine itself.
+
+  \item \textbf{Simple real-world cases (10 examples).}
+    We wrote a new crate that emulates realistic business-logic style Rust code. The functions operate over multiple layered structs, rely on trait implementations, and approximate production patterns while remaining within the subset of Rust currently supported by AENEAS. This did require some additional scaffolding—such as manual implementations of \icodeverb{PartialEq}. Crucially, this crate has external dependencies, including \texttt{smallvec} and \texttt{anyhow}.
+\end{itemize}
+
+For each verification benchmark, we run the full pipeline on the original and extracted functions: translating to Low-Level Borrow Calculus (LLBC) via \texttt{CHARON}, generating Coq proof obligations via \texttt{AENEAS}, and then checking the resulting proof. We record whether verification was attempted and whether it succeeded, along with timings for each stage. These results are reported in Table~\ref{tab:verification_results} in Section~\ref{subsec:verification_results}.
+
+\vspace{-5mm}
+\section{Metrics and Evaluation Criteria}
+\label{sec:metrics_eval_criteria}
+% 1.5 pages
+Across all three experiments we measure:
+(i) \emph{correctness and coverage} (whether extraction or verification succeeds, and how often failures occur),
+(ii) \emph{compilation behaviour} (whether the refactored code compiles and how this compares to the original), and
+(iii) \emph{performance} (end-to-end latency, and for verification, the cost of individual stages).
+RQ1 and RQ2 are primarily concerned with correctness, coverage, and compilation; RQ3 focuses on extraction latency; and RQ4 considers both the success rate and performance of the verification pipeline.
+Table~\ref{tab:evaluation_criteria} summarises how these requirements are determined for each experiment.
+
+\begin{table}[t]
+\centering
+\small
+\begin{tabular}{p{2.5cm}p{4.5cm}p{7.75cm}}
+\toprule
+\textbf{Experiment} & \textbf{Objective} & \textbf{Evaluation Criteria} \\
+\midrule
+
+\raggedright\textbf{Original Cases} &
+Establish correctness and performance of the new extractor relative to the original REM prototype (RQ1, RQ3). &
+\vspace{-2.5mm}
+\begin{itemize}[nosep, leftmargin=*, itemsep=0pt, topsep=1pt, parsep=0pt]
+  \item Extraction success rate on the original REM benchmark suite.
+  \item Match or improvement in compilation outcomes compared to the prototype.
+  \item Reduction in extraction latency.
+\end{itemize} \\
+
+\raggedright\textbf{New Feature Cases} &
+Characterise support for modern Rust features previously unsupported or poorly supported by REM (RQ2, RQ3). &
+\vspace{-2.5mm}
+\begin{itemize}[nosep, leftmargin=*, itemsep=0pt, topsep=1pt, parsep=0pt]
+  \item Extraction success rate per feature category (GEN, ASYNC, CONST, NLCF, HRTB, DTO).
+  \item Compilation outcome of extracted code, with failures classified by root cause.
+  \item Extraction latency on large real-world projects and its variation across features.
+\end{itemize} \\
+
+\raggedright\textbf{Verification Pipeline} &
+Assess the effectiveness and cost of the equivalence-checking pipeline on supported Rust fragments (RQ4). &
+\vspace{-2.5mm}
+\begin{itemize}[nosep, leftmargin=*, itemsep=0pt, topsep=1pt, parsep=0pt]
+  \item Fraction of cases for which verification is attempted and successfully completed.
+  \item Consistency of proofs with intended semantics (no spurious successes; failures explained by tool limits or program in-equivalence).
+  \item End-to-end verification time, broken down into LLBC translation, Coq conversion, and proof parsing/construction/checking.
+\end{itemize} \\
+
+\bottomrule
+\end{tabular}
+
+\captionsetup{justification=centering}
+\caption{Summary of experimental objectives and evaluation criteria.}
+\label{tab:evaluation_criteria}
+\end{table}
+
+\vspace{-5mm}
+\section{Extraction Evaluation}
+\label{sec:extract_eval}
+% 6 pages 
+
+% \vspace{-2.5mm}
+% \subsection{Experimental Questions for Evaluation}
+
+This section addresses RQ1---RQ3 for the extraction pipeline. We ask three concrete questions: 
+(i) whether REM2.0 is at least as correct and robust as the original REM prototype on the original benchmark suite (RQ1), 
+(ii) how far its coverage extends to modern Rust features such as \icodeverb{async}, \icodeverb{const fn}, generics, HRTBs, dynamic trait objects, and non-local control flow (RQ2), 
+and (iii) what latency profile it achieves in practice, and when the separate REM-Repairer stage is required to obtain a compiling result (RQ3).
+We first compare directly against the original REM artefact, then turn to the new real-world feature corpus, and finally summarise the quantitative behaviour and remaining limitations.
 
 \newpage
-\begin{table}[]
-    \centering
-    \begin{tabular}{|c|c|cc|lll|ll|}
-    \hline
-    \multirow{2}{*}{\#} & \multirow{2}{*}{\begin{tabular}[c]{@{}c@{}}Project\\ (LOC)\end{tabular}}      & \multicolumn{2}{c|}{Outcome}                  & \multicolumn{3}{c|}{Time(ms)}                               & \multicolumn{2}{l|}{Verification} \\
-                        &                                                                               & REM                   & New                   & \multicolumn{1}{c}{REM}  & \multicolumn{1}{c}{Raw} & User   & Result          & Reason          \\ \hline
-    1                   & \multirow{7}{*}{\begin{tabular}[c]{@{}c@{}}petgraph\\ (20,157)\end{tabular}}  & \cmark & \cmark & \multicolumn{1}{c}{370}  & 3.511                   & 184.32 &                 &                 \\
-    2                   &                                                                               & \cmark & \cmark & 1020                     & 3.753                   & 217.91 &                 &                 \\
-    3                   &                                                                               & \cmark & \cmark & 1470                     & 2.166                   & 231.08 &                 &                 \\
-    4                   &                                                                               & \cmark & \cmark & 1700                     & 3.337                   & 196.77 &                 &                 \\
-    5                   &                                                                               & \cmark & \cmark & 850                      & 2.018                   & 128.54 &                 &                 \\
-    6                   &                                                                               & \cmark & \cmark & 980                      & 2.148                   & 142.66 &                 &                 \\
-    7                   &                                                                               & \xmark & \cmark & 550                      & 2.030                   & 255.19 &                 &                 \\ \hline
-    8                   & \multirow{18}{*}{\begin{tabular}[c]{@{}c@{}}gitoxide\\ (20,211)\end{tabular}} & \cmark & \cmark & 930                      & 2.851                   & 199.45 &                 &                 \\
-    9                   &                                                                               & \cmark & \cmark & 1240                     & 3.240                   & 173.82 &                 &                 \\
-    10                  &                                                                               & \cmark & \cmark & 640                      & 2.823                   & 208.37 &                 &                 \\
-    11                  &                                                                               & \cmark & \cmark & 810                      & 2.991                   & 244.68 &                 &                 \\
-    12                  &                                                                               & \cmark & \cmark & 810                      & 3.282                   & 188.05 &                 &                 \\
-    13                  &                                                                               & \cmark & \cmark & 860                      & 2.995                   & 163.49 &                 &                 \\
-    14                  &                                                                               & \cmark & \cmark & 690                      & 5.345                   & 226.91 &                 &                 \\
-    15                  &                                                                               & \cmark & \cmark & 680                      & 5.468                   & 203.74 &                 &                 \\
-    16                  &                                                                               & \cmark & No Data & 540                      & N/A                   & N/A & N/A                & N/A                \\
-    17                  &                                                                               & \cmark & \cmark & 1200                     & 3.283                   & 179.4  &                 &                 \\
-    18                  &                                                                               & \cmark & \cmark & 920                      & 5.241                   & 210.62 &                 &                 \\
-    19                  &                                                                               & \cmark & \cmark & 2320                     & 3.283                   & 226.46 &                 &                 \\
-    20                  &                                                                               & \xmark & \cmark & 1150                     & 5.430                   & 192.92 &                 &                 \\
-    21                  &                                                                               & \cmark & \cmark & 690                      & 3.396                   & 123.84 &                 &                 \\
-    22                  &                                                                               & \cmark & \cmark & 640                      & 2.984                   & 264.15 &                 &                 \\
-    23                  &                                                                               & \cmark & \cmark & 700                      & 3.153                   & 132.97 &                 &                 \\
-    24                  &                                                                               & \cmark & \cmark & 640                      & 3.230                   & 147.53 &                 &                 \\
-    25                  &                                                                               & \cmark & \cmark & 720                      & 3.457                   & 221.84 &                 &                 \\ \hline
-    26                  & \multirow{5}{*}{\begin{tabular}[c]{@{}c@{}}kickoff\\ (1,502)\end{tabular}}    & \cmark & \cmark & 1030                     & 3.802                   & 185.09 &                 &                 \\
-    27                  &                                                                               & \cmark & \cmark & 1010                     & 8.557                   & 237.26 &                 &                 \\
-    28                  &                                                                               & \cmark & \cmark & 910                      & 7.365                   & 168.44 &                 &                 \\
-    29                  &                                                                               & \cmark & \cmark & 980                      & 4.864                   & 206.59 &                 &                 \\
-    30                  &                                                                               & \cmark & \cmark & 790                      & 4.191                   & 257.31 &                 &                 \\ \hline
-    31                  & \multirow{9}{*}{\begin{tabular}[c]{@{}c@{}}sniffnet\\ (7,304)\end{tabular}}   & \cmark & \cmark & 1040                     & 7.288                   & 121.06 &                 &                 \\
-    32                  &                                                                               & \xmark & \cmark & 760                      & 5.674                   & 195.22 &                 &                 \\
-    33                  &                                                                               & \cmark & \cmark & 1010                     & 4.439                   & 172.8  &                 &                 \\
-    34                  &                                                                               & \cmark & \cmark & 980                      & 3.602                   & 234.13 &                 &                 \\
-    35                  &                                                                               & \cmark & \cmark & 1060                     & 3.265                   & 141.95 &                 &                 \\
-    36                  &                                                                               & \cmark & \cmark & \multicolumn{1}{c}{1000} & 3.507                   & 260.42 &                 &                 \\
-    37                  &                                                                               & \cmark & \cmark & 1060                     & 4.147                   & 209.61 &                 &                 \\
-    38                  &                                                                               & \cmark & \cmark & 1080                     & 4.284                   & 187.32 &                 &                 \\
-    39                  &                                                                               & \cmark & \cmark & 1060                     & 4.273                   & 149.4  &                 &                 \\ \hline
-    40                  & beerus (302)                                                                  & \cmark & \cmark & 1070                     & 5.158                   & 224.75 &                 &                 \\ \hline
-    \end{tabular}
+% \vspace{-2.5mm}
+\subsection{Baseline Comparison with the Original REM}
+
+\begin{table}[h!]
+\centering
+% \small
+\begin{tabular}{|c|c|cc|ccc|c|}
+\hline
+\multirow{2}{*}{\#} & \multirow{2}{*}{\begin{tabular}[c]{@{}c@{}}Project\\ (LOC)\end{tabular}} & \multicolumn{2}{c|}{Outcome} & \multicolumn{3}{c|}{Time (ms)} & \multirow{2}{*}{\begin{tabular}[c]{@{}c@{}}Repairer\\ Needed\end{tabular}} \\
+ &  & REM & REM2.0 & REM & Raw & User &  \\ \hline
+1 & \multirow{7}{*}{\begin{tabular}[c]{@{}c@{}}petgraph\\ (20,157)\end{tabular}} & \cmark & \cmark & 370 & 3.511 & 184.32 & \xmark \\
+2 &  & \cmark & \cmark & 1020 & 3.753 & 217.91 & \xmark \\
+3 &  & \cmark & \cmark & 1470 & 2.166 & 231.08 & \cmark \\
+4 &  & \cmark & \cmark & 1700 & 3.337 & 196.77 & \xmark \\
+5 &  & \cmark & \cmark & 850 & 2.018 & 128.54 & \xmark \\
+6 &  & \cmark & \cmark & 980 & 2.148 & 142.66 & \xmark \\
+7 &  & \xmark & \cmark & 550 & 2.030 & 255.19 & \cmark \\ \hline
+8 & \multirow{18}{*}{\begin{tabular}[c]{@{}c@{}}gitoxide\\ (20,211)\end{tabular}} & \cmark & \cmark & 930 & 2.851 & 199.45 & \xmark \\
+9 &  & \cmark & \cmark & 1240 & 3.240 & 173.82 & \cmark \\
+10 &  & \cmark & \cmark & 640 & 2.823 & 208.37 & \xmark \\
+11 &  & \cmark & \cmark & 810 & 2.991 & 244.68 & \xmark \\
+12 &  & \cmark & \cmark & 810 & 3.282 & 188.05 & \xmark \\
+13 &  & \cmark & \cmark & 860 & 2.995 & 163.49 & \xmark \\
+14 &  & \cmark & \cmark & 690 & 5.345 & 226.91 & \xmark \\
+15 &  & \cmark & \cmark & 680 & 5.468 & 203.74 & \xmark \\
+16 &  & \cmark & No Data & 540 & N/A & N/A & \xmark \\
+17 &  & \cmark & \cmark & 1200 & 3.283 & 179.40 & \cmark \\
+18 &  & \cmark & \cmark & 920 & 5.241 & 210.62 & \cmark \\
+19 &  & \cmark & \cmark & 2320 & 3.283 & 226.46 & \cmark \\
+20 &  & \xmark & \cmark & 1150 & 5.430 & 192.92 & \cmark \\
+21 &  & \cmark & \cmark & 690 & 3.396 & 123.84 & \xmark \\
+22 &  & \cmark & \cmark & 640 & 2.984 & 264.15 & \xmark \\
+23 &  & \cmark & \cmark & 700 & 3.153 & 132.97 & \xmark \\
+24 &  & \cmark & \cmark & 640 & 3.230 & 147.53 & \xmark \\
+25 &  & \cmark & \cmark & 720 & 3.457 & 221.84 & \xmark \\ \hline
+26 & \multirow{5}{*}{\begin{tabular}[c]{@{}c@{}}kickoff\\ (1,502)\end{tabular}} & \cmark & \cmark & 1030 & 3.802 & 185.09 & \xmark \\
+27 &  & \cmark & \cmark & 1010 & 8.557 & 237.26 & \xmark \\
+28 &  & \cmark & \cmark & 910 & 7.365 & 168.44 & \xmark \\
+29 &  & \cmark & \cmark & 980 & 4.864 & 206.59 & \xmark \\
+30 &  & \cmark & \cmark & 790 & 4.191 & 257.31 & \xmark \\ \hline
+31 & \multirow{9}{*}{\begin{tabular}[c]{@{}c@{}}sniffnet\\ (7,304)\end{tabular}} & \cmark & \cmark & 1040 & 7.288 & 121.06 & \xmark \\
+32 &  & \xmark & \cmark & 760 & 5.674 & 195.22 & \cmark \\
+33 &  & \cmark & \cmark & 1010 & 4.439 & 172.80 & \xmark \\
+34 &  & \cmark & \cmark & 980 & 3.602 & 234.13 & \xmark \\
+35 &  & \cmark & \cmark & 1060 & 3.265 & 141.95 & \xmark \\
+36 &  & \cmark & \cmark & 1000 & 3.507 & 260.42 & \xmark \\
+37 &  & \cmark & \cmark & 1060 & 4.147 & 209.61 & \xmark \\
+38 &  & \cmark & \cmark & 1080 & 4.284 & 187.32 & \xmark \\
+39 &  & \cmark & \cmark & 1060 & 4.273 & 149.40 & \xmark \\ \hline
+40 & beerus (302) & \cmark & \cmark & 1070 & 5.158 & 224.75 & \xmark \\ \hline
+\end{tabular}
+
     \captionsetup{justification=centering}
-    \caption{Comparison of the new toolchain to the original REM toolchain against the same cases.}
+    \caption{Comparison of REM2.0 to the original REM toolchain against the same cases. Raw times are strictly for the extraction, user times indicate overall system latency as reported by VSCode.}
     \label{tab:rem_original_results}
 \end{table}
 
-\subsection{Analysis?}
+Table~\ref{tab:rem_original_results} compares the behaviour of the original REM prototype with REM2.0 on the full benchmark suite described in Section~\ref{subsec:original_rem_benchmarks}. Excluding case~\#16, which is missing its selection markers and therefore cannot be evaluated, the new extractor succeeds on all $39$ remaining cases. By contrast, the original REM prototype fails on three of these (cases~\#7, \#20, and \#32), whereas REM2.0 extracts all three. Crucially, there are no regressions---we did not observe any case where REM succeeded but REM2.0 failed.
 
-\section{Verification: Results and Analysis}
-\label{sec:verification_results_analysis}
+The timing columns succinctly demonstrate the performance impact of the new architecture. The original REM pipeline required between a few hundred and a few thousand milliseconds per extraction (averaging roughly \SI{1000}{ms}). In contrast, the ``Raw'' REM2.0 times---measured inside the daemon, from the extraction request to the application of edits---lie consistently in the low single-digit milliseconds (approximately \SIrange{2}{9}{ms} across all cases). The ``User'' column adds the Repairer (where it was called) and VSCode overheads, but still yields user-perceived latencies in the \SI{120}{ms}--\SI{260}{ms} range, which, given that the human response time to visual stimuli is somewhere between \SIrange{200}{250}{ms} \cite{Jain2015ReactionTime}, is more than acceptable. A more detailed latency distribution is provided in the histogram in Appendix~\ref{app:appendix5_extraction_histogram}.
 
-\subsection{Complete Results Table}
-\label{subsec:verification_results_table}
-\newpage
+The final column reports how often REM-Repairer is needed to restore a compiling program. Out of the forty original REM cases it is invoked in seven, in exactly the same examples as in the original REM evaluation (those with tighter lifetime constraints). This indicates that, although the new extractor often produces compiling code on its own, the repairer remains a crucial component of the toolchain rather than a purely optional add-on.
 
-\begin{table}[ht]
-    \begin{tabular}{c|lllllllll}
-    \hline
-    \rowcolor[HTML]{C0C0C0}
-    \cellcolor[HTML]{C0C0C0}                                                                                   & \multicolumn{1}{c|}{\cellcolor[HTML]{C0C0C0}}                                & \multicolumn{2}{c|}{\cellcolor[HTML]{C0C0C0}\textbf{Size (LOC)}}                                                     & \multicolumn{2}{c|}{\cellcolor[HTML]{C0C0C0}\textbf{Verification}}                                                                & \multicolumn{4}{c}{\cellcolor[HTML]{C0C0C0}\textbf{Time (s)}}                                                                                                                                                                                                                                                                                                                                                                  \\ \cline{3-10}
-    \rowcolor[HTML]{C0C0C0}
-    \multirow{-2}{*}{\cellcolor[HTML]{C0C0C0}\textbf{\begin{tabular}[c]{@{}c@{}}Project\\ (LOC)\end{tabular}}} & \multicolumn{1}{c|}{\multirow{-2}{*}{\cellcolor[HTML]{C0C0C0}\textbf{Type}}} & \multicolumn{1}{c}{\cellcolor[HTML]{C0C0C0}\textbf{CLR}} & \multicolumn{1}{c|}{\cellcolor[HTML]{C0C0C0}\textbf{CLE}} & \multicolumn{1}{c}{\cellcolor[HTML]{C0C0C0}\textbf{Attempted}} & \multicolumn{1}{c|}{\cellcolor[HTML]{C0C0C0}\textbf{Successful}} & \multicolumn{1}{c}{\cellcolor[HTML]{C0C0C0}\textbf{\begin{tabular}[c]{@{}c@{}}LLBC \\ Conversion\end{tabular}}} & \multicolumn{1}{c}{\cellcolor[HTML]{C0C0C0}\textbf{\begin{tabular}[c]{@{}c@{}}CoQ \\ Conversion\end{tabular}}} & \multicolumn{1}{c}{\cellcolor[HTML]{C0C0C0}\textbf{\begin{tabular}[c]{@{}c@{}}Proof Creation \\ \& Verification\end{tabular}}} & \multicolumn{1}{c}{\cellcolor[HTML]{C0C0C0}\textbf{Total}} \\ \hline
-    1                                                                                                          &                                                                              & \textbf{}                                                &                                                           &                                                                &                                                                  &                                                                                                                 &                                                                                                                &                                                                                                                                &                                                            \\
-    2                                                                                                          &                                                                              &                                                          &                                                           &                                                                &                                                                  &                                                                                                                 &                                                                                                                &                                                                                                                                &                                                            \\
-    3                                                                                                          &                                                                              &                                                          &                                                           &                                                                &                                                                  &                                                                                                                 &                                                                                                                &                                                                                                                                &                                                            \\
-    4                                                                                                          &                                                                              &                                                          &                                                           &                                                                &                                                                  &                                                                                                                 &                                                                                                                &                                                                                                                                &                                                            \\
-    5                                                                                                          &                                                                              &                                                          &                                                           &                                                                &                                                                  &                                                                                                                 &                                                                                                                &                                                                                                                                &                                                            \\
-    6                                                                                                          &                                                                              &                                                          &                                                           &                                                                &                                                                  &                                                                                                                 &                                                                                                                &                                                                                                                                &                                                            \\
-    7                                                                                                          &                                                                              &                                                          &                                                           &                                                                &                                                                  &                                                                                                                 &                                                                                                                &                                                                                                                                &                                                            \\
-    8                                                                                                          &                                                                              &                                                          &                                                           &                                                                &                                                                  &                                                                                                                 &                                                                                                                &                                                                                                                                &                                                            \\
-    9                                                                                                          &                                                                              &                                                          &                                                           &                                                                &                                                                  &                                                                                                                 &                                                                                                                &                                                                                                                                &                                                            \\
-    10                                                                                                         &                                                                              &                                                          &                                                           &                                                                &                                                                  &                                                                                                                 &                                                                                                                &                                                                                                                                &                                                            \\
-    11                                                                                                         &                                                                              &                                                          &                                                           &                                                                &                                                                  &                                                                                                                 &                                                                                                                &                                                                                                                                &                                                            \\
-    12                                                                                                         &                                                                              &                                                          &                                                           &                                                                &                                                                  &                                                                                                                 &                                                                                                                &                                                                                                                                &                                                            \\
-    13                                                                                                         &                                                                              &                                                          &                                                           &                                                                &                                                                  &                                                                                                                 &                                                                                                                &                                                                                                                                &                                                            \\
-    14                                                                                                         &                                                                              &                                                          &                                                           &                                                                &                                                                  &                                                                                                                 &                                                                                                                &                                                                                                                                &                                                            \\
-    15                                                                                                         &                                                                              &                                                          &                                                           &                                                                &                                                                  &                                                                                                                 &                                                                                                                &                                                                                                                                &                                                            \\
-    16                                                                                                         &                                                                              &                                                          &                                                           &                                                                &                                                                  &                                                                                                                 &                                                                                                                &                                                                                                                                &                                                            \\
-    17                                                                                                         &                                                                              &                                                          &                                                           &                                                                &                                                                  &                                                                                                                 &                                                                                                                &                                                                                                                                &                                                            \\
-    18                                                                                                         &                                                                              &                                                          &                                                           &                                                                &                                                                  &                                                                                                                 &                                                                                                                &                                                                                                                                &                                                            \\
-    19                                                                                                         &                                                                              &                                                          &                                                           &                                                                &                                                                  &                                                                                                                 &                                                                                                                &                                                                                                                                &                                                            \\
-    20                                                                                                         &                                                                              &                                                          &                                                           &                                                                &                                                                  &                                                                                                                 &                                                                                                                &                                                                                                                                &
-    \end{tabular}
-    \caption{Verification Results. See appendix \ref{sec:appendix2} for details
-    of each repository.}
-    \label{tab:verification_results}
+\vspace{-2.5mm}
+\subsection{New Language Feature Coverage}
+\label{subsec:new_language_features}
+
+We now look at the new corpus introduced in Section~\ref{subsec:new_feature_cases}, which is designed to test against advanced Rust features that the original REM prototype could not handle. Each extraction is classified into one or more feature categories: generics (\textsc{GEN}), async/await (\textsc{ASYNC}), const evaluation (\textsc{CONST}), non-local control flow (\textsc{NLCF}), higher-ranked trait bounds (\textsc{HRTB}), and dynamic trait objects (\textsc{DTO}). These categories directly correspond to cases that generally tend to stretch type inference, lifetime reasoning, or control-flow reconstruction in real-world Rust code. Any mark in any feature column of Table~\ref{tab:new_capabilities_results} indicates that said example contains that construct within the selected region. Representative listings for each category, along with a brief explanation of what we expect the extractor to preserve, are provided in Appendix~\ref{app:new_extraction_features}.
+
+\begin{table}[h!]
+\hspace*{-1cm}
+\centering
+\small
+
+\begin{tabular}{|c|c|cccccc|l|c|}
+\hline
+\multirow{2}{*}{\textbf{\#}} & \multirow{2}{*}{\begin{tabular}[c]{@{}c@{}}Project \\ (LOC)\end{tabular}} & \multicolumn{6}{c|}{Code Features} & \multirow{2}{*}{Res} & \multirow{2}{*}{\begin{tabular}[c]{@{}c@{}}Time\\ (ms)\end{tabular}} \\
+ &  & \multicolumn{1}{c}{GEN} & \multicolumn{1}{c}{ASYNC} & \multicolumn{1}{c}{CONST} & \multicolumn{1}{c}{NLCF} & \multicolumn{1}{c}{HRTB} & \multicolumn{1}{c|}{DYN} &  &  \\ \hline
+1 & \multirow{5}{*}{\begin{tabular}[c]{@{}c@{}}deno \\ (359996)\end{tabular}} &  &  & \cmark &  &  &  & \cmark & 5.882 \\
+2 &  &  &  &  & \cmark &  & \cmark  & \xmark \hyperlink{fail-1}{(1)} & N/A \\
+3 &  &  &  &  & \cmark &  &  & \cmark & 4.346 \\
+4 &  & \cmark &  &  & \cmark &  &  & \cmark & 9.685 \\
+5 &  &  & \cmark &  &  &  &  & \cmark & 2.910 \\ \hline
+6 & \multirow{2}{*}{\begin{tabular}[c]{@{}c@{}}fuel-core \\ (78921)\end{tabular}} &  &  &  & \cmark &  &  & \cmark & 6.736 \\
+7 &  &  & \cmark &  &  &  &  & \cmark & 2.999 \\ \hline
+8 & \multirow{5}{*}{\begin{tabular}[c]{@{}c@{}}meilisearch\\ (186553)\end{tabular}} & \cmark &  &  &  &  &  & \cmark & 4.363 \\
+9 &  & \cmark &  &  &  & \cmark &  & \cmark & 12.071 \\
+10 &  & \cmark &  &  &  & \cmark &  & \xmark \hyperlink{fail-2}{(2)} & N/A \\
+11 &  &  &  & \cmark &  &  &  & \cmark & 3.071 \\
+12 &  &  &  & \cmark &  &  &  & \cmark & 3.852 \\ \hline
+13 & \multirow{2}{*}{\begin{tabular}[c]{@{}c@{}}ripgrep \\ (40453)\end{tabular}} & \cmark &  &  & \cmark &  &  & \cmark & 3.117 \\
+14 &  &  &  &  & \cmark &  &  & \cmark & 2.089 \\ \hline
+15 & \multirow{2}{*}{\begin{tabular}[c]{@{}c@{}}starship \\ (37225)\end{tabular}} &  &  &  & \cmark &  &  & \cmark & 1.955 \\
+16 &  & \cmark &  &  &  &  &  & \cmark & 1.866 \\ \hline
+17 & \multirow{3}{*}{\begin{tabular}[c]{@{}c@{}}sway\\ (108725)\end{tabular}} &  &  & \cmark &  &  &  & \cmark & 4.802 \\
+18 &  &  &  & \cmark &  &  &  & \cmark & 3.073 \\
+19 &  & \cmark &  &  &  & \cmark &  & \cmark & 2.365 \\ \hline
+20 & \multirow{4}{*}{\begin{tabular}[c]{@{}c@{}}tauri\\ (83582)\end{tabular}} & \cmark &  &  &  & \cmark &  & \cmark & 1.183 \\
+21 &  & \cmark &  &  & \cmark &  &  & \cmark & 8.565 \\
+22 &  &  &  &  & \cmark &  &  & \cmark & 3.054 \\
+23 &  &  &  &  & \cmark &  &  & \cmark & 5.346 \\ \hline
+24 & \multirow{4}{*}{\begin{tabular}[c]{@{}c@{}}union\\ (514914)\end{tabular}} &  & \cmark &  &  & \cmark &  & \cmark & 3.175\\
+25 &  &  &  & \cmark &  &  &  & \cmark & 2.864\\
+26 &  &  & \cmark &  & \cmark & \cmark &  & \xmark \hyperlink{fail-3}{(3)} & N/A \\
+27 &  &  &  &  &  &  & \cmark & \xmark \hyperlink{fail-4}{(4)} & N/A \\ \hline
+28 & \multirow{4}{*}{\begin{tabular}[c]{@{}c@{}}uv\\ (321584)\end{tabular}} &  &  & \cmark &  &  &  & \cmark & 16.703\\
+29 &  & \cmark &  &  & \cmark & \cmark &  & \cmark & 6.451 \\
+30 &  &  &  & \cmark &  &  &  & \cmark & 2.873 \\
+31 &  & \cmark &  &  &  &  &  & \xmark \hyperlink{fail-5}{(5)} & N/A \\ \hline
+32 & \multirow{3}{*}{\begin{tabular}[c]{@{}c@{}}vaultwarden\\ (29937)\end{tabular}} &  &  & \cmark & \cmark &  &  & \cmark & 5.134 \\
+33 &  &  & \cmark &  &  &  &  & \cmark & 3.057 \\
+34 &  & \cmark &  & \cmark &  &  &  & \xmark \hyperlink{fail-6}{(6)} & NA \\ \hline
+35 & \multirow{6}{*}{\begin{tabular}[c]{@{}c@{}}zed \\ (888269)\end{tabular}} &  &  &  &  &  & \cmark & \xmark \hyperlink{fail-7}{(7)} & N/A \\
+36 &  &  & \cmark &  &  &  & \cmark & \cmark & 7.383 \\
+37 &  &  &  & \cmark &  &  &  & \cmark & 2.062 \\
+38 &  & \cmark & \cmark &  &  & \cmark &  & \cmark & 3.667 \\
+39 &  & \cmark &  &  &  &  &  & \cmark & 1.959 \\
+40 &  &  & \cmark &  &  &  &  & \cmark & 1.853 \\ \hline
+\end{tabular}
+
+\caption{Results of extracting previously unavailable / incompatible language features. More detail on reasons for failure available in Table~\ref{tab:failure_reasons}}
+\label{tab:new_capabilities_results}
 \end{table}
+
+Across the forty new extraction cases, REM2.0 is able to successfully extract (and result in a compiling program for) thirty-three, yielding an overall success rate of roughly $83\%$. Looking the established categories, we see that most of the modern constructs are handled robustly: all but one \textsc{ASYNC} case succeed (7/8), \textsc{CONST} extractions succeed in almost all examples (10/11), and \textsc{NLCF} is correctly reified into \icodeverb{std::ops::ControlFlow} in the majority of cases (11/13). Higher-ranked trait bounds are also handled reasonably well (6/8), with failures mostly due to the more complex combinations of generics and control flow. Generic functions themselves succeed in most examples (11/14), with the remaining failures arising from incomplete reconstruction of generic bounds.
+
+The main weakness in the current extractor is dynamic dispatch. Only one out of four \textsc{DTO} cases succeeds; in the remaining three, the inferred signature collapses to an underspecified form (e.g., using \icodeverb{_} or overly weak trait bounds), which then prevents the code from compiling. One particularly illustrative case is failure~\#4, where an argument of type \icodeverb{AsRef<[u8]>} is incorrectly generalised to \icodeverb{?Sized}, losing the relationship between the trait and the concrete slice type. We cover these failure modes in more detail in the following section: \ref{subsec:extraction_failures}.
+
+\vspace{-2.5mm}
+\subsection{Failure Cases and Limitations}
+\label{subsec:extraction_failures}
+
+\begin{table}[h!]
+\centering
+\small
+\begin{tabular}{|l|l|}
+\hline
+\# & Reason \\ \hline
+\hypertarget{fail-1}{1} & Unable to infer (part of) function signature \\
+\hypertarget{fail-2}{2} & Unable to infer (entire) return type \\
+\hypertarget{fail-3}{3} & Unable to identify correct extraction bounds (no extraction attempted) \\
+\hypertarget{fail-4}{4} & \icodeverb{AsRef<[u8]>} in caller incorrectly mapped to \icodeverb{?Sized} in callsite \\
+\hypertarget{fail-5}{5} & Return signature of \icodeverb{_} instead of \icodeverb{Result<S::Ok, S::Error>} \\
+\hypertarget{fail-6}{6} & Failed to copy any generic bounds to new sig \\
+\hypertarget{fail-7}{7} & Unable to infer (part of) function signature \\ \hline
+\end{tabular}
+\captionsetup{justification=centering}
+\caption{Reasons why the extraction was a failure for failure cases from Table~\ref{tab:new_capabilities_results}}
+\label{tab:failure_reasons}
+\end{table}
+
+\vspace{-2.5mm}
+The seven failures in Table~\ref{tab:new_capabilities_results} fall into a small number of recurring patterns, summarised in Table~\ref{tab:failure_reasons}. Broadly speaking, they stem from limitations in how the extraction engine generates function signatures from local information, rather than from the moving of the selected code into a new function body.
+
+A first class of failures stems from incomplete type inference for return types or parameter lists (failure examples~\#1, \#2, and \#7). In these cases, RA is able to type-check the original code, but the information available at the extraction boundary is not sufficient to synthesise a concrete function signature. The resulting placeholder types (e.g.\ \icodeverb{_} for a return type) are not accepted by the compiler, and the extraction is recorded as a failure. However, in all of these instances, the compiler was able to suggest a suitable return signature, so a potential future improvement to REM-Repairer is to extend it to handle these cases. 
+
+The second class of failures involves generic bounds and trait information (examples~\#4, \#5, and \#6). Here the extractor identifies the correct high-level shape of the signature, but either drops necessary bounds (e.g.\ missing \icodeverb{where}-clauses or trait constraints on type parameters) or over-generalises a concrete trait application. The \icodeverb{AsRef<[u8]>} to \icodeverb{?Sized} mis-translation in failure~\#4 is a representative example: the new signature no longer captures the intended relationship between the argument and the slice type, which propagated to many downstream errors. In this instance, the Rust compiler was unable to suggest a suitable fix. 
+
+These patterns were common for the DTO cases, where the type information needed to reconstruct a precise \icodeverb{dyn Trait} (or similar \icodeverb{dyn} signature) often lives outside the current file or depends on non-trivial where-clauses. Because REM2.0 currently uses a (mostly) single-file view of the program, a fully elaborated crate graph and other expensive dependencies for raw speed, it does not always have enough global information to resolve these traits in the way \icodeverb{rustc} would. Closing this gap will likely require importing more context from the surrounding crate---for example, by following trait definitions and associated types across modules---so that the extractor can reconstruct signatures with the same fidelity as the compiler.
+
+\vspace{-3.5mm}
+% \subsection{Quantitative Summary and Discussion}
+% \label{subsec:extraction_summary}
+
+% Taken together, the two extraction experiments paint a clear and consistent picture for us. On the original suite, REM2.0 achieves complete compatibility: it handles all evaluable cases that the original prototype handled and additionally succeeds on three cases where the prototype failed. At the same time, the new architecture delivers vastly reduced latencies, with raw extraction times in the low single-digit milliseconds and end to end (user experienced) latencies on the order of a couple of hundred milliseconds, rather than the hundreds to thousands of milliseconds required by the previous design. This affirmatively answers RQ1 and RQ3: the new extractor is both more capable and substantially faster.
+
+% On the new real-world set of cases, REM2.0 successfully extracts and compiles roughly four out of five cases overall, and performs particularly well on \textsc{ASYNC}, \textsc{CONST}, and \textsc{NLCF} examples. Generic functions and higher-ranked trait bounds are also handled in most cases, although the failures here highlight the need for a more robust propagation of the generic bounds and where-clauses through the callsite into the caller. DTOs are the biggest single point of failure, with only one of four cases succeeding. At this stage, these failures are tightly coupled to signature reconstruction limits and the current limitations of our single-file view of the program.
+
+% The usage of REM-Repairer across the original cases suggests that the repair stage plays a focused, rather than pervasive, role. In the majority of extractions, the raw output of the extraction engine already compiles; the repairer is triggered for examples where a lifetime repair is required to satisfy the borrow checker. From a the perspective of a developer, REM2.0 now behaves like a standard, fast extract-function refactoring in most situations, with the option to transparently apply additional repairs when the underlying Rust semantics demand it.
+
+% Overall, the extraction evaluation shows that by basing our extraction on RA's infrastructure and developing the single-file analysis model achieves the intended design goals: REM2.0 is faster, more compatible with the original benchmark suite, and substantially more capable on modern Rust language features. The remaining weaknesses---particularly around DTOs and complex trait bounds---give us some clear directions for future work.
+
+\vspace{-4mm}
+\section{Verification Evaluation}
+\label{sec:verif_eval}
+\vspace{-1mm}
+% 4 pages 
+The extraction experiments in Section~\ref{sec:extract_eval} have shown that REM2.0 can perform refactorings quickly and with a broad coverage of language features. This section will evaluate the verification stage that sits on top of that pipeline. Our goal is to understand, for code within the current \texttt{CHARON}/\texttt{AENEAS} fragment, how often the verifier can establish equivalence between the original and extracted functions, what performance cost this incurs, and what kinds of failures or limitations arise in practice. We first outline the verification goals and benchmark setup, then present quantitative results and performance measurements, before briefly examining representative case studies and failure modes.
+
+\vspace{-2.5mm}
+\subsection{Verification Goals and Setup}
+
+The verification experiment addresses \textbf{RQ4}: for code within the supported subset, can we feasibly verify equivalence between original and extracted functions? In REM2.0, the verifier is an optional high-assurance mode: developers are able to refactor using the fast extract + repair pipeline and then can selectively invoke verification for critical functions in crates that AENEAS can support. Our evaluation will therefore ask (i) how often the pipeline can produce a successful equivalence proof for realistic examples, and (ii) what latency overhead this introduces
+
+To stay within the current capabilities of \texttt{AENEAS}, we have assembled a benchmark suite of twenty cases (See Section~\ref{subsec:verification_benchmarks}). The first ten are deliberately simple, and drawn from internal RA tests for extract method (EX in Table~\ref{tab:verification_results}. The remaining ten are ``simple real-world'' functions drawn from the same or related repositories as our extraction benchmarks, manually filtered to avoid features that the verification tools cannot yet handle (RW in Table~\ref{tab:verification_results}. For each benchmark, REM2.0 runs extraction and then feeds both versions into the verification toolchain. \texttt{CHARON} first translates the relevant crate to LLBC, \texttt{AENEAS} then generates Coq definitions, and finally REM2.0 invokes a proof generator that produces and checks an equivalence lemma in Coq. We record whether verification was \emph{attempted} and \emph{succeeded}, and we break total latency into LLBC conversion, Coq translation, and proof construction/checking times, as reported in Table~\ref{tab:verification_results}. All experiments share the same machine, toolchain versions, and a fixed per-case timeout of 10 seconds. We count timeouts and AENEAS conversion as attempted but unsuccessful proofs, and failures to convert to LLBC as neither. 
+
+\vspace{-2.5mm}
+\subsection{Verification Results and Performance}
+\label{subsec:verification_results}
+Table~\ref{tab:verification_results} summarises the verification outcomes and timings for our twenty benchmarks. All ten basic cases (\textsc{EX}) successfully produce equivalence proofs within roughly $1.7$–$2.2$ seconds end-to-end. The majority of this time is spent in proof checking (under the hood coqc is called on 3 separate files regardless), with LLBC conversion accounting for only a few hundred milliseconds per run. If \texttt{charon cargo} has been run before, we see that with most of the intermediate results cached in the \texttt{target}, the LLBC generation takes approximately 66\% as long. 
+
+For the ten real-world benchmarks (\textsc{RW}), the picture is similar but scaled up. Successful cases complete in approximately $3.8$–$4.4$ seconds, but with a far more equal split of the total time. We can also see that caching is far more important: a fresh LLBC translation takes on the order of $9$–$15$ seconds, whereas reusing cached LLBC reduces this to roughly $1.6$–$1.9$ seconds. A big portion of this is dependencies that only need to be compiled once (either by \texttt{charon cargo} or \texttt{cargo}. This means that once a crate has been translated once (or even just compiled once), subsequent verification runs on the same crate fall comfortably within a few seconds. Overall, the results indicate that for code within the supported fragment, REM2.0 can routinely obtain machine-checked equivalence proofs, but at a cost that is one to two orders of magnitude higher than extraction alone.
+
+{
+% \setlength{\textwidth}{1.05\textwidth}   % make textwidth 10% wider
+% \setlength{\LTleft}{-2cm}   % shift table 1.5cm into the left margin
+% \setlength{\LTright}{0pt}     % no extra space on the right
+\begin{table}[h!]
+\centering
+% \raggedright
+\small
+
+\begin{tabular}{|c|c|cc|ccccc|}
+\hline
+\multirow{2}{*}{\#} & \multirow{2}{*}{Type} & \multicolumn{2}{c|}{Size (LOC)} & \multicolumn{5}{c|}{Time (ms)} \\ \cline{3-9} 
+ &  & CLR & CLE & \begin{tabular}[c]{@{}c@{}}LLBC\\ FRESH\end{tabular} & \begin{tabular}[c]{@{}c@{}}LLBC\\ CACHE\end{tabular} & \begin{tabular}[c]{@{}c@{}}Coq\\ Convert\end{tabular} & \begin{tabular}[c]{@{}c@{}}Proof Creation\\ \& Verification\end{tabular} & Total \\ \hline
+1 & EX & 4 & 4 & 293.04 & 198.4 & 308.25 & 1361.46 & 1868.11 \\
+2 & EX & 5 & 3 & 318.51 & 211.99 & 324.04 & 1638.93 & 2174.96 \\
+3 & EX & 5 & 3 & 275 & 175.96 & 295.95 & 1493.59 & 1965.5 \\
+4 & EX & 7 & 3 & 333.63 & 236.36 & 331.67 & 1314.47 & 1882.5 \\
+5 & EX & 5 & 3 & 289.29 & 176.14 & 326.38 & 1274.78 & 1777.3 \\
+6 & EX & 7 & 4 & 289.88 & 194.97 & 316.42 & 1268.78 & 1780.17 \\
+7 & EX & 3 & 4 & 272.51 & 170.92 & 294.54 & 1267.48 & 1732.94 \\
+8 & EX & 7 & 7 & 308.61 & 211.39 & 321.55 & 1216.28 & 1749.22 \\
+9 & EX & 8 & 6 & 269.91 & 192.37 & 325.98 & 1298.64 & 1816.99 \\
+10 & EX & 4 & 3 & 349.53 & 242.97 & 327.96 & 1363.15 & 1934.08 \\ \hline
+11 & RW & 4 & 10 & 15154.38 & 1666.14 & 1260.24 & 1383.22 & 4309.60 \\
+12 & RW & 11 & 4 & 9406.05 & 1671.70 & 1194.65 & 1340.72 & 4207.08 \\
+13 & RW & 14 & 5 & 9288.67 & 1763.12 & 1088.14 & 1168.97 & 4020.23 \\
+14 & RW & 5 & 44 & 9202.97 & 1746.28 & 1228.37 & 1313.29 & 4287.94 \\
+15 & RW & 24 & 12 & 9506.05 & 1618.23 & 1042.66 & 1202.97 & 3863.86 \\
+16 & RW & 6 & 7 & 9535.96 & 1748.76 & 1050.50 & 1185.17 & 3984.43 \\
+17 & RW & 13 & 22 & 9836.45 & 1650.95 & 1194.40 & 1514.83 & 4360.18 \\
+18 & RW & 29 & 7 & 10579.37 & 1710.06 & 1086.26 & 1200.34 & 3996.67 \\
+19 & RW & 26 & 11 & 9318.42 & 1680.40 & 1316.54 & 1328.94 & 4325.88 \\
+20 & RW & 17 & 5 & 9337.03 & 1880.03 & 1166.90 & 0.00 & N/A \\ \hline
+\end{tabular}
+
+\caption{Equivalence Results and Timings \\ Total time is shortest of FRESH and CACHE}
+\label{tab:verification_results}
+\end{table}
+}
+
+For robustness, we also reran the verification pipeline on deliberately \emph{incorrect} refactorings. For each benchmark, we manually modified either the extracted function or its call site to introduce a small behavioural change while keeping the Rust code type-correct. In all cases where the original verification attempt succeeded (i.e.\ excluding case~\#20, which already fails to verify), the modified version caused the equivalence proof to be rejected: Coq was unable to prove the generated lemma, and the verifier reported failure. This backs up our claim that within its supported fragment, the pipeline is highly sensitive to real semantic differences.
+
+\vspace{-2.5mm}
+\subsection{Case Studies}
+
+To further explain what the equivalence checker results mean, we briefly examine two representative cases: one synthetic example and one real-world function.
+
+The \textsc{EX} benchmarks are deliberately small but structurally non-trivial: several include loops, conditionals, and updates to a mutable accumulator, mirroring the kind of code that developers routinely extract into helper functions. For these cases, REM2.0 successfully generates Coq developments in which the original and extracted functions are related by an automatically produced equivalence lemma. An example of such a lemma and its proof can be found in the listing~\ref{lst:lemma_example_simple} in Appendix~\ref{app:lemmas}).
+
+The \textsc{RW} benchmarks show that the same approach applies to short functions taken from real projects, not just hand-crafted examples. After extraction, these functions sometimes gain additional parameters (from moved-out locals) but otherwise preserve their original structure, and Coq is still able to check the generated equivalence proofs within a few hundred to a thousand milliseconds once translation is complete. The form of the proof is identical, but as listing~\ref{lst:lemma_example_complex} (Appendix~\ref{app:lemmas}) shows, the underlying datatypes in Coq are vastly more complex. 
+
+Together, these examples show that the equivalence checking pipeline is able to produce proofs for non-trivial refactorings, with the same underlying proof structure being able to comfortably scale from very simplistic (or even unitless) function definitions to substantially richer datatypes and modules. 
+
+\vspace{-2.5mm}
+\subsection{Failure Modes of the Verifier}
+
+Despite the generally positive results, a few benchmarks highlight current limitations of the verification pipeline and of \texttt{CHARON}/\texttt{AENEAS}.
+
+The most obvious failure is case~\#20 in Table~\ref{tab:verification_results}, a ``real-world'' example that computes the total backoff delay. The original (Rust)function maintains a counter \icodeverb{attempts}, a mutable \icodeverb{delay}, and a running \icodeverb{total} inside a \icodeverb{while attempts < cfg.max_attempts} loop. However, after the translation, \texttt{AENEAS} produced a recursive Coq \icodeverb{Fixpoint} where termination is expressed in terms of an \icodeverb{attempts} parameter. \texttt{coqc} then erorred with \emph{``Cannot guess decreasing argument of fix''}. Intuitively, we know that the Rust code terminates because the loop counter is incremented and compared against a fixed bound, but the way that AENEAS generated a recursive definition of this function resulted in this decrease not being syntactically obvious to Coq's termination checker. As a result, the entire Coq development for this benchmark fails to compile. 
+
+More broadly, several potential benchmarks had to be excluded earlier in the pipeline because they rely on language features that \texttt{AENEAS} does not yet support. These include certain core intrinsics, derived \icodeverb{Eq}/\icodeverb{PartialEq} implementations, and macro expansions such as \icodeverb{matches!}. When such constructs appear, the translation step fails before Coq code is generated, and no proof attempt is possible. In our current experiment design, we designed the real-world benchmarks to avoid these constructs, but this filtering necessarily hides some of the friction that developers would encounter in unrestricted code.
+
+In the short term, the most realistic mitigation is to give developers better guidance about when they can expect verification to succeed. As a follow-on to this work, we plan to extend REM2.0 with a lightweight ``AENEAS-able'' checker that can quickly test whether a given function lies inside the current verified fragment and report obvious blockers (unsupported intrinsics, traits, or control-flow patterns). This checker is not available at the time of writing, but is planned for shortly after the completion of this project.
+
+\vspace{-5mm}
+\section{Discussion and Threats to Validity}
+\label{sec:discussion_threats}
+% 1 - 1.5 pages 
+\vspace{-3mm}
+\subsection{Discussion}
+The extraction experiments show that embedding REM2.0 into RA's infrastructure meets the main design goals from Chapter~\ref{chap:expanding_rem}. On the original REM benchmarks, it is strictly better than the prototype---it covers all 39 available cases, and does so with a latency that would be undetectable to developers. On the new set of cases, it handles most examples involving \icodeverb{async}/\icodeverb{await}, \icodeverb{const fn}, NLCF, generics, and HRTBs, but also exposes a set of failures around DTOs and some of the more complex generic bounds. Taken together, these results support RQ1 and RQ2: REM2.0 is at least as capable as the original tool and substantially more expressive in the Rust features it can refactor.
+
+For performance (RQ3), the contrast is highly impressive. The original REM pipeline had extraction times in the hundreds to thousands of milliseconds, likely not including the work done by IntelliJ. By reusing RA's analysis in a persistent daemon, REM2.0 reduces the raw extraction costs to a few milliseconds and user-experienced latency to well under a quarter of a second.
+
+The verification results offer a new perspective (RQ4). For code within the subset supported by \texttt{CHARON} and \texttt{AENEAS}, the verifier is capable of producing end-to-end equivalence proofs between original and extracted functions. This is orders of magnitude slower than extraction and restricted to a subset of Rust, but provides a much stronger guarantee. In practice, this suggests that there is going to be a two-tier workflow: developers use REM2.0's fast extraction by default and selectively invoke the repairer or the verification pipeline for safety-critical code, tricky lifetime patterns, or APIs with strong behavioural contracts that need to be upheld.
+
+Finally, the usage profile of REM-Repairer confirms its role as a targeted component of the toolchain. It is still essential for cases with tight lifetime constraints, but most extractions can succeed without it. However, as shown above, the large latency introduced with VSCode's overhead more than outweighs the call to the Repairer, and thus we have made the Extract + Repair pathway the default option inside our VSCode extension. 
+
+\vspace{-3.5mm}
+\subsection{Threats to Validity}
+As with any empirical study, our evaluation is subject to several threats to validity:
+
+\textbf{Internal validity.}
+Timing measurements for RQ3 and RQ4 are affected by system noise, caching, and warm-up behaviour in RA and the OS. Although we did our best to use a controlled environment and consistent configurations, individual runs may vary slightly, so the numbers should be read as relative trends rather than precise bounds.
+
+\textbf{External validity.}
+Our benchmarks, while drawn from real projects, are limited by necessity. The original REM suite captured a specific snapshot of Rust code and the new corpus focuses on large, popular GitHub repositories with manually curated extraction sites. This biases the evaluation toward more “mainstream’’ code and as such cannot cover domains such as embedded \icodeverb{no_std} crates or highly specialised libraries.
+
+\textbf{Construct validity.}
+We treat compilation success and, where applicable, successful \texttt{CHARON}/\texttt{AENEAS} proofs as proxies for refactoring correctness (RQ1, RQ2, RQ4). In practice, we can only have a superficial understanding of each example and largely rely on the Rust compiler and (where possible) the verification pipeline to detect problems. While the type system and borrow checker catch many errors, subtle behavioural changes (e.g.\ performance, logging, concurrency effects) may still go unnoticed.
+
+\textbf{Tool ecosystem stability.}
+REM2.0 depends on internal APIs of RA and on external verification tools (\texttt{CHARON}, \texttt{AENEAS}) that are under active development\footnote{specifically the internal APIs of RA are designed entirely for use within RA, and do break often. Our toolchain is built on version \texttt{0.0.262}, but with weekly releases the API is already up to version \texttt{0.0.3XX}. Whilst there has been no update to the major components we rely on, a brief attempt to migrate was quickly disbanded}. Future changes may alter behaviour, performance, or supported features, so our results capture a particular point in the evolution of this tool stack.
+
+
+% \vspace{-5mm}
+\section{Summary}
+\label{sec:eval_summary}
+\vspace{-2.5mm}
+% 0.5 page
+This chapter has evaluated REM2.0 against the four research questions posed at the start of this section. The extraction experiments show that REM2.0 matches and extends the capabilities of the original REM prototype (RQ1, RQ2), while the new architecture delivers interactive, IDE-like latency by reusing RA's incremental analysis in a persistent daemon (RQ3). For code within the currently supported \texttt{CHARON}/\texttt{AENEAS} fragment, the verification pipeline can further certify behavioural equivalence between original and extracted functions, at substantially higher performance cost but with correspondingly stronger guarantees (RQ4).
+
+Overall, the results indicate that REM2.0 provides a practical extract-function refactoring for modern Rust, with a fast default path and targeted support for both automated repair and optional formal verification when additional assurance is required.

@@ -362,7 +362,8 @@
               \if@tempswa
                 \twocolumn
               \fi}
-\newcommand\chapter{\if@openright\cleardoublepage\else\clearpage\fi
+\newcommand\chapter{
+\if@openright\cleardoublepage\else\clearpage\fi
                     \thispagestyle{plain}%
                     \global\@topnum\z@
                     \@afterindentfalse
@@ -389,18 +390,18 @@
                       \@afterheading
                     \fi}
 \def\@makechapterhead#1{%
-  \vspace*{50\p@}%
+  \vspace*{30\p@}%
   {\parindent \z@ \raggedright \normalfont
     \ifnum \c@secnumdepth >\m@ne
       \if@mainmatter
         \huge\bfseries \@chapapp\space \thechapter
         \par\nobreak
-        \vskip 20\p@
+        \vskip 10\p@
       \fi
     \fi
     \interlinepenalty\@M
     \Huge \bfseries #1\par\nobreak
-    \vskip 40\p@
+    \vskip 20\p@
   }}
 \def\@schapter#1{\if@twocolumn
                    \@topnewpage[\@makeschapterhead{#1}]%
@@ -409,12 +410,12 @@
                    \@afterheading
                  \fi}
 \def\@makeschapterhead#1{%
-  \vspace*{50\p@}%
+  \vspace*{30\p@}%
   {\parindent \z@ \raggedright
     \normalfont
     \interlinepenalty\@M
     \Huge \bfseries  #1\par\nobreak
-    \vskip 40\p@
+    \vskip 20\p@
   }}
 \newcommand\section{\@startsection {section}{1}{\z@}%
                                    {-3.5ex \@plus -1ex \@minus -.2ex}%

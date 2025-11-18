@@ -1,0 +1,527 @@
+% \chapter{Literature Review}
+\chapter{Background}
+\label{chap:lit_review}
+
+Rust is a modern systems programming language that enforces memory safety
+through a strict ownership and borrowing discipline. This discipline, enforced
+by Rust's borrow checker, ensures that well-typed Rust programs are free from
+data races and dangling pointers without requiring a GC
+\cite{automated_refactoring_of_rust_programs}. However, Rust's unique type
+system — centred on ownership and lifetimes — poses
+new challenges for code transformation tools and formal reasoning. This
+literature review surveys academic work on automated refactoring techniques for
+Rust, approaches to verification of Rust programs (including formal methods and
+model checking), and efforts to formalise Rust's semantics. We compare Rust's
+refactoring and verification tooling to those of other languages, and we discuss
+integration with development environments. The goal is to highlight the state of
+the art in making Rust programs easier to evolve and prove correct, while
+pinpointing structural refinements for a clearer organisation of this body of
+work.
+
+\section{Overview of Refactoring}
+
+As previously mentioned, refactoring is the process of restructuring existing
+code to improve its internal structure without changing its external behaviour.
+It is a key practice for enhancing code maintainability and reducing technical
+debt in software projects \cite{OneThousandOneStories-SoftwareRefactoring}.
+Modern IDES, such as Eclipse and IntelliJ IDEA include a wide array fo automated
+refactorings, providing developers with quick, semantics- persevering code
+transformations \cite{AdventureOfALifetime}. In theory, these automated
+refactorings offer a safe way to restructure code (backed by well-defined
+preconditions to preserve behaviour \cite{Formal_Specifiation_JAVA}) and should
+be widely used in practice.
+
+However, empirical studies show a disparity between tool support and actual
+usage. Developers often remain reluctant to use automated refactoring features,
+preferring manual code changes
+\cite{OneThousandOneStories-SoftwareRefactoring}. For example, even with
+“Rename” refactoring available at the click of a button, many programmers still
+rely on find-and-replace or other manual methods
+\cite{OneThousandOneStories-SoftwareRefactoring}. The survey also noted that
+many developers expressed a desire to better understand their IDE's refactoring
+capabilities. This suggests that while the tools exist, there is a gap in
+awareness and useability of the tooling available. Additionally, as evidenced by
+the lack of adoption of even ``Rename'' refactorings,  challenges still remain
+in getting developers to trust automated tools to perform complex manipulations.
+
+Research into automated refactoring aims to bridge this gap by making tools more
+reliable and intelligent. For instance, Tip (2007) demonstrated that
+refactorings can be modeled with type constraints to systematically explore
+alternative valid program structures \cite{RefactoringUsingTypeConstraints}.
+Such approaches use static analyses to ensure that transformations maintain type
+correctness and behavioral equivalence, giving developers confidence in the
+automation. Nevertheless, the human factor (usability, understandability of tool
+behavior) remains critical.
+\section{Rust's Ownership Model and Formal Semantics}
+\label{sec:rust_owndership_model_formal_semantics}
+
+Rust's ownership model introduces compile-time enforced rules for aliasing and
+memory lifetime. Each value in Rust has a single owning scope, and references
+(borrows) must obey strict rules that prevent concurrent mutation and
+use-after-free \cite{automated_refactoring_of_rust_programs},\cite{the_rust_language}.
+While this model provides strong safety guarantees, it complicates formal
+semantics and tool development. Early efforts to rigorously define Rust's
+semantics culminated in \textit{RustBelt}, which provided the first machine-checked
+safety proof for a realistic subset of Rust's type system
+\cite{RustBelt}.\textit{RustBelt} demonstrated that safe Rust code (even when
+using unsafe internals of standard libraries) is memory and thread safe, by
+modeling Rust in the Coq proof assistant \cite{RustBelt}. This foundational work
+established confidence in Rust's core design and set the stage for verifying
+more complex properties. Subsequent research has extended Rust's semantic
+foundation to cover aliasing in unsafe code (e.g. Stacked Borrows and Tree
+Borrows models for pointer aliasing) \cite{AENEAS_PART_2}, and to connect Rust's
+high-level rules with low-level memory models. These formal models provide a
+basis on which verification tools and refactoring tools can reason about Rust
+code behavior. In summary, Rust's enforced aliasing discipline, while posing
+challenges, has inspired a rich line of work in formal semantics that underpins
+safe refactoring and verification.
+
+\section{Automated Refactoring in Rust vs Other Languages}
+\label{sec:automated_ref_rust_vs_other}
+Welll established languages like java and C\# benefit from decades of IDE
+support for refactorings such as \textit{Rename}, \textit{Extract Method} and
+\textit{Extract Module / Variable}.
+Rust, being newer and with far more complex compile-time rules, has lagged
+behind in automated refactoring support \cite{AdventureOfALifetime}. The
+ubiquitous \textit{Extract Method} is ``widely used in all major IDEs'' for
+other languages, but implementing it for Rust is surprisingly non-trivial due to
+Rust's ownership and lifetime constraints \cite{AdventureOfALifetime}. In
+contrast to a language like Java, where extracting a function involves mostly
+syntactic rearrangement, Rust's refactoring tools must also infer where to
+borrow or clone data and how to introduce lifetime parameters to satisfy the
+borrow checker \cite{automated_refactoring_of_rust_programs},
+\cite{automatically_enforcing_rust_trait_properties}. Early comparisons noted
+that Rust's lack of reflection and unstable compiler APIs made it harder to
+build refactoring tools as robust as those for Java / C\#. Even in the two years
+since REM was released, compiler APIs have changed so much that it proved
+impossible to compile the original project without significant rewrites. On the
+positive side, Rust's compiler errors can guide manual refactorign by
+pinpointing violations of borrowing rules, giving programmers immediate
+feedback; this meansd that if a refactoring compiles in Rust, it is likely
+behaviour-preserving \cite{Endler_2024}. Nonetheless, the consensus in both
+academia and industry is that first-class refactoring tools are needed to manage
+large Rust codebases with the same ease developers expect in other environments
+\cite{AdventureOfALifetime}, \cite{OneThousandOneStories-SoftwareRefactoring}.
+\section{Automated Refactoring Techniques for Rust}
+\label{sec:automated_ref_tech_rust}
+\subsection{Renaming and Simple Refactorings}
+One of the first efforts to build a Rust refactoring tool was by G. Sam et al.
+(2017), who created a proof-of-concept refactoring framework utilizing the Rust
+compiler's internal APIs. The team partnered with Mozilla Research to be among
+the first to implement the Rust specific refactorings of \textit{Lifetime
+Elision} and \textit{Lifetime Reification}. This allowed their program to
+introuce explicit lifetime parameters in instances where the compiler was
+implicitly inferring them - a refactoring that was brand new to Rust. The
+challenges encountered illustrated how Rust's stricter scoping and shadowing
+rules required careful handling of name conflicts during renaming (e.g. avoiding
+situations where renaming a variable could unintentionally shadow another)
+\cite{automated_refactoring_of_rust_programs}. Additionally, the 2017 study
+concluded that many refactorings are possible with Rust's compiler
+infrastructure, but ensuring \textit{behavioural preservation} (especially
+around ownership transfers) requires additional static analyses not needed in
+langauges without Rust's constraints. Their work on \textit{Lifetime Elision}
+has since formed part of the REM toolchain, where the rich feedback from the
+Rust compiler is leveraged to ensure that the final transformation is both
+valid Rust and as legible as possible \cite{AdventureOfALifetime},
+\cite{BorrowingWithoutSorrowing}.
+
+\subsection{Extract Method (REM)}
+
+A major advance in Rust refactoring came with the Rust Extract Maestro (REM),
+with the theoretical background provided by the work of Costea et al. (2023) in
+\textit{Adventure of a Lifetime: Extract Method Refactoring for Rust}. Thy et
+al. (2023) then provided a practical implementation of REM in \textit{Borrowing
+Without Sorrowing}. REM is a tool that tackled notoriously complex Extract
+Method refactoring for Rust. REM decomposes the extract-method process into a
+sequence of transformations, each addressing a specific aspect of Rust's type
+and borrow rules \cite{AdventureOfALifetime}. The approach begins with a
+``na\"ive'' function hoisting (moving a block of code into a new function), then
+applies a series of \textit{automated program repairs} to make the code compile
+correctly. This process is guided by \textit{oracles} - specialised analyses
+that resolve issues the compiler would flag. One such oracle is an
+intra-procedural \textbf{ownership analysis} which infers whether each value
+moved to the new function should be passed by value, by shared reference (using
+\icodeverb{&T}), or by mutable reference (using \icodeverb{&mut T}). Appendix 1
+(\ref{sec:appendix1}) provides a detailed example of what this looks like in
+practice.
+
+Another oracle leverages Rust's own compiler (rustc) as a sub-procedure: REM
+invokes Rust's lifetime checker to identify lifetime inconsistencies, then
+introduces appropriate lifetime parameters to the extracted function until the
+borrow checker is satisfied.  By iteratively repairing borrow errors in the
+extracted code, REM ensures the transformation preserves semantics and yields a
+well-typed program. The REM tool, implemented as an extension to the IntelliJ
+Rust plugin, was shown to handle complex extractions that involve non-local
+control flow (e.g. \icodeverb{return} or \icodeverb{break} inside the extracted fragment) and borrowing
+across function boundaries. In an evaluation on real-world Rust projects, REM
+could successfully perform extractions that developers had done manually
+(including cases with nested lifetimes), outperforming existing tools in the
+scope of code it can handle. Their work demonstrated that seemingly ``unsafe''
+transformations (like cutting a function in half) can be automated in Rust by
+coupling transformations with verification from the Rust compiler's own checks.
+
+\subsection{Automated Fixes for Ownership Errors}
+An alternative angle on Rust refactoring is automatically \textit{fixing} code that
+violates ownership/borrow rules - essentially a refactoring from
+``non-compiling'' to ``compiling'' code without changing behavior.
+\textbf{Rust-Lancet} (Yang et al., ICSE 2024) is a tool aimed at
+\textit{automated ownsership-rule-violation fixing with behaviour preservation}.
+Given a Rust source file that fails to compile due to borrow checker errors,
+Rust-Lancet analyzes the Abstract Syntax Tree (AST) and applies code transformations
+to eliminate the error while preserving the program's semantics
+\cite{RustLancet}. Under the hood, it uses Rust parsing libraries (\icodeverb{syn} and
+\icodeverb{quote}) to manipulate the AST and generate patched code. In a similar
+manner to REM, Rust-Lancet employs an interative repair loop: it first applies a
+fix (for example, inserting a \icodeverb{clone()} on a value to appease ownership
+rules), then rechecks the compiler errors and repeats if fruther fixes are
+needed. The tool includes correctness checks to avoid over-fixing; a
+\textit{behaviour preservation} module validates that the inserted changes do
+not alter program outputs for typical cases.  In an evaluation on over 150 real
+cases of ownership rule violations (gathered from Rust's test suite and prior
+research), Rust-Lancet was able to completely fix a large fraction of them with
+zero false positives (i.e. it never introduced an incorrect fix). It even
+outperformed suggestions given by the Rust compiler and baseline techniques
+using large language models, especially in scenarios requiring multiple
+coordinated edits. While Rust-Lancet is positioned as a bug-fixing tool, it
+overlaps with refactoring by automatically rewriting code in a
+semantics-preserving way. Its success highlights how Rust's rigorous rules can
+be leveraged - the tool knows a patch is correct when the compiler's checks pass
+and its behavior preservation validation succeeds \cite{RustLancet}.
+
+\subsection{Comparison and Summary}
+Overall, automated refactoring in Rust is characterized by taking full advantage
+of the rich and sophisticated output of the Rust compiler. Tools like REM
+explicitly invoke the borrow checker and type checker as so called oracles
+\cite{AdventureOfALifetime}, whilst others, like Rust-Lancet, effectively
+automate a ``fix until compile'' loop wiht guarantees of behaviour preservation.
+This is in contrast to many refactoring tools for garbage-collected languages,
+which operate mostly on the AST or intermediate representation without needing
+to consider memory lifetimes. The research so far indicates that, with suitable
+abstractions (e.g. ownership analysis algorithms and lifetime inference
+strategies), even complex Rust refactorings can be automated soundly. As more of
+these techniques mature, we expect Rust's refactoring support to begin matching
+the breadth available for languages like C++ and Java, albeit with different
+underlying algorithms tailored to Rust's unique semantics.
+
+\section{Verification and Formal Methods for Rust}
+\label{sec:verification_formal_methods}
+Rust's appeal for building reliable software has spurred interest in applying
+formal verification techniques to Rust programs. Traditional \textit{deductive
+verification} and \textit{model checking} must be adapted to account for Rust's ownership,
+lifetimes, and possibly unsafe code. In this section, we review key verification
+tools and techniques, and the formal semantics advances enabling them.
+
+\subsection{RustBelt and Type-System Soundness}
+
+Jung et al. (2018) introduced \textbf{RustBelt}, a foundational framework for
+reasoning about Rust's type system and memory safety. In their landmark paper,
+\textit{RustBelt: Securing the Foundations of the Rust Programming Language},
+they proved the soundness of Rust's core type system. By embedding a Rust-like
+language ($\lambda$Rust) in the Iris framework (a higher-order concurrent
+separation logic), RustBelt verified that well-typed safe Rust code cannot
+exhibit undefined behaviour \cite{RustBelt}. This was the first independent verification of
+Rust's claims about memory and thread safety. Additionally, it proivdfed a
+foundation on which other verification effors could build: one can assume that
+safe code is memory-safe, allowing them to focus verification effort either on
+higher-level functional correctness or the remaining pitfalls of unsafe code.
+
+\subsection{Verification via Functional Translation (CHARON and AENEAS)}
+One prominent approach to verifying Rust programs is to reduce the problem to
+verifying \textit{pure functional code}. \textbf{AENEAS} (Ho \& Potzenko, ICFP
+2022) is a toolchain that translates a substantial subset of Rust into a purely
+functional language, suitable for input to existing proof assistants or model
+checkers \cite{AENEAS}. The key insight of Aeneas is that for many Rust programs
+(those not using interior mutability or unrestricted unsafe code), explicit
+memory reasoning can be eliminated. Aeneas introduces an intermediate
+representation called \textit{Low-Level Borrow Calculus} (LLBC), inspired by
+Rust's mid-level IR (MIR), which makes the ownership and borrowing structure of
+a program explicit. Crucially, LLBC's semantics is \textit{ownership-centric}:
+instead of a heap, it uses an abstraction of \textit{loans} and \textit{borrows}
+to track aliasing, meaning individual values carry information about what they
+borrow.
+
+Ho and Protzenko went on to define a set of pure, value-based semantics for LLBC
+- one with no pointer addresses - therby ``capturing the essence of the borrow
+mechanism'' in a mathematical form \cite{AENEAS_PART_2}. They then translate LLBC
+into a pure lambda calculus\footnote{See this excellent introduction to the
+Lambda Calculus for more information: \newline
+https://plato.stanford.edu/entries/lambda-calculus/}, effectively converting
+Rust code into a functional
+program with the same behavior. The result is that one can verify properties of
+the Rust program by verifying the translated functional program using a theorem
+prover of choice. For example, one might translate Rust to Coq or F* and
+prove postconditions about the output, with Aeneas ensuring those properties
+carry back to the original Rust code.
+
+To tackle tricky issues like termination of borrows across function boundaries,
+AENEAS introduced a notion of \textit{backwards functions} to conservitavely
+approximate the ``borrow graph'' of a program and ensure the translated code
+remains termination-friendly. The approach was shown to significantly reduce the
+burden on proof engineers, since they no longer needed to reason about low-level
+memory safety - Rust's type system has already done the heavy lifting for them.
+
+From there, Ho et al., (ICFP 2024) presented \textit{Sound Borrow-Checking for
+Rust via Symbolic Semantics} \cite{AENEAS_PART_2}, with the goal of addressing two
+open questions from AENEAS's methodology.First, they established a link between
+Aeneas's LLBC and a traditional heap-based semantics, by proving that LLBC's
+admittedly unusual modelling is faithful to a standard memory model, ensuring
+that verifiying programs in LLBC is not ``proving the wrong thing''. Second,
+they introduced a set of formal \textit{symbolic semantics} for Rust that act as
+a sound abstraction of concrete execution, and prove that these symbolic
+semantics are capable of correctly approximating Rust's behavior.  In essence,
+they show that if a program is accepted by their symbolic interpreter (which
+enforces borrow rules), then there exists a corresponding concrete execution in
+a real heap that is memory-safe. This result formally validates the idea that
+the borrow checker (or a tool mimicking it) prevents all illicit behaviors.
+
+A very important outcome of this work is a proof that the \textbf{symbolic
+interpreter can server as a verified borrow-checker} for LLBC programs. This
+provides increased confidence that tools like Aeneas (which rely on symbolic
+execution as an intermediate) are built on solid theoretical ground, and it
+paves the way for future verified compilers or static analyzers for Rust that
+incorporate a proven-correct borrow checker. The broader significance is that
+Rust's complex lifetime rules are now accompanied by a machine-checked proof of
+their soundness, something rare for industrial language features.
+
+\subsection{Static Analysers and Model Checkers}
+\subsubsection*{Static Analysis}
+Beyond full formal verification, several tools bring lightweight verification or
+bug-finding to Rust. \textbf{PRUSTI} (Astrauskas et al., OOPSLA 2019) is a
+static \textit{deductive verifyer} that uses Rust's types to simplify program
+annotation and verification, \cite{prust_in_practice}.
+Prusti translates Rust code into the Viper verification language, using Rust's
+lifetime and ownership information to implicitly encode permissions for
+verification \cite{prusti_project}. This means a developer can write
+specifications (pre/post-conditions, invariants) for Rust functions, and Prusti
+will prove them, assuming no undefined behavior in safe code. The advantage of
+leveraging Rust's type system is evident - e.g., Prusti knows that two mutable
+references cannot alias, which corresponds to a simple permission separation in
+the verification condition. Over the past few years, Prusti has grown to handle
+significant subsets of Rust, and it even provides a Visual Studio Code extension
+for interactive use \cite{Prusti_assistant_github}.
+
+In a similar vein, \textit{RefinedRust: A Type Sysem for High-Assurance
+Verification of Rust Programs} (G\"aher et al., 2024) introduced a
+refinement type system for Rust that can verify both safe and certain unsafe
+code by embedding checking into the type system \cite{RefinedRust}.
+RefinedRust's types allow expressing rich safety and correctness properties, and
+a prototype tool translates annotated Rust into a Coq model for verification.
+This line of work brings Rust closer to languages like Dafny or Liquid Haskell
+in terms of having a path to verification integrated with the language's types.
+
+\subsubsection*{Model Checking}
+The most notable tool for \textit{model checking} is \textbf{Kani}, a bounded
+model checker for Rust developed by AWS. Kani translates Rust programs
+(including those with \texttt{unsafe} code) into verification conditions that are checked
+by a SAT/SMT solver (built on the C Bounded Model Checker (CBMC) backend)
+\cite{automatically_enforcing_rust_trait_properties}. What sets Kani apart is
+that it operates on Rust's MIR (Mid-level IR), leveraging information about
+traits and generics directly rather than reducing to LLVM bitcode. By working at
+the MIR level, Kani retains high-level semantics like trait object behavior,
+which allowed the team to verify complex properties involving dynamic trait
+objects (Rust's form of dynamic dispatch). VanHattum et al. (ICSE 2023) describe
+how Kani handles dynamic trait dispatch soundly, making it the first model
+checker to support the full range of Rust trait features
+\cite{verifying_dynamic_trait_objects}. In experiments, they found that using
+Rust-specific knowledge (MIR and trait info) improved verification performance
+by 5$\times$ - 15$\times$ compared to an equivalent analysis at the LLVM level.
+Kani is being used to verify critical systems components (for example, AWS has
+applied it to verify parts of their cryptographic libraries and virtualization
+code), focusing on memory safety and user-provided assertions in
+performance-critical Rust code. Other dynamic analyzers like MIRI (an
+interpreter that detects undefined behavior in Rust by executing code in a
+defined environment) complement these verification tools by checking one
+execution at a time but with a semantic model that catches unsafe violations;
+however, MIRI is more a testing aide than a formal verifier.
+
+\subsection{Summary}
+We have shown that the Rust verification ecosystem in incredibly rich and includes: foundational proofs of the
+language's safety (RustBelt, symbolic semantics), translation-based verifiers
+(Aeneas, Prusti, RefinedRust) that build on the guarantees of Rust's types, and
+model checkers (Kani) that leverage Rust's own compiler internals for efficient
+exhaustive exploration. Each of these harnesses Rust's key feature—its rich type
+system—as an asset to simplify or optimize verification. This contrasts with
+verification for languages like C/C++, where the lack of a guaranteed memory
+safety baseline means much effort is spent just to mitigate wild pointers or
+data races. In Rust's case, the baseline guarantees free the verifier to focus
+on higher-level properties or the remaining unsafe corners of the language. The
+research surveyed here shows a trend of \textit{integrating verification with the
+language's design}: from using the borrow checker in a proof assistant, to
+encoding Rust lifetimes as logical predicates, to running model checkers on MIR.
+This tight integration yields verifiers that are both sound (no false negatives
+on safety) and relatively precise, making formal assurance of Rust software
+increasingly attainable.
+
+\section{Integration with IDEs and Language Servers}
+\label{sec:integration_language_server}
+The ultimate goal for refactoring and verification tools is seamless integration
+into developers' workflows. For Rust, integration has meant working closely with
+the compiler or the emerging Language Server Protocol (LSP). However,
+\texttt{rustc} was not originally desinged as a reusable library for IDE
+features, which led to the creation of separate projects to support code
+intelligence and analysis. The first generation Rust Language Server (RLS)
+attempted to use the compiler internals to power IDE features, but it struggled
+with performance and completeness as Rust evolved. Today, the community relies
+on \textbf{rust-analyzer}, a from-scratch implementation of a Rust language
+server that emphasizes speed and modularity \cite{Schiedt_2022}. Rust-analyzer
+constructs its own parse tree and does its own type inference, enabling
+on-the-fly responses to editor queries without running the full compiler on
+every change. This architecture is conducive to implementing refactorings as
+lightweight code transformations called “assists.” In fact, rust-analyzer
+already supports basic refactorings like \textit{Rename} and \textit{Extract
+Variable}, and \textit{Extract Method} as editor assists. These operate on
+rust-analyzer's internal syntax tree and use its knowledge of ownership and
+types to ensure the edits are valid. For example, the Extract Function assist
+initially had limitations with Rust's generics and lifetimes - extracting code
+from a generic function would produce errors because the assist didn't propagate
+required type parameters or lifetime parameters to the new function. However,
+even with substantial development by the community, certain assists still fall
+significantly short of the capabilities of tools developed specifically for
+purpose, such as REM.
+
+Integration into the popular IntelliJ IDEA (via the Rust plugin) has also seen
+some development. The REM tool was originally built atop the IntelliJ plugin,
+indicating that industrial IDEs can serve as a proving ground for research
+prototypes \cite{AdventureOfALifetime}. In principle, once validated, these
+prototypes can be upstreamed, bringing advanced refactorings to everyday
+developers. A challenge here is maintaining the tools: Rust's syntax and
+compiler behavior evolve, so refactoring algorithms must be kept in sync. One
+way this is being addressed is by using Rust's stable analysis APIs where
+possible. For instance, tools like Rust-Lancet chose to use the
+community-maintained \texttt{syn} crate for parsing so that they aren't tied to
+internal compiler data structures that change nightly \cite{RustLancet}.
+Similarly, projects to support large-scale refactoring use cases (such as
+Facebook's code migration tools or the Rust-to-Rust transformations needed in
+the Rust 2018 edition uplift) relied on either compiler suggestions or external
+scripting. The Rust compiler team has introduced machine-applicable suggestions
+in compiler error messages, which tools like \textbf{rustfix} can apply
+automatically. This essentially allows the compiler to assist in simple
+refactors (e.g. renaming a deprecated syntax, adding a missing lifetime
+specifier) by emitting a structured suggestion. Whist not as general as a true
+refactoring engine, this has helped with batch changes across large codebases.
+
+\subsection{Compiler Internals for Ownership and Borrowing}
+It's worth noting how Rust's compiler architecture influences refactoring and
+verification tools. Rustc itself goes through a series of analyses: it parses
+into an AST (with desugaring), performs name resolution and type checking
+(including lifetime inference), and then produces MIR where
+borrow checking and other analyses occur. Because of this, tools integrated at various stages
+have different views of the program. For example, a refactoring tool working on
+an AST (like rust-analyzer's assists or Rust-Lancet) must re-run portions of
+the compiler (or mimic them) to ensure that after transformation the code still
+passes borrow check. Meanwhile, a verification tool like Kani that operates on
+MIR has the advantage of piggybacking on the actual borrow-checker's results -
+it can trust that MIR is already free of borrow rule violations and focus on
+exploring execution paths \cite{verifying_dynamic_trait_objects}. As research
+progresses, we may see more refactoring tools move to operate on MIR or use the
+borrow checker in the loop, because MIR provides a simpler, desugared view of
+the code with explicit borrow regions (e.g. the Polonius project, a
+next-generation borrow checker, could potentially expose an API for tools to
+query borrow relationships). For now, practical refactoring uses higher-level
+representations (AST plus perhaps some compiler query for type info) because
+it's easier to map edits back to source code.
+
+\section{Related Work Beyond Rust: Refactoring in Other Languages and Paradigms}
+\label{sec:related_work_beyond_rust}
+The challenges and advances in refactoring outlined throughout this review are
+not unique to Rust. Many other languages have ispired research and into
+automated refactoring and its many pitfalls. The easiest case study is Java,
+being one of the earliest targets of refactoring tools, and it has a rich
+literature. Beyond the generics case study mentioned earlier
+(\cite{GenericRefactoringJAVA}), researchers have looked at refactoring
+concurrent Java code, refactoring to use new language features, and large-scale
+restructuring of legacy systems. Zhang et al. (2024) recently proposed an
+automated refactoring approach for Java's asynchronous programming using the
+CompletableFuture API. Their tool, \textbf{ReFuture}, integrates static analysis
+(visitor patterns, alias analysis, etc.) to identify where an older async
+construct (like using raw threads or Futures) can be transformed into a modern
+CompletableFuture chain \cite{AutomaticRefactoringAsyncJAVA}. Impressively,
+\textbf{ReFuture} was evaluated on 9 large Java projects, including
+\textit{Hadoop} and \textit{ActiveMQ}, and managed to refactor 639 out of 813
+eligible code segments automatically, without introducing errors
+\cite{AutomaticRefactoringAsyncJAVA}. This demonstrates that automated
+refactoring can manage to tackle performance or paradigm-migration tasks, not just
+cosmetic and maintenance changes.
+
+In the mobile app domain, Lin et al. (2015) addressed refactoring for Android's
+asynchronous constructs. Android apps often mis-use the AsyncTask class, leading
+to memory leaks or lost UI updates. Lin and his team developed
+\textbf{ASYNCDROID}, a tool to refactor improper AsyncTask usage into a sover
+structures like IntentService \cite{AndroidAsncRefactoring}. Their formative
+study found that about 45\% of the AsyncTask occurrences in real apps could be
+automatically refactored by ASYNCDROID's rules, and an additional ~10\% could
+be handled with minor manual tweaks, resulting in more than half of problematic
+cases being fixed largely automatically. The tool was implemented as an Eclipse
+plugin and offered typical refactoring tool conveniences including a preview of
+the changes and a rollback option. Importantly, when the authors submitted some
+of these refactoring patches to open-source projects, the maintainers accepted
+them, validating that the transformations were indeed considered improvements
+with no behavioral regressions \cite{AndroidAsncRefactoring}. This work
+illustrates how automated refactoring can be applied in a specialized context
+(mobile asynchronous UI code) by encoding domain-specific knowledge as
+transformation rules and preconditions.
+
+Other notable refactoring research outside of Rust includes work on functional
+languages and dynamically-typed languages. In Haskell, for example, the HaRe
+tool (Li et al., 2005) brought refactoring support to a lazy, purely functional
+language, requiring careful handling of Haskell's scoping, type classes, and
+purity concerns \cite{HaRe}. In dynamic languages like JavaScript and Python, refactoring is
+complicated by the lack of static types; researchers have explored heuristic and
+runtime-analysis-based approaches to perform refactorings safely (e.g.,
+refactoring Python's modules or JavaScript's callbacks to promises). While we
+will refrain from delving into specific studies for those here, it is worth noting that each
+language tends to spawn its own refactoring research to address unique features.
+
+Finally, it is important that we note that refacotring is very closely
+intertwined with other software engineering tasks like code smell detection,
+program repair and modernisation. Refactoring tools are sometimes used as
+building blocks for automated program repair, such as applying
+behavior-preserving transformations to enable a later bug-fixing change, with
+one such case even mentioned in
+\textit{Adventure of a Lifetime} \cite{AdventureOfALifetime}. Tools like
+Facebook's JScodeshift or Python's Bowler allow developers to script custom
+refactorings (essentially semi-automated transformations), which blurs the line
+between a ``human-driven'' refactoring ands a tool-driven migration. The
+incdeasing adoption of language servers means refactoring capablilities can be
+made available in a wide range of editors, not just heavyweight IDEs
+\cite{AdventureOfALifetime}. This has been a positive development for languages
+like Rust and Go, where a language server can provide refactoring assists
+consistently across many development environments.
+
+\section{Conclusion} % TODO expand the conclusion, potentialy with a section
+% going over the gaps in the research. Alternatively, we could analyse each
+% source at the time it is introduced and discuss its limitations there.
+\label{sec:lit_concusions}
+% TODO rewrite this section
+
+The landscape of Rust refactoring and verification has rapidly evolved, marrying
+the Rust compiler’s strengths with novel algorithms from the research community.
+Automated refactoring tools for Rust have progressed from simple renaming
+utilities to sophisticated systems that integrate program repair and static
+analysis (REM and Rust-Lancet) to handle ownership and lifetime challenges
+\cite{AdventureOfALifetime}, \cite{RustLancet}. Verification tools leverage
+Rust’s unique guarantees to simplify proofs – whether by translating to pure
+functional models (Aeneas) \cite{AENEAS}, by encding lifetime reasoning into
+logical frameworks (RustBelt, RefinedRust) \cite{RustBelt}, \cite{RefinedRust},
+or by exploring executions with model checkers (Kani) that understand
+Rust-specific features \cite{verifying_dynamic_trait_objects}. A unifying theme
+is that Rust’s ownership semantics, once seen purely as a hurdle, have become an
+enabler for both refactoring and verification: they localize the reasoning about
+memory, allowing tools to either confidently transform code or assert properties
+with the guarantee that certain classes of bugs are already ruled out.
+
+In conclusion, Rust’s combination of strong static checks and low-level
+performance has fostered a unique blend of research. The advances in refactoring
+mean that developers can expect increasing assistance in restructuring Rust code
+without fear of breaking it. Meanwhile, the maturation of formal methods for
+Rust suggests that full verification of critical Rust code is becoming
+practical, supported by tools that integrate with Rust’s development ecosystem.
+By structuring the literature along clear axes (refactoring vs. verification,
+formal foundations vs. practical tools, compiler phases involved, safe vs.
+unsafe scope), future reviews can further improve clarity and coverage. The
+works cited here collectively show that Rust’s initially steep learning curve
+for both humans and tools can be mitigated by clever automation and rigorous
+semantics – turning Rust’s famed safety guarantees from a burden into a powerful
+ally for program analysis and transformation.
+
+\renewcommand\thefigure{\thechapter .\arabic{figure}}

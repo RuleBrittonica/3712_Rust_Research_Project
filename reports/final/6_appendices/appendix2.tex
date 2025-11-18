@@ -1,94 +1,85 @@
-\section{Appendix 2: Details of each Repository in the Evaluation}
+\section{Appendix 2: Details of each Repository}
 \label{sec:appendix2_details_of_each_repository}
 
-\begin{longtable}{c|lllll}
-\caption{Details of each repository in the evaluation} 
-\label{tab:appendix2_details_of_each_repository} \\
+\begin{table}[h]
+\centering
+\small
+
+\begin{tabular}{|c|c|c|c|c|}
 \hline
-\multicolumn{1}{|c|}{\#} & 
-\multicolumn{1}{l|}{\textbf{Repository}} & 
-\multicolumn{1}{l|}{\textbf{Original SHA}} & 
-\multicolumn{1}{l|}{\textbf{Post Extract SHA}} & 
-\multicolumn{1}{l|}{\textbf{Date}} & 
-\multicolumn{1}{l|}{\textbf{Author}} \\ \hline
-\endfirsthead
+\textbf{Ranking} & \textbf{Project Repo}        & \textbf{Stars} & \textbf{Forks} & \textbf{Open Issues} \\ \hline
+2  & denoland/deno                & 105077 & 5768  & 2384 \\
+3  & rustdesk/rustdesk            & 102158 & 14993 & 61   \\
+4  & tauri-apps/tauri             & 98717  & 3155  & 1161 \\
+5  & unionlabs/union              & 74500  & 3835  & 155  \\
+6  & astral-sh/uv                 & 72353  & 2212  & 2136 \\
+7  & zed-industries/zed           & 69398  & 5885  & 3054 \\
+8  & FuelLabs/sway                & 62106  & 5428  & 862  \\
+9  & alacritty/alacritty          & 60977  & 3227  & 323  \\
+10 & rust-lang/rustlings          & 60569  & 10978 & 46   \\
+11 & FuelLabs/fuel-core           & 57463  & 2856  & 149  \\
+12 & BurntSushi/ripgrep           & 57159  & 2304  & 85   \\
+13 & topjohnwu/Magisk             & 56856  & 15853 & 36   \\
+14 & sharkdp/bat                  & 55755  & 1409  & 318  \\
+15 & meilisearch/meilisearch      & 54438  & 2254  & 221  \\
+16 & lencx/ChatGPT                & 54214  & 6192  & 856  \\
+17 & rust-unofficial/awesome-rust & 53670  & 3064  & 10   \\
+18 & starship/starship            & 52113  & 2284  & 762  \\
+19 & dani-garcia/vaultwarden      & 50694  & 2374  & 17   \\
+20 & openai/codex                 & 50131  & 6215  & 1164 \\
+21 & types/typst                  & 47876  & 1305  & 1007 \\ \hline
+\end{tabular}
 
-\multicolumn{6}{c}%
-{{\bfseries Table \thetable\ (continued)}} \\
+\captionsetup{justification=centering}
+\caption{Brief summary of the 20 repositories searched to find real-world examples. \#1 is the Rust project itself.}
+\label{tab:repo_summary}
+\end{table}
+
+\newpage
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{|c|p{3cm}|p{11cm}|}
 \hline
-\multicolumn{1}{|c|}{\#} & 
-\multicolumn{1}{l|}{\textbf{Repository}} & 
-\multicolumn{1}{l|}{\textbf{Original SHA}} & 
-\multicolumn{1}{l|}{\textbf{Post Extract SHA}} & 
-\multicolumn{1}{l|}{\textbf{Date}} & 
-\multicolumn{1}{l|}{\textbf{Author}} \\ \hline
-\endhead
+\# & Name & URL \\ \hline
 
-\hline \multicolumn{6}{r}{{Continued on next page}} \\ \hline
-\endfoot
+1  & denoland/\newline deno 
+   & \url{https://github.com/denoland/deno/commit/104514b06dfbbb899235fb1147aa1fa62477a6d5} \\
+
+2  & FuelLabs/\newline fuel-core
+   & \url{https://github.com/FuelLabs/fuel-core/commit/ed92738280e068475682e220b93921bbbfebfdd7} \\
+
+3  & meilisearch/\newline meilisearch
+   & \url{https://github.com/meilisearch/meilisearch/commit/31142b36635ba062184b7d42f2e86021b11e911c} \\
+
+4  & BurntSushi/\newline ripgrep
+   & \url{https://github.com/BurntSushi/ripgrep/commit/7534d5144f5c5e89d67c791e663cdc0bee069b0e} \\
+
+5  & starship/\newline starship
+   & \url{https://github.com/starship/starship/commit/9093891acbe2c86b1615c37386dadbb0cc632199} \\
+
+6  & FuelLabs/\newline sway
+   & \url{https://github.com/FuelLabs/sway/commit/cdfc56c700ab32eefb84f75ed3048bd2a0ea22d2} \\
+
+7  & tauri-apps/\newline tauri
+   & \url{https://github.com/tauri-apps/tauri/commit/658e5f5d1dc1bd970ae572a42447448d064a7fee} \\
+
+8  & unionlabs/\newline union
+   & \url{https://github.com/unionlabs/union/commit/9b01ce6d75b84f049c1ede75750d33ce26ae73d9} \\
+
+9  & astral-sh/\newline uv
+   & \url{https://github.com/astral-sh/uv/commit/9af989e30c86391767830aa588c32fcb7c9a76b5} \\
+
+10 & dani-garcia/\newline vaultwarden
+   & \url{https://github.com/dani-garcia/vaultwarden/commit/952992c85bdf3147ddb8e663538e29c748b71f94} \\
+
+11 & zed-industries/zed
+   & \url{https://github.com/zed-industries/zed/commit/d00ad02b05981c79942b3bdff957e2384e68b89f} \\
 
 \hline
-\endlastfoot
+\end{tabular}
 
-1  &  &  &  &  &  \\
-2  &  &  &  &  &  \\
-3  &  &  &  &  &  \\
-4  &  &  &  &  &  \\
-5  &  &  &  &  &  \\
-6  &  &  &  &  &  \\
-7  &  &  &  &  &  \\
-8  &  &  &  &  &  \\
-9  &  &  &  &  &  \\
-10 &  &  &  &  &  \\
-11 &  &  &  &  &  \\
-12 &  &  &  &  &  \\
-13 &  &  &  &  &  \\
-14 &  &  &  &  &  \\
-15 &  &  &  &  &  \\
-16 &  &  &  &  &  \\
-17 &  &  &  &  &  \\
-18 &  &  &  &  &  \\
-19 &  &  &  &  &  \\
-20 &  &  &  &  &  \\
-21 &  &  &  &  &  \\
-22 &  &  &  &  &  \\
-23 &  &  &  &  &  \\
-24 &  &  &  &  &  \\
-25 &  &  &  &  &  \\
-26 &  &  &  &  &  \\
-27 &  &  &  &  &  \\
-28 &  &  &  &  &  \\
-29 &  &  &  &  &  \\
-30 &  &  &  &  &  \\
-31 &  &  &  &  &  \\
-32 &  &  &  &  &  \\
-33 &  &  &  &  &  \\
-34 &  &  &  &  &  \\
-35 &  &  &  &  &  \\
-36 &  &  &  &  &  \\
-37 &  &  &  &  &  \\
-38 &  &  &  &  &  \\
-39 &  &  &  &  &  \\
-40 &  &  &  &  &  \\
-41 &  &  &  &  &  \\
-42 &  &  &  &  &  \\
-43 &  &  &  &  &  \\
-44 &  &  &  &  &  \\
-45 &  &  &  &  &  \\
-46 &  &  &  &  &  \\
-47 &  &  &  &  &  \\
-48 &  &  &  &  &  \\
-49 &  &  &  &  &  \\
-50 &  &  &  &  &  \\
-51 &  &  &  &  &  \\
-52 &  &  &  &  &  \\
-53 &  &  &  &  &  \\
-54 &  &  &  &  &  \\
-55 &  &  &  &  &  \\
-56 &  &  &  &  &  \\
-57 &  &  &  &  &  \\
-58 &  &  &  &  &  \\
-59 &  &  &  &  &  \\
-60 &  &  &  &  &  \\
-
-\end{longtable}
+\captionsetup{justification=centering}
+\caption{Details of each repository in the evaluation, with the specific commit hash that we found examples from / evaluated against}
+\label{tab:appendix2_details_of_each_repository}
+\end{table}

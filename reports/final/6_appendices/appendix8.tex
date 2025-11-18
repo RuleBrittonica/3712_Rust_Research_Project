@@ -1,0 +1,206 @@
+\section{Appendix 8: Implementation of the Verification Pipeline}
+\label{app:implementation_verification}
+
+This appendix contains a much more thorough dive into all of the implementation details behind the equivalence proover. It is intended to be read alongside the source code, and will in places contain duplicate information from Section~\ref{sec:implementation_verification}.
+
+\vspace{5mm}
+
+\begin{minipage}[t]{0.55\textwidth}
+\vspace{-90mm}
+The design of REM2.0's equivalence checking is guided by two principles: (1)
+verification must require no additional annotations or input from the developer,
+and (2) it must complete quickly enough to fit into interactive IDE workflows.
+To achieve this, the pipeline translates both the original program $P$ and the
+refactored program $P'$ into progressively more structured semantic
+representations, culminating in a machine-checked proof of observational
+equivalence.
+
+At a high level, the pipeline consists of five stages: \textbf{Extraction},
+\textbf{REM repairs}, \textbf{CHARON translation}, \textbf{AENEAS
+functionalisation}, and \textbf{Coq verification}. Each stage builds on the
+previous one, gradually exposing the semantics of the refactored code, before we end up with the pure, functional model in Coq. Figure
+\ref{fig:verification_pipeline} provides an overview of the entire process. We will only very briefly cover off on extraction and lifetime repairing in this section, please refer to Chapter \ref{chap:expanding_rem} for the full scope.
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.35\textwidth}
+\centering
+\begin{tikzpicture}[node distance=2cm, >=stealth, thick]
+  % Nodes
+  \node[draw, rounded corners, fill=blue!10, minimum width=6cm, minimum height=1cm] (extract) {1. Extraction};
+  \node[draw, rounded corners, fill=blue!10, minimum width=6cm, minimum height=1cm, below of=extract] (rem) {2. REM Repairs};
+  \node[draw, rounded corners, fill=blue!10, minimum width=6cm, minimum height=1cm, below of=rem] (charon) {3. CHARON (LLBC)};
+  \node[draw, rounded corners, fill=blue!10, minimum width=6cm, minimum height=1cm, below of=charon] (aeneas) {4. AENEAS (Functionalisation)};
+  \node[draw, rounded corners, fill=blue!10, minimum width=6cm, minimum height=1cm, below of=aeneas] (coq) {5. Coq Verification};
+
+  % Arrows
+  \draw[->] (extract) -- (rem);
+  \draw[->] (rem) -- (charon);
+  \draw[->] (charon) -- (aeneas);
+  \draw[->] (aeneas) -- (coq);
+\end{tikzpicture}
+
+\captionof{figure}{Overview of the verification pipeline: from source code extraction to proof of observational equivalence in Coq.}
+\label{fig:verification_pipeline}
+\end{minipage}
+
+\vspace{-2.5mm}
+\subsection{Extraction}
+Extraction lifts a user-selected region into a new function and replaces the selection with a call at the original site. As detailed in Section \ref{sec:single_file_workspace}, this step is powered by a Rust-Analyzer (RA) backed engine that performs single-file incremental analysis. It resolves the selection’s AST and symbol information in memory and synthesises a function skeleton together with the call-site edit.
+
+The extraction result is returned as a deterministic set of edits (a patch) and a machine-readable summary for downstream stages. By design, the extractor does not attempt to finalise lifetimes or advanced ownership modes—that responsibility is delegated to REM’s repair phase. This separation keeps extraction millisecond fast and predictable, and completely independent of crate size, while ensuring a stable interface for the later verification.
+
+\vspace{-2.5mm}
+\subsection{REM}
+REM performs \textit{post-extraction} semantic repair to attempt to bring the extracted code back into alignment with Rust's ownership and lifetime rules. Whilst much of the original REM toolchain's efforts have been integrated into the extraction process, we still rely heavily on the most complex part of REM's analysis: the Lifetime reification. We introduce, propagate, and constrain lifetime parameters to satisfy the borrow checker, generalising where necessary.
+
+As detailed earlier, REM treats the compiler as an oracle: it iterates repairs until the program compiles, and then attempts to apply lifetime elision to produce a human-readable signature (where practical) and a function body that aligns as closely as possible to idiomatic Rust. The output of REM is thus the repaired program $P'$, which is then passed onto CHARON to begin the process of discharging equivalence obligations. 
+
+\vspace{-2.5mm}
+\subsection{CHARON}
+\label{subsec:charon}
+
+The first (new) stage of our verification pipeline is translation from Rust into a
+lower-level, verification-friendly form. This role is performed by
+\textbf{CHARON}, a Rust to LLBC (Low-Level Borrow Calculus) translator. CHARON
+accepts Rust source code (or more precisely, its compiler intermediate
+representation MIR) \footnote{Even more precisely, the tool itself accepts Rust
+code, but its initial steps rely on a complex interaction with \texttt{rustc} to
+acquire the MIR}. CHARON's main task is to extract complex semantic information
+from \verb|rustc| and produce a machine readable output containing said
+information. Up until this point, we have been working with / reasoning about a single file. Whilst this kept extraction lightning fast, CHARON's support for single file conversion is limited at best\footnote{CHARON can convert just a single file, but it relies on \texttt{rustc} to do so, and as such the single file must be self contained, which we cannot guarantee}. 
+
+Thus at this stage, we construct two ``virtual'' crates within the users temporary directory (\icodeverb{std::env::temp()}). The advantages of this approach are:
+\begin{enumerate}
+    \item Any changes the user makes to their source code whilst we are performing the later stages of analysis will not get passed down to us (potentially introducing half written words or other bugs that would fail immediately)
+    \item We do not require a file lock on the users code, so they can continue work
+    \item We can safely abstract away the creation / deletion of the virtual crates, and have them live for only so long as the equivalence engine runs for, using a custom implementation of the \icodeverb{Drop} trait. 
+    \item We can limit the data passing over the JSON-RPC bridge to just the original and extracted code for the file the user is working in. 
+\end{enumerate}
+
+CHARON then performs several non-trivial transformations:
+\begin{itemize}
+  \item \textbf{Structured control flow.}  
+    MIR is a control-flow graph with arbitrary \icodeverb{goto}s; CHARON reconstructs
+    this into structured \icodeverb{if}, \icodeverb{match}, and \icodeverb{loop} constructs,
+    or preserves the raw form with the \texttt{--ullbc} option.
+
+  \item \textbf{Trait and type resolution.}  
+    Explicitly records how trait bounds are proven, normalises default methods,
+    and can transform associated types into explicit parameters
+    (\texttt{--remove-associated-types}).
+
+  \item \textbf{Lifetime handling.}  
+    Hides the distinction between early- and late-bound variables and makes
+    implied bounds explicit, simplifying reasoning about generic functions.
+
+  \item \textbf{Closures and vtables.}  
+    Represented as ordinary structs implementing the relevant \texttt{Fn*}
+    traits, making them accessible to later verification steps.
+
+  \item \textbf{Noise reduction.}  
+    Options such as \texttt{--hide-marker-traits} remove built-in traits
+    (\icodeverb{Sized}, \icodeverb{Send}, etc.) that would otherwise clutter the output.
+\end{itemize}
+
+The result is a cleaned, semantically faithful program in LLBC form. Unlike raw
+MIR, which is compiler-oriented, LLBC is designed for verification: ownership
+and borrowing are represented directly, trait resolution is explicit, and
+control flow is structured. A sample program and small portion of its MIR are
+shown below. However, the output of CHARON is not designed for human
+readability, and even the tiny program in Figure \ref{fig:charon_translation}
+produces over 140,000 characters of LLBC. This (very verbose) explicitness is
+what enables the subsequent translation into pure functional code for
+verification.
+
+\begin{figure}[ht]
+  \small
+  \centering
+  \begin{minipage}[t]{0.45\linewidth}
+    \inputminted[fontsize=\footnotesize]{rust}{3_Chapter3/CHARON_example/rust.rs}
+    \vfill
+    \captionsetup{type=listing}
+    \caption{Rust source}
+  \end{minipage}
+  \hfill
+  \begin{minipage}[t]{0.45\linewidth}
+    \inputminted[fontsize=\footnotesize]{text}{3_Chapter3/CHARON_example/mir.txt}
+    \vfill
+    \captionsetup{type=listing}
+    \caption{Excerpt of MIR (\texttt{rustc})}
+  \end{minipage}
+  \captionsetup{justification=centering}
+  \caption{Illustration of CHARON's role. While only Rust and MIR are shown here, CHARON translates the MIR into LLBC. The LLBC is only designed to be machine readable, and as such is ommitted}
+  \label{fig:charon_translation}
+\end{figure}
+
+\vspace{-2.5mm}
+\subsection{AENEAS}
+With the program translated into LLBC by CHARON, the next stage of the pipeline
+is handled by \textbf{AENEAS}. AENEAS takes the borrow- and lifetime–explicit
+LLBC and translates it into a \emph{purely functional form}, stripping away
+low-level memory operations while preserving the program's semantics. This
+functionalisation step is what makes the program suitable for downstream
+reasoning in Coq: instead of reasoning about references and loans, we can reason
+about values and functions. Currently AENEAS supports translation into
+\emph{Coq, Lean, HOL4}, and \emph{F*}.
+
+In practice, AENEAS acts as the bridge between compiler-level detail and
+proof-level abstraction. CHARON ensures that all the complexities of lifetimes,
+loads, and trait resolution are made explicit; AENEAS then packages these into a
+form where correctness properties can be stated and proved without touching the
+borrow checker or the stack/heap. Within the context of our pipeline, this is the point where Rust
+code ``stops being Rust'' and becomes a functional program whose equivalence can
+be checked in Coq.
+
+\vspace{-2.5mm}
+\subsection{Coq}
+AENEAS translates the LLBC into a purely functional form, targeting Coq. The
+final stage of the pipeline then combines the two generated Coq files ($P_{coq}$
+and $P'_{coq}$), together with all auxiliary information needed to
+automatically verify the equivalence between the original and refactored Rust
+programs. A key challenge at this stage is the verbosity of the generated Coq
+code (as illustrated in Listing~\ref{lst:complex-wrong-coq}), which led us to
+implement a custom Coq tokeniser and parser tailored to the format emitted by
+AENEAS.
+
+In parallel with these translations, the equivalence prover’s main task is to
+produce the \texttt{EquivCheck.v} file. This module instantiates both the
+original and refactored definitions and generates an equivalence theorem, which
+is a Coq encoding of the obligation(s) described in Section~\ref{sec:proof_obligations}. In practice, this means the Coq project is set up so that
+it automatically checks that the two versions produce the same results for all
+inputs. We defer the details of the proof obligations to that section; the key
+point here is that the generated Coq project is self-contained: once compiled,
+the equivalence is verified without further user intervention.
+
+\vspace{-2.5mm}
+\subsubsection*{What is Coq?}
+Coq is an interactive theorem prover and proof assistant built on a dependently
+typed functional language. It allows developers to define mathematical objects,
+programs, and logical propositions, and to construct machine-checked proofs
+about them. Every proof is validated by Coq's small, trusted kernel, giving very
+high assurance of correctness. Coq has a long history of use in large-scale
+verification projects—such as CompCert (a verified C compiler) and formally
+verified operating systems—making it a natural fit for reasoning about the
+safety and correctness of Rust programs.
+
+\vspace{-2.5mm}
+\subsubsection*{Why Coq?}
+Coq was selected over alternatives such as HOL4, Lean, or F* for three main reasons:
+\begin{itemize}[leftmargin=*,itemsep=0pt,topsep=2pt]
+  \item \textbf{Mature ecosystem}  
+    Decades of development have produced robust tooling, extensive libraries,
+    and a stable kernel.
+
+  \item \textbf{Direct integration}  
+    AENEAS already targets Coq, whereas HOL4 and Lean would require substantial
+    new backends for compatibility.
+
+  \item \textbf{Automation}  
+    Coq's tactic language and SMT integrations allow many routine proofs—
+    such as equivalence checks—to be discharged automatically.
+\end{itemize}
+
+Lean and HOL4 both provide highly expressive grammars, but at the cost of
+significant engineering effort to integrate with AENEAS \footnote{They both require even more additional supporting architecture on top of the current pipeline}. Whilst F* would require the least additional infrastructure, the platform is not that mature mature and would also duplicate existing
+functionality. Coq therefore offers the best combination of maturity,
+automation, and direct compatibility with our pipeline.

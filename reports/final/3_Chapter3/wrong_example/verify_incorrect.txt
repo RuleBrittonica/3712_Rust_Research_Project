@@ -1,0 +1,5 @@
+COQ_PROJECT: cases/4.1_examples/bad_verif/_CoqProject
+EQUIVCHECK: cases/4.1_examples/bad_verif/EquivCheck.v
+PRIMITIVES: cases/4.1_examples/bad_verif/Primitives.v
+SUCCESS: false
+OUTPUT_END

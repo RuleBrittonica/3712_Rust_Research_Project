@@ -1,25 +1,25 @@
-\chapter{Automatic Verification of Refactored Code}
+\chapter{Automatic Equivalence Proofs for Refactored Code}
 \label{chap:verification}
-
+\vspace*{-20mm}
 %  Approx 8-10 pages
 
 % This chapter presents the second innovation: automated equivalence proofs
 % without user annotations.
 
-In the strictest sense, refactoring is defined as a behavior-preserving code
+In the strictest sense, refactoring is defined as a behaviour-preserving code
 transformation. In practice, refactoring is only valuable if it preserves the
 original program's behaviour. In Rust, where ownership and lifetimes enforce
 strict invariants, the mere fact that refactored code compiles does not
-guarantee equivalence. Additionally, because REM performs complex,
+guarantee equivalence. Additionally, because REM2.0 performs complex,
 compiler-guided repairs as part of its extraction process
 \cite{AdventureOfALifetime}, there is an increased risk of introducing subtle
 changes in program behaviour. Subtle shifts in aliasing or lifetime structure
 can produce programs that pass the compiler yet diverge semantically from their
-originals. For high-assurance domains, this risk is unacceptable: automated
+originals. Additionally, as Section~\ref{subsec:extraction_failures} shows, automated extract method tooling can produce incorrect extractions that still compile. For high-assurance domains, this risk is unacceptable: automated
 tools must not only generate compiling code but also provide evidence that
-transformations are correct.
+transformations are correct. 
 
-This chapter introduces a novel verification pipeline that extends REM with
+This chapter introduces a novel equivalence proof pipeline that extends REM2.0 with
 automatic, annotation-free proofs of equivalence between original and refactored
 code. Our approach combines the existing formal methods toolchains - CHARON
 \footnote{More information accessible from their GitHub, \url{https://github.com/AeneasVerif/charon}}, which
@@ -29,277 +29,360 @@ then generates Coq code equivalent to the original Rust source through a pure
 $\lambda$-calculus based intermediary. We then use this Coq code to formally prove that the refactored code is equivalent to the original.
 The result is an end-to-end system in which the Extract $\rightarrow$ Repair
 cycle is followed by a Verify phase, discharging proofs in seconds with no
-additional burden on the developer. By embedding verification directly into the
-refactoring process, we move beyond compilation success to true semantic
-assurance, whilst also bridging the gap between theory and practical developer tools.
+additional burden on the developer. By embedding automated equivalence proofs directly into the
+refactoring process, we provide developers with the option to move beyond compilation success to true semantic assurance, whilst also bridging the gap between theory and practical developer tools.
 
-\section{Motivation: Why Verification is Essential}
-\label{sec:motivation_verification}
+Throughout this section (and previously) we do occasionally refer to the equivalence checker as a ``verifier''. We acknowledge that the work it performs isn't verification in the strictest sense of the word, but it suits the language much better. 
 
-Despite decades of work on automated refactoring, developers continue to show
-reluctance to adopt such tools in practice. Empirical studies indicate that even
-simple, “safe” refactorings such as renaming are frequently performed manually,
-as programmers prefer to trust their own edits over opaque tool behaviour
-\cite{OneThousandOneStories-SoftwareRefactoring}. This gap stems from usability
-and, more fundamentally, from trust: if a refactoring tool cannot convincingly
-guarantee that semantics are preserved, developers are unwilling to rely on it
-for non-trivial code transformations.
+% \vspace*{-5mm}
+\section{What if Extraction Goes Wrong?}
+\label{sec:extraction_goes_wrong}
+\vspace{-2.5mm}
+% Introduce a "trivial" case where the refactoring engine gets the refactoring wrong.
+% Then demonstrate that the verifyer would catch this error and tell the developer about it.
 
-The challenge is particularly problematic in Rust. Compared to languages like Java or
-C\#, where refactorings operate largely at the syntactic or type level, Rust's
-ownership and lifetime system makes every transformation potentially semantic.
-Prior work shows that Extract Method in Rust is not merely ``cut and paste'' but
-requires compiler-guided repairs such as introducing lifetime parameters,
-reifying control flow, and inferring ownership modes
-\cite{AdventureOfALifetime}. Crucially, the final step to the original REM
-algorithm involves a series of non-trivial lifetime adjustments, guided by
-\verb|rustc|, to ensure that the extracted code satisfies the borrow checker.
-Whilst these are what is required to enable REM to succeed where na\"ive tools fail, but they also
-make unintended behavioural or semantic changes more likely. A transformation that
-compiles may nonetheless shift aliasing patterns, extend or shorten lifetimes,
-or alter when resources are released — all of which are semantically observable
-in Rust.
+% The VSCode extension (previous section) implements this as an error message clearly displayed to the user, and gives them the option to revert their code to the state it was just before performing the extraction
 
-Traditional quality controls such as testing do not fill this gap. Tests, even
-when comprehensive, explore only a small subset of possible inputs and
-interleavings. In safety or performance critical domains, developers cannot
-afford to accept the residual risk that untested paths diverge after a
-refactoring. Verification, by contrast, offers a principled way to resolve the
-trust deficit: it can establish - on a program by program basis - that for all
-inputs respecting the refactored function's preconditioned, that the refactored
-program is equivalent to the orginal. By integrating verification directly into
-REM's pipeline, we address not only the technical challenge of making complex
-extractions compile, but also the socio-technical challenge of making developers
-confident that such transformations are behaviour-preserving.
+Automated extraction is not infallible: incorrect handling of ownership or mutation
+can silently alter program semantics. To demonstrate the reason why we have built the verifier, and its role in REM2.0, we consider a trivial but illustrative example where the extractor mishandles a mutable
+binding\footnote{Our extraction pipeline does not perform this extraction incorrectly, but previous tools, especially the ones evaluated against in Adventure of a Lifetime could make similar mistakes. This example is a demonstration of such a failed extraction.}. The verifier correctly identifies the non-equivalence and reports the
+failure to the developer through the VSCode extension interface, offering an option
+to automatically revert to the previous state. Figure~\ref{fig:extract_wrong_rust} shows the case we are working with, along with a correct extraction (passing the mutable reference to x, \icodeverb{&mut x}), and an incorrect extraction (passing a cloned `x' instead \icodeverb{x.clone()}). This error sidesteps Rusts safety guarantees as the compiler cannot prove what \icodeverb{x} is at compile time, and thus we get a runtime crash as shown by Listing\ref{lst:incorrect_extraction_crash}. 
 
-\newpage
-\section{Overview of the Verification Pipeline}
-\label{verification pipeline}
+\begin{figure}[H]
+\centering
 
-\begin{wrapfigure}{tr}{0.5\textwidth} % r = right, width = half page
-  \centering
-  \vspace{\baselineskip}
-  \vspace{\baselineskip}
-  \vspace{\baselineskip}
-
-  \begin{tikzpicture}[node distance=2cm, >=stealth, thick]
-    % Nodes
-    \node[draw, rounded corners, fill=blue!10, minimum width=6cm, minimum height=1cm] (extract) {1. Extraction};
-    \node[draw, rounded corners, fill=blue!10, minimum width=6cm, minimum height=1cm, below of=extract] (rem) {2. REM Repairs};
-    \node[draw, rounded corners, fill=blue!10, minimum width=6cm, minimum height=1cm, below of=rem] (charon) {3. CHARON (LLBC)};
-    \node[draw, rounded corners, fill=blue!10, minimum width=6cm, minimum height=1cm, below of=charon] (aeneas) {4. AENEAS (Functionalisation)};
-    \node[draw, rounded corners, fill=blue!10, minimum width=6cm, minimum
-    height=1cm, below of=aeneas] (coq) {5. Coq Verification};
-
-    % Arrows
-    \draw[->] (extract) -- (rem);
-    \draw[->] (rem) -- (charon);
-    \draw[->] (charon) -- (aeneas);
-    \draw[->] (aeneas) -- (coq);
-  \end{tikzpicture}
-  \caption{Overview of the verification pipeline: from source code extraction to proof of observational equivalence in Coq.}
-  \label{fig:verification_pipeline}
-\end{wrapfigure}
-
-The verification pipeline augments REM's extract-and-repair workflow with an
-automatic equivalence check. Its design is guided by two principles: (1)
-verification must require no additional annotations or input from the developer,
-and (2) it must complete quickly enough to fit into interactive IDE workflows.
-To achieve this, the pipeline translates both the original program $P$ and the
-refactored program $P'$ into progressively more structured semantic
-representations, culminating in a machine-checked proof of observational
-equivalence.
-
-At a high level, the pipeline consists of five stages: \textbf{Extraction},
-\textbf{REM repairs}, \textbf{CHARON translation}, \textbf{AENEAS
-functionalisation}, and \textbf{Coq verification}. Each stage builds on the
-previous one, gradually exposing the semantics of the refactored code while
-preserving a clear correspondence to the original. Figure
-~\ref{fig:verification_pipeline} provides an overview of the entire process. We will only very briefly cover off on extraction and lifetime repairing in this chapter, please refer to Chapter \ref{chap:expanding_rem} for the full scope. 
-
-\subsection{Extraction}
-
-Extraction lifts a user-selected region into a new function and replaces the selection with a call at the original site. As detailed in Section \ref{sec:single_file_analysis}, this step is powered by a Rust-Analyzer (RA) backed engine that performs single-file incremental analysis. It resolves the selection’s AST and symbol information in memory and synthesises a function skeleton together with the call-site edit.
-
-The extraction result is returned as a deterministic set of edits (a patch) and a machine-readable summary for downstream stages. By design, the extractor does not attempt to finalise lifetimes or advanced ownership modes—that responsibility is delegated to REM’s repair phase. This separation keeps extraction millisecond fast and predictable, and completely independent of crate size, while ensuring a stable interface for the later verification.
-
-\subsection{REM}
-
-REM performs \textit{post-extraction} semantic repair to attempt to bring the extracted code back into alignment with Rust's ownership and lifetime rules. Whilst much of the original REM toolchain's efforts have been integrated into the extraction process, we still rely heavily on the most complex part of REM's analysis: the Lifetime reification. We introduce, propagate, and constrain lifetime parameters to satisfy the borrow checker, generalising where necessary.
-
-As detailed earlier, REM treats the compiler as an oracle: it iterates repairs until the program compiles, and then attempts to apply lifetime elision to produce a human-readable signature (where practical) and a function body that aligns as closely as possible to idiomatic Rust. The output of REM is thus the repaired program $P'$, which is then passed onto CHARON to begin the process of discharging equivalence obligations. 
-
-\subsection{CHARON}
-\label{subsec:charon}
-
-The first stage of our verification pipeline is translation from Rust into a
-lower-level, verification-friendly form. This role is performed by
-\textbf{CHARON}, a Rust to LLBC (Low-Level Borrow Calculus) translator. CHARON
-accepts Rust source code (or more precisely, its compiler intermediate
-representation MIR) \footnote{Even more precisely, the tool itself accepts Rust
-code, but its initial steps rely on a complex interaction with \texttt{rustc} to
-acquire the MIR}. CHARON's main task is to extract complex semantic information
-from \verb|rustc| and produce a machine readable output containing said
-information.
-
-CHARON performs several non-trivial transformations:
-\begin{description}[leftmargin=!,labelwidth=2cm]
-  \item[Structured control flow.] MIR is a control-flow graph with arbitrary
-  \texttt{goto}s; CHARON reconstructs this into structured \texttt{if},
-  \texttt{match}, and \texttt{loop} constructs, or preserves the raw form with
-  the \texttt{--ullbc} option.
-  \item[Trait and type resolution.] Explicitly records how trait bounds are
-  proven, normalises default methods, and can transform associated types into
-  explicit parameters (\texttt{--remove-associated-types}).
-  \item[Lifetime handling.] Hides the distinction between early- and late-bound
-  variables and makes implied bounds explicit, simplifying reasoning about
-  generic functions. \item[Closures and vtables.] Represented as ordinary
-  structs implementing the relevant
-  \texttt{Fn*} traits, making them accessible to later verification steps.
-  \item[Noise reduction.] Options such as \texttt{--hide-marker-traits} remove
-  built-in traits (\texttt{Sized}, \texttt{Send}, etc.) that would otherwise
-  clutter the output.
-\end{description}
-
-The result is a cleaned, semantically faithful program in LLBC form. Unlike raw
-MIR, which is compiler-oriented, LLBC is designed for verification: ownership
-and borrowing are represented directly, trait resolution is explicit, and
-control flow is structured. A sample program and small portion of its MIR are
-shown below. However, the output of CHARON is not designed for human
-readability, and even the tiny program in Figure \ref{fig:charon_translation}
-produces over 140,000 characters of LLBC. This (very verbose) explicitness is
-what enables the subsequent translation into pure functional code for
-verification.
-
-\begin{figure}[ht]
-  \centering
-  \begin{minipage}[t]{0.45\linewidth}
-    \inputminted[linenos, breaklines, frame=none, fontsize=\footnotesize]{rust}{3_Chapter3/CHARON_example/rust.rs}
-    \vfill
-    \caption*{Rust source}
-  \end{minipage}
-  \hfill
-  \begin{minipage}[t]{0.45\linewidth}
-    \inputminted[linenos, breaklines, frame=none, fontsize=\footnotesize]{text}{3_Chapter3/CHARON_example/mir.txt}
-    \vfill
-    \caption*{Excerpt of MIR (\texttt{rustc})}
-  \end{minipage}
-  \caption{Illustration of CHARON's role. While only Rust and MIR are shown here, CHARON translates the MIR into LLBC}
-  \label{fig:charon_translation}
-\end{figure}
-
-\subsection{AENEAS}
-
-With the program translated into LLBC by CHARON, the next stage of the pipeline
-is handled by \textbf{AENEAS}. AENEAS takes the borrow- and lifetime–explicit
-LLBC and translates it into a \emph{purely functional form}, stripping away
-low-level memory operations while preserving the program's semantics. This
-functionalisation step is what makes the program suitable for downstream
-reasoning in Coq: instead of reasoning about references and loans, we can reason
-about values and functions. Currently AENEAS supports translation into
-\emph{Coq, Lean, HOL4}, and \emph{F*}.
-
-In practice, AENEAS acts as the bridge between compiler-level detail and
-proof-level abstraction. CHARON ensures that all the complexities of lifetimes,
-loads, and trait resolution are made explicit; AENEAS then packages these into a
-form where correctness properties can be stated and proved without touching the
-borrow checker or the stack/heap. For our pipeline, this is the point where Rust
-code ``stops being Rust'' and becomes a functional program whose equivalence can
-be checked in Coq.
-
-The central insight behind AENEAS is that Rust's ownership discipline makes much of low-level memory reasoning unnecessary.
-
-\subsection{Coq}
-% Potentially include a small paragraph here explaining what Coq is, for the uninitiated.
-
-AENEAS translates the LLBC into a purely functional form, in this case Coq. The
-final stage of the pipeline is thus to join the two Coq files ($P_{coq}$ and
-$P'_{coq}$) with all of the auxiliary information needed to automatically verify
-equivalence between the original and refactored Rust programs.
-
-\subsubsection*{What is Coq?}
-Coq is an interactive theorem prover and proof assistant built on a dependently
-typed functional language. It allows developers to define mathematical objects,
-programs, and logical propositions, and to construct machine-checked proofs
-about them. Every proof is validated by Coq's small, trusted kernel, giving very
-high assurance of correctness. Coq has a long history of use in large-scale
-verification projects—such as CompCert (a verified C compiler) and formally
-verified operating systems—making it a natural fit for reasoning about the
-safety and correctness of Rust programs.
-
-\subsubsection*{Why Coq?}
-Coq was selected over alternatives such as HOL4, Lean, or F* for three main reasons:
-\begin{description}[leftmargin=!,labelwidth=2.5cm]
-    \item[Mature ecosystem] Decades of development have produced robust tooling, extensive libraries, and a stable kernel.
-    \item[Direct integration] AENEAS already targets Coq, whereas HOL4 and Lean would require substantial new backends for compatibility.
-    \item[Automation] Coq's tactic language and SMT integrations allow many routine proofs—such as equivalence checks—to be discharged automatically.
-\end{description}
-
-Lean and HOL4 both provide highly expressive logics, but at the cost of
-significant engineering effort to integrate with AENEAS. F* is closer in spirit
-to AENEAS, but the platform is less mature and would duplicate existing
-functionality. Coq therefore offers the best combination of maturity,
-automation, and direct compatibility with our pipeline.
-
-\subsubsection*{Verification Example}
-
-The below example, whilst trivial, aims to convey how this relatively complex dance works under the hood. Starting from a successful extraction of the Rust source code, shown below:
-
-\begin{figure}[h]
+\begin{subfigure}[t]{0.32\textwidth}
     \centering
-    \begin{subfigure}{0.45\linewidth}
-      \inputminted[fontsize=\footnotesize, frame=none, linenos=false, breaklines=true, breakanywhere=true]{rust}{3_Chapter3/simple_original.rs}
-      \caption{Function before extraction}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}{0.45\linewidth}
-      \inputminted[fontsize=\footnotesize, frame=none, linenos=false, breaklines=true, breakanywhere=true]{rust}{3_Chapter3/simple_extracted.rs}
-      \caption{Function after extraction}
-    \end{subfigure}
-    \captionsetup{justification=centering}
-\end{figure}
-
-We then use the pipeline described in the previous sections to get to the stage of having a Coq translation of the whole crate before and after extraction\footnote{At this stage CHARON requires a whole crate of context, despite it not being needed for the actual extraction. Under the hood we just construct a ``virtual'' crate that is what the crate would be post extraction.}. Before we look at the translations themselves, it is worth also noting the supporting
-infrastructure. AENEAS generates not just the Coq files for individual
-functions, but also a small project scaffold. The \texttt{Primitives.v} file
-defines the Coq representations of Rust's core datatypes (\texttt{i32},
-\texttt{Vec}, \texttt{Option}, etc.), providing a foundation on which the
-translations depend. We then generate \texttt{\_CoqProject} file that ties the entire build
-together, specifying all dependencies and runtime conditions so that the project can be
-automatically compiled and checked consistently.
-
-\begin{figure}[h]
-  \centering
-  \begin{minipage}{0.45\linewidth}
-    \inputminted[linenos, breaklines, frame=none, fontsize=\footnotesize]{coq}{3_Chapter3/COQ_example/simple.v}
-    \caption*{Original translation}
-  \end{minipage}\hfill
-  \begin{minipage}{0.45\linewidth}
-    \inputminted[linenos, breaklines, frame=none, fontsize=\footnotesize]{coq}{3_Chapter3/COQ_example/simple_ref.v}
-    \caption*{Refactored translation}
-  \end{minipage}
-  \caption{Coq translations for the simple example.}
-  \label{fig:coq_simple}
-\end{figure}
-
-Alongside these translations, the verifyer's main job is to produce the \texttt{EquivCheck.v}
-file. This module instantiates both the original and refactored definitions and
-generates an equivalence theorem. This theorem is a Coq representation of the obligation(s) covered in Section \ref{sec:proof_obligations}. In practice, this means the Coq project is set
-up to automatically check that the two versions produce the same results for all
-inputs. We defer discussion of the proof obligations themselves to
-Section~\ref{sec:proof_obligations}, but here the important point is that the
-generated Coq project is self-contained: once compiled, the equivalence is
-verified without further user intervention.
-
-\begin{figure}[h]
+    \inputminted[
+        fontsize=\scriptsize,
+        linenos,
+        frame=lines
+    ]{rust}{3_Chapter3/wrong_example/original.rs}
+    \sublistingcaption{Original Code}
+    \label{lst:extraction-original}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.32\textwidth}
     \centering
-    \inputminted[linenos, breaklines, frame=non, fontsize=\footnotesize]{coq}{3_Chapter3/COQ_example/equiv_check.v}
-    \caption{The generated equivalence check for the above programs}
-    \label{fig:coq_equiv_check}
+    \inputminted[
+        fontsize=\scriptsize,
+        linenos,
+        frame=lines
+    ]{rust}{3_Chapter3/wrong_example/correct_extraction.rs}
+    \sublistingcaption{Correct Extraction}
+    \label{lst:extraction-correct}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.32\textwidth}
+    \centering
+    \inputminted[
+        fontsize=\scriptsize,
+        linenos,
+        frame=lines
+    ]{rust}{3_Chapter3/wrong_example/incorrect_extraction.rs}
+    \sublistingcaption{Incorrect Extraction}
+    \label{lst:extraction-incorrect}
+\end{subfigure}
+
+\captionsetup{justification=centering}
+\caption{Comparison of the original program, a correct extraction, and an incorrect extraction that clones rather than mutably borrows.}
+\label{fig:extract_wrong_rust}
 \end{figure}
 
+\inputminted{bash}{3_Chapter3/wrong_example/terminal_out.txt}
+{
+\captionsetup{justification=centering}
+\captionof{listing}{Terminal output from running the incorrect extraction. The program crashes at runtime, not at compile time.}
+\label{lst:incorrect_extraction_crash}
+}
+
+From here, we generate a semantically equivalent file, but in the Coq proof assistant language. In Figure~\ref{fig:extract_wrong_coq} below, we list the important parts of these translations. Other aspects (e.g. the complex definitions that translate Rust types to Coq types) have been ignored and will be covered later in Section~\ref{sec:implementation_verification}. Also note that rustc has performed some static optimisations on the code before translation, at this stage there is no way to disable them within CHARON so Listing~\ref{lst:coq-original} is visually different to the rust implementation.
+
+\begin{figure}[H]
+\centering
+
+\begin{subfigure}[t]{0.32\textwidth}
+    \centering
+    \inputminted[
+        fontsize=\scriptsize,
+        linenos,
+        frame=lines,
+        breaklines,
+    ]{rust}{3_Chapter3/wrong_example/Original.v}
+    \sublistingcaption{Original Code}
+    \label{lst:coq-original}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.32\textwidth}
+    \centering
+    \inputminted[
+        fontsize=\scriptsize,
+        linenos,
+        frame=lines,
+        breaklines, 
+    ]{rust}{3_Chapter3/wrong_example/CorrectExtraction.v}
+    \sublistingcaption{Correct Extraction}
+    \label{lst:coq-correct}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.32\textwidth}
+    \centering
+    \inputminted[
+        fontsize=\scriptsize,
+        linenos,
+        frame=lines,
+        breaklines
+    ]{rust}{3_Chapter3/wrong_example/IncorrectExtraction.v}
+    \sublistingcaption{Incorrect Extraction}
+    \label{lst:coq-incorrect}
+\end{subfigure}
+
+\captionsetup{justification=centering}
+\caption{Comparison of the original program, a correct extraction, and an incorrect extraction that clones rather than mutably borrows.}
+\label{fig:extract_wrong_coq}
+\end{figure}
+\vspace{-2.5mm}
+
+Having obtained the AENEAS-generated Coq representations of both the correct and incorrect extractions, we now perform an automated equivalence check. This step constitutes a concrete implementation of the proof obligations described in Section~\ref{sec:proof_obligations}. In essence, the verifier constructs and discharges a proof showing that, for all possible inputs to the caller function, the original and refactored programs produce identical results. Because the verification operates within Coq's pure, functional semantics—free from hidden side effects or mutable state—the resulting proof provides strong assurance of behavioural equivalence.
+
+\begin{figure}[H]
+\centering
+%  Top row: Equivalence specifications 
+\begin{subfigure}[t]{0.48\textwidth}
+    \centering
+    \inputminted[fontsize=\scriptsize, frame=lines]{coq}{3_Chapter3/wrong_example/EquivCorrect.v}
+    \sublistingcaption{Equivalence Check (Correct Extraction)}
+    \label{lst:verify-equivalence-correct}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.48\textwidth}
+    \centering
+    \inputminted[fontsize=\scriptsize, frame=lines]{coq}{3_Chapter3/wrong_example/EquivIncorrect.v}
+    \sublistingcaption{Equivalence Check (Incorrect Extraction)}
+    \label{lst:verify-equivalence-incorrect}
+\end{subfigure}
+
+\vspace{6pt}
+
+%  Bottom row: Verifier results 
+\begin{subfigure}[t]{0.48\textwidth}
+    \centering
+    \inputminted[fontsize=\scriptsize, frame=lines]{bash}{3_Chapter3/wrong_example/verify_correct.txt}
+    \sublistingcaption{Verifier Output (Correct Extraction)}
+    \label{lst:verify-output-correct}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.48\textwidth}
+    \centering
+    \inputminted[fontsize=\scriptsize, frame=lines]{bash}{3_Chapter3/wrong_example/verify_incorrect.txt}
+    \sublistingcaption{Verifier Output (Incorrect Extraction)}
+    \label{lst:verify-output-incorrect}
+\end{subfigure}
+
+\captionsetup{justification=centering}
+\caption{Comparison of equivalence checking results for the correct and incorrect extractions. The verifier confirms semantic equivalence in the first case and correctly rejects the cloned variant as non-equivalent.}
+\label{fig:verify-results}
+\end{figure}
+\vspace{-2.5mm}
+
+In this example, the incorrectly extracted version introduces a cloned value (\icodeverb{x.clone()}) in place of a mutable borrow, thereby altering the program's semantics while still producing compilable Rust code. Through the equivalence checks shown in Figure~\ref{fig:verify-results}, the equivalence checker detects this discrepancy by symbolically comparing the Coq representations of both versions and rejecting the transformed function as non-equivalent. Within the REM2.0 workflow, this failure is brought directly to the developer via the VSCode extension as a clear error message, accompanied by an option to automatically revert to the pre-extraction state.
+
+\vspace{-5mm}
+\section{Demonstrating Non-Trivial Verification}
+\label{sec:non_trivial_verification}
+\vspace{-2.5mm}
+
+The previous section showcased a deliberately trivial case to serve as an introduction to the concept, and to illustrate how the equivalence checker guards against obvious semantic breakages. In contrast, real refactorings can involve nested loops, const generics, ownership subtleties, and type-level invariants that interact in ways which are far less visible in the surface syntax. In this section we examine a more realistic example, inspired by an incorrect extraction found in the Vaultwarden code base, where the refactoring compiles, typechecks, and appears superficially reasonable, yet silently changes the program's behaviour. The aim here is to demonstrate that the verifier is not merely checking syntactic structure nor trivially returning success, but is able to detect subtle semantic divergences that Rust's type system alone cannot rule out.
+
+\begin{figure}[H]
+\centering
+
+\begin{subfigure}[t]{0.48\textwidth}
+    \centering
+    \inputminted[
+        fontsize=\scriptsize,
+        linenos,
+        frame=lines
+    ]{rust}{3_Chapter3/complex_example/orig.rs}
+    \sublistingcaption{Original Code}
+    \label{lst:complex-original}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.48\textwidth}
+    \centering
+    \inputminted[
+        fontsize=\scriptsize,
+        linenos,
+        frame=lines
+    ]{rust}{3_Chapter3/complex_example/wrong.rs}
+    \sublistingcaption{Incorrect Extraction}
+    \label{lst:complex-wrong}
+\end{subfigure}
+
+\captionsetup{justification=centering}
+\caption{Original Function and Incorrect Extraction produced by the Engine. Example inspired by the failed Vaultwarden extraction, see Section~\ref{subsec:extraction_failures}}
+\label{fig:extract_wrong_rust}
+\end{figure}
+\vspace{-2.5mm}
+
+At a glance, the incorrect extraction appears harmless: the loop structure is preserved, the in-place update remains nested within an iterator, and Rust's type system accepts the transformation due to the array's \icodeverb{Copy} bound. However, because the extracted function takes its array \emph{by value} rather than by mutable reference, it mutates a temporary copy and discards it. This subtle deviation is difficult to detect manually and impossible for the compiler to reject. The equivalence checker, however, detects the mismatch by comparing the Coq translations of both versions and identifying that the caller's array is unchanged in the transformed program. As shown in Figure~\ref{fig:extract_wrong_rust_extended}, the equivalence check on the incorrect extraction fails\footnote{The assertions in listing \ref{lst:complex-wrong} also fail at runtime, they are used here to allow us to demonstrate the failure in Rust, and imitate a unit test.}, and REM2.0 is capable of passing this failure directly to the developer, preventing the silently incorrect refactoring from being applied.
+
+\begin{figure}[H]
+\centering
+
+% Top row: two side-by-side subfigures
+\begin{subfigure}[t]{0.48\textwidth}
+    \centering
+    \inputminted[
+        fontsize=\scriptsize,
+        linenos,
+        frame=lines,
+        breaklines
+    ]{coq}{3_Chapter3/complex_example/Orig.v}
+    \sublistingcaption{Original Code}
+    \label{lst:complex-original-coq}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.48\textwidth}
+    \centering
+    \inputminted[
+        fontsize=\scriptsize,
+        linenos,
+        frame=lines,
+        breaklines
+    ]{coq}{3_Chapter3/complex_example/Wrong.v}
+    \sublistingcaption{Incorrect Extraction}
+    \label{lst:complex-wrong-coq}
+\end{subfigure}
+
+% Optional vertical space between rows
+\vspace{0.5em}
+
+% Bottom row: one full-width subfigure
+\begin{subfigure}[t]{\textwidth}
+    \centering
+    \inputminted[
+        fontsize=\scriptsize,
+        linenos,
+        frame=lines,
+        breaklines
+    ]{bash}{3_Chapter3/complex_example/terminal_out.txt}
+    \sublistingcaption{Terminal output showing the verification failure}
+    \label{lst:complex-output}
+\end{subfigure}
+
+\captionsetup{justification=centering}
+\caption{Coq Translation and output of REM2.0's equivalence checker. // Note that some of Coq translation has been omitted for brevity. See Appendix~\ref{app:coq_translations} for the full translation.}
+\label{fig:extract_wrong_rust_extended}
+\end{figure}
+
+\vspace{-2.5mm}
+Together, these results demonstrate that the equivalence checker performs genuinely non-trivial reasoning: it succeeds only when two programs are behaviourally identical, and it rejects transformations that break behavioural equivalence even when the compiler accepts them and the syntactic structure appears valid. This establishes that the equivalence stage is a substantive correctness guarantee rather than a superficial or always-succeeding check.
+
+\vspace*{-5mm}
+\section{Handling of Likely Edge Cases}
+\label{sec:handling_of_complex_cases}
+\vspace{-2.5mm}
+
+While the previous section(s) have demonstrated the need for the equivalence checker, going into examples in depth, this section aims to show how we handle likely boundary conditions that do arise as a result of using the extraction engine. Out goal is to show that: (i) invalid patterns are rejected early by rustc (and surfaced into REM2.0 as actionable diagnostics), (ii) well-typed but ``degenerate'' shapes (no params, unit return, locally inferred \icodeverb{_}) translate cleanly through CHARON/AENEAS and verify as expected, and (iii) known limitations (e.g. \icodeverb{!}) are identified and cannot result in spurious ``success''.  The below table demonstrates each such edge case and what we expect to happen:
+
+{
+\setlength{\textwidth}{1.05\textwidth}   % make textwidth 10% wider
+\setlength{\LTleft}{-1cm}   % shift table 1.5cm into the left margin
+\setlength{\LTright}{0pt}     % no extra space on the right
+\small
+
+\begin{longtable}
+{|
+>{\raggedright\arraybackslash}p{0.15\textwidth}|
+>{\raggedright\arraybackslash}p{0.23\textwidth}|
+>{\raggedright\arraybackslash}p{0.10\textwidth}|
+>{\raggedright\arraybackslash}p{0.1\textwidth}|
+>{\raggedright\arraybackslash}p{0.34\textwidth}|
+}
+\hline
+\textbf{Case} &
+\textbf{Minimal Example} &
+\textbf{Rustc / Cargo} &
+\textbf{Translate} &
+\textbf{Equivalence Outcome / Notes} \\
+\hline
+\endfirsthead
+
+\hline
+\textbf{Case} &
+\textbf{Minimal Example} &
+\textbf{Rustc / Cargo} &
+\textbf{Translate} &
+\textbf{Verifier Outcome / Notes} \\
+\hline
+\endhead
+
+\hline
+\multicolumn{5}{r}{Continued on next page} \\
+\hline
+\endfoot
+
+\hline
+\endlastfoot
+
+No input arguments, Unit return or Both &
+\texttt{fn ping() \{ /* ... */ \}} \newline
+\texttt{fn reset(x: \&mut i32) \{ *x = 0; \}}  &
+OK &
+OK &
+Proof engine capable of unfolding functions without a \icodeverb{forall} clause. Reflexivity guarantees equivalence. \\
+\hline
+
+Unit return (explicit or inferred) &
+\texttt{fn touch(x:\&mut i32)\{ *x += 1; \}} \newline
+\texttt{fn f()->() \{ \}} &
+OK &
+OK &
+Equivalence checked via identical post-state; return value is \texttt{unit}. Side-effect modelling preserved. \\
+\hline
+
+\_ in parameter or return type &
+\texttt{fn g(x: \_)-> i32 \{ x+1 \}} \newline
+\texttt{fn h(x:i32)->\_ \{ x*2 \}} &
+\textbf{Error} (invalid signatures) &
+N/A &
+Rejected upstream by the compiler. No translation or proof attempted. \\
+\hline
+
+\_ in local binding (within body) &
+\texttt{let x: \_ = 42; let y = x+1;} &
+OK &
+OK &
+Type is concretised before/at MIR; Coq has a concrete integer type. Verifier succeeds as usual. \\
+\hline
+
+\texttt{!} (never) return type &
+\texttt{fn abort()->! \{ panic!("fail") \}} &
+OK &
+\textbf{Fails} &
+Excluded from verification set. REM 2.0 reports an unsupported-feature diagnostic; extraction may proceed but is not verified. \\
+\hline
+
+Non-local control flow in extracted region &
+\texttt{break}/\texttt{continue} inside loop body &
+OK &
+OK &
+Control flow reified as \texttt{std::ops::ControlFlow}. Verifier checks pattern-match and proves behavioural equivalence. \\
+\hline
+\caption{Edge-case coverage for extraction and verification. “Translate” refers to CHARON/AENEAS; “Verifier” to the equivalence checker.}
+\label{tab:edgecases} \\
+
+\end{longtable}}
+
+\vspace{-2.5mm}
+Taken together, these cases show that the pipeline neither devolves into trivial proofs, nor silently accepts unsupported constructs. Invalid signatures involving \icodeverb{_} are blocked by rustc and surfaced to the user; structurally simple but well-typed shapes (no params, unit return, local \icodeverb{_}) translate cleanly and verify; and known limitations (e.g., \icodeverb{!}) are explicitly reported and excluded from proof. This provides broad coverage over edge conditions while keeping the verifier's guarantees meaningful and trustworthy. Whilst the design specifications and implementation are detailed in Section~\ref{sec:implementation_verification} and Appendix~\ref{app:implementation_verification}, what we have demonstrated here reflects a core philosophy of the equivalence checker: to the best of its capacity, it must never report that two pieces of code are equivalent when they are not.
+
+\vspace*{-5mm}
 \section{Proof Obligations}
 \label{sec:proof_obligations}
+\vspace{-2.5mm}
 
 In the final stage of the verification pipeline, we discharge a formal
 \textit{equivalence obligation} inside Coq. Intuitively, we must show that the
@@ -307,91 +390,383 @@ refactored program behaves identically to the original program for all valid
 inputs. The central idea is functional equivalence: the observable outputs of
 the two programs must match.
 
+% Tighter spacing around display maths in this section only
+\begingroup
+\setlength{\abovedisplayskip}{4pt}
+\setlength{\belowdisplayskip}{4pt}
+\setlength{\abovedisplayshortskip}{2pt}
+\setlength{\belowdisplayshortskip}{2pt}
+
+\vspace{-2.5mm}
 \subsection{Simplified Obligation}
-In its simplest form, the obligation can be stated as:
+We write $\llbracket f \rrbracket$ for the semantic interpretation (meaning) of
+the function $f$ as produced by the AENEAS translation into Coq. Simply put, the obligation can be stated as:
+\begin{equation*}
+  \forall x \in \mathrm{Dom}(f).\;
+  \llbracket f \rrbracket(x) = \llbracket f' \rrbracket(x)
+\end{equation*}
+Where $f$ is the original function and $f'$ is its refactored counterpart. This
+expresses that for every possible construct of inputs $x$, the translated functions return identical
+results. In practice, this is the form we attempt to discharge automatically, as
+shown in Figure~\ref{lst:verify-equivalence-correct}.
 
-\[
-\forall x.\; \text{tr}(f)(x) = \text{tr}(f')(x)
-\]
-
-where \(f\) is the original function, \(f'\) is its refactored counterpart, and
-\(\text{tr}(\cdot)\) denotes the translation into Coq performed by AENEAS. This expresses that
-for every input \(x\), the translated functions return identical results. In practice, this is
-the form discharged automatically in our examples (see
-Section~\ref{sec:verification_examples}).
-% TODO make a section that has a couple of indepth examples (potentially as an appendix)
-
+\vspace{-2.5mm}
 \subsection{Whole-Program Context}
 For a more complete characterisation, we must acknowledge that functions are
 never executed in isolation, but as part of the enclosing program. Thus the
 obligation can be strengthened to whole-program equivalence:
+\begin{equation*}
+    \forall x \in \mathrm{Dom}(f).\; 
+    \llbracket f \rrbracket(x) = \llbracket f' \rrbracket(x)
+\end{equation*}
+Where $P$ is the original program and $P'$ is the refactored program, differing
+only in that $f$ is replaced by $f'$. This captures the fact that equivalence
+must hold regardless of how the function is used internally. An equivalent way to phrase this is through \textit{contextual equivalence}:
+\begin{equation*}
+    \forall x \in \mathrm{Dom}(f).\; 
+    \llbracket f \rrbracket(x) = \llbracket f' \rrbracket(x)
+\end{equation*}
+where $C[\cdot]$ denotes an arbitrary program context. This emphasises that the
+replacement of $f$ by $f'$ preserves behaviour under any calling environment. This is only true within the side-effect free functional environment that we translate into.
 
-\[
-\forall x.\; \text{tr}(P)(x) = \text{tr}(P')(x)
-\]
-
-where \(P\) is the original program and \(P'\) is the refactored program,
-differing only in that \(f\) is replaced by \(f'\). This captures the fact that
-equivalence must hold regardless of how the function is used internally.
-
-An equivalent way to phrase this is through \textit{contextual equivalence}:
-
-\[
-\forall C, x.\; \text{tr}(C[f])(x) = \text{tr}(C[f'])(x)
-\]
-
-where \(C[\cdot]\) denotes an arbitrary program context. This emphasises that the
-replacement of \(f\) by \(f'\) preserves behaviour under any calling
-environment.
-
+\vspace{-2.5mm}
 \subsection{Relation to Prior Work}
 Earlier work on AENEAS stated equivalence in a deliberately general form,
 including preconditions \(\Phi(x)\), effect traces \(\tau\), and projections
 \(\mathit{obs}(\tau)\) onto observable behaviours. These factors were
 necessary to account for impure features, partial programs, and richer effect
 semantics. In contrast, our pipeline deliberately restricts attention to a
-simpler setting. REM only produces well-typed, borrow-checked Rust fragments,
+simpler setting. REM2.0 produces well-typed, borrow-checked Rust fragments,
 and AENEAS is applied to safe Rust code without interior mutability or
-concurrency. Under these restrictions:
-\begin{itemize}
+concurrency. Hence:
+\begin{itemize}[noitemsep, topsep=0pt, leftmargin=*]
     \item Preconditions can be dropped, as REM ensures typing and borrow safety.
     \item Effect traces can be omitted, as our fragments are side-effect free
     modulo return values.
     \item Observable projections reduce to plain equality of results.
+    \item AENEAS guarantees that its transformations map directly back to the Rust source. If something holds in AENEAS's translation, it holds in Rust\cite{AENEAS, AENEAS_PART_2}. Hence no extra proof work is required (on our end) to uphold this
 \end{itemize}
 
 This simplification yields an obligation that is easier to state and automate,
 while still capturing the core requirement that refactoring preserves behaviour.
 
+\vspace{-3.5mm}
 \subsection{Practical Implications}
 The simplified obligation highlights a guiding design principle: the pipeline is
 intended to complement the extraction algorithm rather than over-approximate it.
-It is therefore preferable to \textit{fail early} when unsupported constructs
+It is therefore preferable to \textit{fail early} when unsupported constructs and language features
 are encountered, rather than risk certifying programs incorrectly. AENEAS
 reports unsupported features (e.g. closures or nested borrows) as translation
-failures, while Coq distinguishes between an unprovable equivalence and an
+failures, while the Coq implementation clearly distinguishes between an unprovable equivalence and an
 unsupported fragment. This separation ensures that developers never receive a
 false positive: code is either successfully verified, or it fails explicitly
-with a clear diagnostic.
-
-This leads naturally to the question of coverage: which Rust features are
+with a clear diagnostic. This leads naturally to the question of coverage: which Rust features are
 currently supported by AENEAS, and which remain open problems? We address this
-in the following section.
+in the final section of this chapter, Section~\ref{sec:limitations_verification}.
 
+\vspace{-5mm}
+\section{Implementation of the Equivalence Pipeline}
+\label{sec:implementation_verification}
+\vspace{-2.5mm}
+
+The design of REM2.0's automated equivalence checking is guided by two
+principles: (1) it must require no additional annotations or input from the
+developer, and (2) it must complete quickly to fit into interactive IDE
+workflows. To achieve this, the pipeline translates both the original program
+$P$ and the refactored program $P'$ through a sequence of more structured
+semantic representations, culminating in a machine-checked proof of
+observational equivalence. For brevity, this section only gives a
+very high-level overview of the architecture; Appendix~\ref{app:implementation_verification}
+contains the full technical details and examples.
+
+At a high level, the pipeline consists of five stages:
+\textbf{Extraction}, \textbf{REM repairs}, \textbf{CHARON translation},
+\textbf{AENEAS functionalisation}, and \textbf{Coq verification}. Each stage
+builds on the previous one, progressively exposing the semantics of the
+refactored code until we obtain a pure, functional model of both versions in
+Coq.
+
+\vspace{-3.5mm}
+\subsection{Extraction and Repair}
+The pipeline starts from REM2.0's extraction engine.
+Given a user selection, the extractor lifts the region into a new function and
+replaces it with a callsite adaptor. The extractor
+is unable to finalise lifetimes and thus it delegates these to REM's post-extraction repair phase.
+REM then performs \emph{lifetime repair} to bring the extracted program $P'$
+into agreement with the Rust borrow checker. It treats the
+compiler as an ``oracle'', iteratively repairing lifetimes until the program compiles, and applying lifetime elision where
+possible to recover idiomatic types and make the output as ``readable'' as possible. The result is a repaired, compiling version of the program.
+
+\vspace{-3.5mm}
+\subsection{Translation via CHARON and AENEAS}
+The next stages translate the Rust programs into a verification-oriented
+representation. CHARON takes the compiled MIR for both $P$ and $P'$ and produces
+LLBC (Low-Level Borrow Calculus), a machine only readable form in which all behinds the scenes logic of rust are made 100\% explicit. To keep this process
+stable with respect to edits in the user's workspace, REM2.0 constructs
+temporary ``virtual'' crates, which are memory isolated replicas of the original crate but with either the original or refactored function present. They are required to allow us to begin running CHARON. 
+
+AENEAS then transforms LLBC into a purely functional model, removing explicit
+stack and heap operations while preserving the semantics of the Rust program.
+In this form, programs are expressed as total functions over values rather than
+mutating references, which is far better suited to proof assistants. In our
+pipeline, AENEAS targets Coq, but in principle it can also emit encodings for
+other systems such as Lean, HOL4, or F*.
+
+\vspace{-3.5mm}
+\subsection{Equivalence Checking in Coq}
+\vspace{-1mm}
+The final stage assembles a Coq project containing the functional encodings of
+$P$ and $P'$ (produced by AENEAS) together with a generated module
+\texttt{EquivCheck.v}. This module instantiates the two versions, generates the
+equivalence theorem described in Section~\ref{sec:proof_obligations}, and
+invokes the necessary automation to show that they produce the same observable
+results for all inputs. Once the Coq project is compiled, the equivalence check
+is fully automatic: if the proof succeeds, we obtain a machine-checked guarantee
+that the refactoring preserved behaviour. The underlying Coq infrastructure, alternative backends, and
+example proof scripts and much more are discussed in extensive detail in
+Appendix~\ref{app:implementation_verification}.
+
+% \section{Implementation of the Verification Pipeline}
+% \label{sec:implemtation_verification}
+
+% \begin{minipage}[t]{0.55\textwidth}
+% \vspace{-90mm}
+% The design of REM2.0's equivalence checking is guided by two principles: (1)
+% verification must require no additional annotations or input from the developer,
+% and (2) it must complete quickly enough to fit into interactive IDE workflows.
+% To achieve this, the pipeline translates both the original program $P$ and the
+% refactored program $P'$ into progressively more structured semantic
+% representations, culminating in a machine-checked proof of observational
+% equivalence.
+
+% At a high level, the pipeline consists of five stages: \textbf{Extraction},
+% \textbf{REM repairs}, \textbf{CHARON translation}, \textbf{AENEAS
+% functionalisation}, and \textbf{Coq verification}. Each stage builds on the
+% previous one, gradually exposing the semantics of the refactored code, before we end up with the pure, functional model in Coq. Figure
+% \ref{fig:verification_pipeline} provides an overview of the entire process. We will only very briefly cover off on extraction and lifetime repairing in this chapter, please refer to Chapter \ref{chap:expanding_rem} for the full scope.
+% \end{minipage}
+% \hfill
+% \begin{minipage}[t]{0.35\textwidth}
+% \centering
+% \begin{tikzpicture}[node distance=2cm, >=stealth, thick]
+%   % Nodes
+%   \node[draw, rounded corners, fill=blue!10, minimum width=6cm, minimum height=1cm] (extract) {1. Extraction};
+%   \node[draw, rounded corners, fill=blue!10, minimum width=6cm, minimum height=1cm, below of=extract] (rem) {2. REM Repairs};
+%   \node[draw, rounded corners, fill=blue!10, minimum width=6cm, minimum height=1cm, below of=rem] (charon) {3. CHARON (LLBC)};
+%   \node[draw, rounded corners, fill=blue!10, minimum width=6cm, minimum height=1cm, below of=charon] (aeneas) {4. AENEAS (Functionalisation)};
+%   \node[draw, rounded corners, fill=blue!10, minimum width=6cm, minimum height=1cm, below of=aeneas] (coq) {5. Coq Verification};
+
+%   % Arrows
+%   \draw[->] (extract) -- (rem);
+%   \draw[->] (rem) -- (charon);
+%   \draw[->] (charon) -- (aeneas);
+%   \draw[->] (aeneas) -- (coq);
+% \end{tikzpicture}
+
+% \captionof{figure}{Overview of the verification pipeline: from source code extraction to proof of observational equivalence in Coq.}
+% \label{fig:verification_pipeline}
+% \end{minipage}
+
+% \vspace{-2.5mm}
+% \subsection{Extraction}
+% Extraction lifts a user-selected region into a new function and replaces the selection with a call at the original site. As detailed in Section \ref{sec:single_file_workspace}, this step is powered by a Rust-Analyzer (RA) backed engine that performs single-file incremental analysis. It resolves the selection's AST and symbol information in memory and synthesises a function skeleton together with the call-site edit.
+
+% The extraction result is returned as a deterministic set of edits (a patch) and a machine-readable summary for downstream stages. By design, the extractor does not attempt to finalise lifetimes or advanced ownership modes—that responsibility is delegated to REM's repair phase. This separation keeps extraction millisecond fast and predictable, and completely independent of crate size, while ensuring a stable interface for the later verification.
+
+% \vspace{-2.5mm}
+% \subsection{REM}
+% REM performs \textit{post-extraction} semantic repair to attempt to bring the extracted code back into alignment with Rust's ownership and lifetime rules. Whilst much of the original REM toolchain's efforts have been integrated into the extraction process, we still rely heavily on the most complex part of REM's analysis: the Lifetime reification. We introduce, propagate, and constrain lifetime parameters to satisfy the borrow checker, generalising where necessary.
+
+% As detailed earlier, REM treats the compiler as an oracle: it iterates repairs until the program compiles, and then attempts to apply lifetime elision to produce a human-readable signature (where practical) and a function body that aligns as closely as possible to idiomatic Rust. The output of REM is thus the repaired program $P'$, which is then passed onto CHARON to begin the process of discharging equivalence obligations. 
+
+% \vspace{-2.5mm}
+% \subsection{CHARON}
+% \label{subsec:charon}
+
+% The first (new) stage of our verification pipeline is translation from Rust into a
+% lower-level, verification-friendly form. This role is performed by
+% \textbf{CHARON}, a Rust to LLBC (Low-Level Borrow Calculus) translator. CHARON
+% accepts Rust source code (or more precisely, its compiler intermediate
+% representation MIR) \footnote{Even more precisely, the tool itself accepts Rust
+% code, but its initial steps rely on a complex interaction with \texttt{rustc} to
+% acquire the MIR}. CHARON's main task is to extract complex semantic information
+% from \verb|rustc| and produce a machine readable output containing said
+% information. Up until this point, we have been working with / reasoning about a single file. Whilst this kept extraction lightning fast, CHARON's support for single file conversion is limited at best\footnote{CHARON can convert just a single file, but it relies on \texttt{rustc} to do so, and as such the single file must be self contained, which we cannot guarantee}. 
+
+% Thus at this stage, we construct two ``virtual'' crates within the users temporary directory (\icodeverb{std::env::temp()}). The advantages of this approach are:
+% \begin{enumerate}[leftmargin=*,itemsep=0pt,topsep=2pt]
+%     \item Any changes the user makes to their source code whilst we are performing the later stages of analysis will not get passed down to us (potentially introducing half written words or other bugs that would fail immediately)
+%     \item We do not require a file lock on the users code, so they can continue work
+%     \item We can safely abstract away the creation / deletion of the virtual crates, and have them live for only so long as the equivalence engine runs for, using a custom implementation of the \icodeverb{Drop} trait. 
+%     \item We can limit the data passing over the JSON-RPC bridge to just the original and extracted code for the file the user is working in. 
+% \end{enumerate}
+
+% CHARON then performs several non-trivial transformations:
+% \begin{itemize}[leftmargin=*,itemsep=0pt,topsep=2pt]
+%   \item \textbf{Structured control flow.}  
+%     MIR is a control-flow graph with arbitrary \icodeverb{goto}s; CHARON reconstructs
+%     this into structured \icodeverb{if}, \icodeverb{match}, and \icodeverb{loop} constructs,
+%     or preserves the raw form with the \texttt{--ullbc} option.
+
+%   \item \textbf{Trait and type resolution.}  
+%     Explicitly records how trait bounds are proven, normalises default methods,
+%     and can transform associated types into explicit parameters
+%     (\texttt{--remove-associated-types}).
+
+%   \item \textbf{Lifetime handling.}  
+%     Hides the distinction between early- and late-bound variables and makes
+%     implied bounds explicit, simplifying reasoning about generic functions.
+
+%   \item \textbf{Closures and vtables.}  
+%     Represented as ordinary structs implementing the relevant \texttt{Fn*}
+%     traits, making them accessible to later verification steps.
+
+%   \item \textbf{Noise reduction.}  
+%     Options such as \texttt{--hide-marker-traits} remove built-in traits
+%     (\icodeverb{Sized}, \icodeverb{Send}, etc.) that would otherwise clutter the output.
+% \end{itemize}
+
+% The result is a cleaned, semantically faithful program in LLBC form. Unlike raw
+% MIR, which is compiler-oriented, LLBC is designed for verification: ownership
+% and borrowing are represented directly, trait resolution is explicit, and
+% control flow is structured. A sample program and small portion of its MIR are
+% shown below. However, the output of CHARON is not designed for human
+% readability, and even the tiny program in Figure \ref{fig:charon_translation}
+% produces over 140,000 characters of LLBC. This (very verbose) explicitness is
+% what enables the subsequent translation into pure functional code for
+% verification.
+
+% \begin{figure}[ht]
+%   \small
+%   \centering
+%   \begin{minipage}[t]{0.45\linewidth}
+%     \inputminted[fontsize=\footnotesize]{rust}{3_Chapter3/CHARON_example/rust.rs}
+%     \vfill
+%     \captionsetup{type=listing}
+%     \caption{Rust source}
+%   \end{minipage}
+%   \hfill
+%   \begin{minipage}[t]{0.45\linewidth}
+%     \inputminted[fontsize=\footnotesize]{text}{3_Chapter3/CHARON_example/mir.txt}
+%     \vfill
+%     \captionsetup{type=listing}
+%     \caption{Excerpt of MIR (\texttt{rustc})}
+%   \end{minipage}
+%   \captionsetup{justification=centering}
+%   \caption{Illustration of CHARON's role. While only Rust and MIR are shown here, CHARON translates the MIR into LLBC. The LLBC is only designed to be machine readable, and as such is ommitted}
+%   \label{fig:charon_translation}
+% \end{figure}
+
+% \vspace{-2.5mm}
+% \subsection{AENEAS}
+% With the program translated into LLBC by CHARON, the next stage of the pipeline
+% is handled by \textbf{AENEAS}. AENEAS takes the borrow- and lifetime–explicit
+% LLBC and translates it into a \emph{purely functional form}, stripping away
+% low-level memory operations while preserving the program's semantics. This
+% functionalisation step is what makes the program suitable for downstream
+% reasoning in Coq: instead of reasoning about references and loans, we can reason
+% about values and functions. Currently AENEAS supports translation into
+% \emph{Coq, Lean, HOL4}, and \emph{F*}.
+
+% In practice, AENEAS acts as the bridge between compiler-level detail and
+% proof-level abstraction. CHARON ensures that all the complexities of lifetimes,
+% loads, and trait resolution are made explicit; AENEAS then packages these into a
+% form where correctness properties can be stated and proved without touching the
+% borrow checker or the stack/heap. Within the context of our pipeline, this is the point where Rust
+% code ``stops being Rust'' and becomes a functional program whose equivalence can
+% be checked in Coq.
+
+% \vspace{-2.5mm}
+% \subsection{Coq}
+% AENEAS translates the LLBC into a purely functional form, targeting Coq. The
+% final stage of the pipeline then combines the two generated Coq files ($P_{coq}$
+% and $P'_{coq}$), together with all auxiliary information needed to
+% automatically verify the equivalence between the original and refactored Rust
+% programs. A key challenge at this stage is the verbosity of the generated Coq
+% code (as illustrated in Listing~\ref{lst:complex-wrong-coq}), which led us to
+% implement a custom Coq tokeniser and parser tailored to the format emitted by
+% AENEAS.
+
+% In parallel with these translations, the equivalence prover's main task is to
+% produce the \texttt{EquivCheck.v} file. This module instantiates both the
+% original and refactored definitions and generates an equivalence theorem, which
+% is a Coq encoding of the obligation(s) described in Section~\ref{sec:proof_obligations}. In practice, this means the Coq project is set up so that
+% it automatically checks that the two versions produce the same results for all
+% inputs. We defer the details of the proof obligations to that section; the key
+% point here is that the generated Coq project is self-contained: once compiled,
+% the equivalence is verified without further user intervention.
+
+% \vspace{-2.5mm}
+% \subsubsection*{What is Coq?}
+% Coq is an interactive theorem prover and proof assistant built on a dependently
+% typed functional language. It allows developers to define mathematical objects,
+% programs, and logical propositions, and to construct machine-checked proofs
+% about them. Every proof is validated by Coq's small, trusted kernel, giving very
+% high assurance of correctness. Coq has a long history of use in large-scale
+% verification projects—such as CompCert (a verified C compiler) and formally
+% verified operating systems—making it a natural fit for reasoning about the
+% safety and correctness of Rust programs.
+
+% \vspace{-2.5mm}
+% \subsubsection*{Why Coq?}
+% Coq was selected over alternatives such as HOL4, Lean, or F* for three main reasons:
+% \begin{itemize}[leftmargin=*,itemsep=0pt,topsep=2pt]
+%   \item \textbf{Mature ecosystem}  
+%     Decades of development have produced robust tooling, extensive libraries,
+%     and a stable kernel.
+
+%   \item \textbf{Direct integration}  
+%     AENEAS already targets Coq, whereas HOL4 and Lean would require substantial
+%     new backends for compatibility.
+
+%   \item \textbf{Automation}  
+%     Coq's tactic language and SMT integrations allow many routine proofs—
+%     such as equivalence checks—to be discharged automatically.
+% \end{itemize}
+
+% Lean and HOL4 both provide highly expressive grammars, but at the cost of
+% significant engineering effort to integrate with AENEAS \footnote{They both require even more additional supporting architecture on top of the current pipeline}. Whilst F* would require the least additional infrastructure, the platform is not that mature mature and would also duplicate existing
+% functionality. Coq therefore offers the best combination of maturity,
+% automation, and direct compatibility with our pipeline.
+
+\vspace*{-6mm}
 \section{Limitations of Current Verification}
 \label{sec:limitations_verification}
+\vspace{-2.5mm}
 % This section is to be nice and brief. Just a quick overview of the main
 % limitations specifically with AENEAS etc. From there, we can point the reader
 % to chapter 5 for more details.
-
 At present, the verification guarantees supported by our pipeline are
 constrained by the subset of Rust that AENEAS can translate. AENEAS is designed
-to operate on safe Rust; programs that make use of \texttt{unsafe} constructs
+to operate on safe Rust; programs that make use of \icodeverb{unsafe} constructs
 fall outside its scope. While this excludes some low-level systems code, the
 restriction is deliberate: safe Rust already captures the majority of idiomatic
 Rust usage, and the long-term plan is to integrate AENEAS with complementary
-tools that target \texttt{unsafe} code. The current support landscape is
+tools that target \icodeverb{unsafe} code. The current support landscape is
 summarised in Table~\ref{tab:aeneas_limitations}.
+\vspace{-1mm}
+\begin{table}[h]
+    \small
+    \centering
+    \begin{tabular}{p{0.45\linewidth}p{0.55\linewidth}}
+        \toprule
+        \textbf{Feature} & \textbf{Status} \\
+        \midrule
+        Safe Rust & Fully supported (excluding where mentioned in this table) \\
+        Unsafe Rust & Not supported (out of scope of \texttt{AENEAS}) \\
+        Loops & Supported (no nested loops) \\
+        Function pointers / Closures & Not supported (work in progress) \\
+        Traits & Supported \\
+        Type parametricity & Limited: type parameters with borrows not supported \\
+        Nested borrows in function signatures & Not supported (work in progress) \\
+        Interior mutability (\texttt{Cell}, \texttt{RefCell}, etc.) & Not supported (planned via ghost states) \\
+        Concurrency & Out of scope (long-term research goal) \\
+        \bottomrule
+    \end{tabular}
+    \caption{Current AENEAS support for Rust features}
+    \label{tab:aeneas_limitations}
+\end{table}
+\vspace{-5mm}
 
 Within safe Rust, several technical limitations remain. Loops are supported only
 in restricted forms (no nested loops), though this is under active development.
@@ -405,39 +780,16 @@ current plan is to capture its effects using ghost states. Finally, concurrent
 execution is out of scope: AENEAS models sequential Rust programs only, with
 parallelism considered a long-term research goal.
 
-\begin{table}[h]
-    \centering
-    \caption{Current AENEAS support for Rust features}
-    \label{tab:aeneas_limitations}
-    \begin{tabular}{p{0.35\linewidth}p{0.55\linewidth}}
-        \toprule
-        \textbf{Feature} & \textbf{Status} \\
-        \midrule
-        Safe Rust & Fully supported \\
-        Unsafe Rust & Not supported (future integration planned) \\
-        Loops & Supported (no nested loops) \\
-        Function pointers / Closures & Not supported (work in progress) \\
-        Traits & Supported \\
-        Type parametricity & Limited: type parameters with borrows not supported \\
-        Nested borrows in function signatures & Not supported (work in progress) \\
-        Interior mutability (\texttt{Cell}, \texttt{RefCell}, etc.) & Not supported (planned via ghost states) \\
-        Concurrency & Out of scope (long-term research goal) \\
-        \bottomrule
-    \end{tabular}
-\end{table}
-
 It is important to emphasise that the verification pipeline is designed to
 complement the extraction algorithm. As such, it is preferable for verification
 to \textit{fail early} when encountering unsupported features rather than risk
 certifying code incorrectly. A failed verification due to unsupported language
 constructs is reported differently to the developer than a failed proof
 obligation. This distinction ensures that false positives—cases where
-unverifiable code would otherwise appear verified—are avoided, preserving the
-integrity of the guarantees provided by the pipeline.
+unverifiable code would otherwise appear verified—are avoided..
 
-In summary, the present pipeline is best understood as a verification framework
-for sequential, safe Rust programs without advanced features such as nested
+In summary, the present pipeline is best understood as an equivalence framework
+for sequential, safe Rust programs without features such as nested
 borrows, closures, or concurrency. These restrictions reflect the state of
 AENEAS rather than fundamental barriers, and ongoing work is progressively
-extending the supported subset. Broader limitations of the full REM--AENEAS--Coq
-pipeline are deferred to Section~\ref{sec:limitations_conclusions}.
+extending the supported subset. As AENEAS development progresses, we expect the equivalence checker to be able to handle complete crates. A complete discussion of the  limitations, and the current expected use case of the full REM2.0 pipeline have been deferred to Section~\ref{chap:conclusions_future_work}.

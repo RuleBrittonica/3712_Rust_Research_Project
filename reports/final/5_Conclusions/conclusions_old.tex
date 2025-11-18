@@ -1,0 +1,77 @@
+\chapter{Conclusions and Future Work}
+\label{chap:conclusions_future_work}
+\vspace*{-15mm}
+
+\vspace*{-5mm}
+\section{Revisiting Aims and Research Questions}
+\label{sec:revisiting_aims}
+The aim of this project was to design, implement, and evaluate a practical extract-function refactoring toolchain for Rust that can handle modern language features and, where possible, provide stronger correctness guarantees than ``it still compiles''. Concretely, the work set out to build a new version of REM that integrates with \texttt{rust-analyzer}, supports contemporary Rust langauge features such as \icodeverb{async}/\icodeverb{await} and \icodeverb{const fn}, and connects to a verification pipeline for equivalence checking.
+
+Chapter~\ref{chap:evaluation_experimental_results} framed this aim in terms of four research questions:
+\begin{itemize}[nosep, leftmargin=*]
+  \item \textbf{RQ1} -- Does the new toolchain match or exceed the original REM on the existing benchmark suite?
+  \item \textbf{RQ2} -- To what extent can the new extraction pipeline handle modern Rust features (async, \icodeverb{const fn}, generics, higher-ranked trait bounds, dynamic trait objects, and non-local control flow)?
+  \item \textbf{RQ3} -- What extraction latencies are achievable when we reuse \texttt{rust-analyzer} as a persistent analysis daemon? How does this impact the user experience, if at all?
+  \item \textbf{RQ4} -- For code within the supported subset, can we feasibly verify equivalence between original and extracted functions using \texttt{CHARON} and \texttt{AENEAS}?
+\end{itemize}
+
+The evaluation results gave us clear answers. For \textbf{RQ1}, REM2.0 achieves strict parity with the original REM on the original benchmark suite and additionally succeeds on several cases that previously failed. For \textbf{RQ2}, it handles the majority of feature-focused examples involving \icodeverb{async}, \icodeverb{const}, NLCF, generics, and HRTBs, with remaining weaknesses concentrated around DTOs and intricate generic bounds. For \textbf{RQ3}, the new architecture reduces extraction latency from hundreds or thousands of milliseconds to a few milliseconds internally and to well under a quarter of a second as observed in the editor. For \textbf{RQ4}, the verification pipeline can construct end-to-end equivalence proofs for a non-trivial fragment of Rust, although at substantially higher performace cost and with a restricted language subset.
+
+\vspace*{-5mm}
+\section{Summary of Contributions}
+\label{sec:summary_of_contributions}
+
+Against this backdrop, the thesis makes several technical and empirical contributions.
+\vspace*{-2.5mm}
+\paragraph{A rust-analyzer-based architecture for extraction.}
+The first contribution is the design and implementation of REM2.0 as a long-lived daemon built on top of RA. Instead of repeatedly invoking the Rust compiler on whole crates, REM2.0 builds on RA's analysis and exposes a JSON-RPC interface that can be driven from a VSCode extension or command-line client. 
+\vspace*{-2.5mm}
+\paragraph{A feature-rich extraction engine.}
+Second, the project develops an extraction engine that supports a much broader range of Rust features than the original REM prototype. It operates correctly in the presence of \icodeverb{async}/\icodeverb{await}, \icodeverb{const fn}, HRTBs, generics with multiple trait constraints, and NLCF, using \icodeverb{std::ops::ControlFlow} to standardise returns, \icodeverb{break}, and \icodeverb{continue}. Whilst it struggles on DTOs, this is the most complex feature it has to face and is an area for continued research. 
+\vspace*{-2.5mm}
+\paragraph{A repairer for lifetimes and type signatures.}
+Third, the work refined, updated and now reuses REM-Repairer as a post-processing step that automatically adjusts extracted function signatures and lifetime annotations when the original extraction creates borrow-checker errors. Empirically, the repairer is needed in the same kind of cases as in the original evaluation---those with tight lifetime constraints---and thus remains a crucial component of the overall toolchain.
+\vspace*{-2.5mm}
+\paragraph{Integration with verification tooling.}
+Fourth, we prototyped a verification pipeline that connects REM2.0 to \texttt{AENEAS}. For functions within the supported fragment, this pipeline is able to translate the extracted code to Coq definitions, and thus construct proofs that the two versions are behaviourally equivalent. This provides a path from ordinary refactoring to machine-checked correctness guarantees for selected cases.
+\vspace*{-2.5mm}
+\paragraph{Empirical evaluation on real Rust projects.}
+Finally, the project contributes an empirical study across three benchmark corpora: the original REM artefact of forty cases, a new group of forty extractions drawn from highly starred GitHub repositories, and a set of twenty verification benchmarks combining targeted examples and simple real-world functions. These experiments demonstrate that the architecture scales to realistic workloads, quantifies the latency improvements, and characterises both the strengths and failure modes of REM2.0
+
+\vspace*{-5mm}
+\section{Limitations and Open Challenges}
+\label{sec:limitations_open_challenges}
+
+Despite these contributions, REM2.0 has clear limitations that draw a clear line in the sand as to where it can be relied upon today and where further work is needed.
+
+On the language feature side, DTOs and complex generic bounds are the biggest current weaknesses. Several failure cases arose when the extractor couldn't reconstruct a precise function signature, falling back to underspecified types or dropping necessary bounds. This is closely related to the second limitation: REM2.0 mostly operates with a modified single-file view context, based on RA's crate graphs, which makes it impossible to discover modules we don't explicitly trace and import. 
+
+The verification pipeline is similarly constrained by the fragment currently supported by \texttt{AENEAS}. Many real-world functions make use of language features that lie outside this fragment, and even when verification is possible, it incurs significantly higher cost than extraction. As a result, the verifier cannot yet be applied indiscriminately to arbitrary refactorings.
+
+Finally, the evaluation focuses on correctness and performance, not on user experience. We have not done a study to assess how developers actually adopt the tool, how often they invoke verification, or how much they trust the results. Understanding these human factors is an important but out-of-scope challenge.
+
+These limitations do not undermine the main claims of the thesis, but they do mark out the boundary of current use cases and motivate the next steps.
+
+\vspace*{-5mm}
+\section{Future Directions}
+\label{sec:future_directions}
+
+Several areas of future work follow directly from the limitations and from our broader vision of provably correct refactorings. 
+
+A first direction is \emph{deeper integration with RA}. By drawing more on available global crate-graph information, REM2.0 will be able to extract much richer trait and where-clause information. This will close many of the gaps we have seen in extracting DTOs and complex generic bounds. However, may involve extending internal APIs or contributing changes upstream.
+
+A second direction is to \emph{extend and accelerate the verification fragment}. As \texttt{CHARON} and \texttt{AENEAS} evolve, there is scope to support a larger subset of Rust---for example, controlled uses of traits, limited async patterns, or additional standard-library abstractions. In parallel, techniques such as caching intermediate artefacts or reusing proof skeletons across similar refactorings could help reduce the end-to-end cost of verification.
+
+Third, there is room for \emph{smarter repair and analysis heuristics}. REM-Repairer could be upgraded to be able to infer missing bounds or function annotations from the compiler feedback it collects for lifetime repairs, or potentially by learning patterns from previously successful repairs. Static checks that predict whether a given extraction is likely to be verifiable could help developers decide when it is worth paying the verification cost.
+
+A fourth and final direction is \emph{focussing on the users}. We as researchers do an awful lot of coming up with excellent concepts, but without a clear focus on what developers want from their tools, we can't progress most effectively. To that end, embedding verification status more deeply into the IDE—for example, through inline indicators and ``verify this refactoring'' commands—could make the additional guaranties more visible and actionable. Small-scale user studies would provide evidence about how and when developers are willing to pay for verification, and what they need to know to truly trust the tool. 
+
+\vspace*{-5mm}
+\section{Broader Outlook}
+\label{sec:broader_outlook}
+
+Stepping back, this thesis sits at the intersection of refactoring tools, modern language servers, and formal verification. Rust is a demanding testbed for safe automated refactoring: its ownership and lifetime system are designed to make entire classes of bugs unrepresentable, but as we and many others have discovered, those guarantees make na\"ive extractions impossible and well intentioned ones incredibly difficult. 
+
+REM2.0 shows that a rust-analyzer-based design can deliver extract-function refactorings that are both fast enough for everyday use and expressive enough to handle a wide range of contemporary Rust idioms. The addition of a repair stage and a verification pipeline demonstrates that we can go beyond compilation as our only correctness source, and selectively obtain machine-checked evidence that a refactoring preserves behaviour.
+
+If such tools become commonplace, they could change how developers think about the large-scale development of Rust code: many refactorings would remain cheap, interactive, and IDE-driven, while critical feature changes could be escalated to formally justified transformations with no extra impact on the developers workflow. More broadly, the work suggests a path toward refactoring tools that treat correctness as their main concern rather than an afterthought. In this sense, REM2.0 is not just a faster extract-function command for Rust, but an early step toward a generation of refactoring tools that integrate verification into everyday software engineering practice.

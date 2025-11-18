@@ -62,3 +62,42 @@ while still producing code that compiles under Rust's strict type system.
 
 % TODO if I end up writing an incrementally compiling version of CHARON, add
 % that information here.
+
+\section{Motivation: Why Verification is Essential}
+\label{sec:motivation_verification}
+
+Despite decades of work on automated refactoring, developers continue to show
+reluctance to adopt such tools in practice. Empirical studies indicate that even
+simple, “safe” refactorings such as renaming are frequently performed manually,
+as programmers prefer to trust their own edits over opaque tool behaviour
+\cite{OneThousandOneStories-SoftwareRefactoring}. This gap stems from usability
+and, more fundamentally, from trust: if a refactoring tool cannot convincingly
+guarantee that semantics are preserved, developers are unwilling to rely on it
+for non-trivial code transformations.
+
+The challenge is particularly problematic in Rust. Compared to languages like Java or
+C\#, where refactorings operate largely at the syntactic or type level, Rust's
+ownership and lifetime system makes every transformation potentially semantic.
+Prior work shows that Extract Method in Rust is not merely ``cut and paste'' but
+requires compiler-guided repairs such as introducing lifetime parameters,
+reifying control flow, and inferring ownership modes
+\cite{AdventureOfALifetime}. Crucially, the final step to the original REM
+algorithm involves a series of non-trivial lifetime adjustments, guided by
+\verb|rustc|, to ensure that the extracted code satisfies the borrow checker.
+Whilst these are what is required to enable REM to succeed where na\"ive tools fail, but they also
+make unintended behavioural or semantic changes more likely. A transformation that
+compiles may nonetheless shift aliasing patterns, extend or shorten lifetimes,
+or alter when resources are released — all of which are semantically observable
+in Rust.
+
+Traditional quality controls such as testing do not fill this gap. Tests, even
+when comprehensive, explore only a small subset of possible inputs and
+interleavings. In safety or performance critical domains, developers cannot
+afford to accept the residual risk that untested paths diverge after a
+refactoring. Verification, by contrast, offers a principled way to resolve the
+trust deficit: it can establish - on a program by program basis - that for all
+inputs respecting the refactored function's preconditioned, that the refactored
+program is equivalent to the orginal. By integrating verification directly into
+REM's pipeline, we address not only the technical challenge of making complex
+extractions compile, but also the socio-technical challenge of making developers
+confident that such transformations are behaviour-preserving.

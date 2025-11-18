@@ -1,0 +1,474 @@
+\chapter{Evaluation and Experimental Results}
+\label{chap:evaluation_experimental_results}
+\vspace*{-15mm}
+
+% Quick paragraph detailing the contents of this chapter
+% First we outline how we setup our experiments, where the test data came from, how we select it, etc
+% Then we outline the criteria we will be using to evaluate our toolchain on, before we give the results and the conclusions we can draw from them
+
+This chapter presents the evaluation and experimental results of the new REM toolchain. We begin by describing the setup of our three experiments, including the origin of and selection of test data, before outlining the criteria we used to evaluate its correctness and overall capabilities. We then present and discuss the results of both the extraction and verification pipelines, highlighting key improvements over the original REM prototype and identifying remaining limitations as well as opportunities for refinement and further improvement.
+
+\vspace*{-5mm}
+\section{Experimental Setup}
+\label{sec:experimental_setup}
+
+% Quick paragraph outlining what is going on in this section
+% Two experiments for the extraction toolchain - cases drawn entirely from real world examples (40x from REM, 40X new)
+% Ensure we are at least as capable as REM 
+% Determine what else we can do (r.e. generics, async, etc)
+% One experiment for the verification toolchain (10x trivial cases, 10x real world but simple)
+
+To evaluate the REM extraction and verification pipelines, we designed two complementary sets of experiments. The first targets the \emph{extraction toolchain}, comprising two groups of test cases: forty drawn directly from real-world examples previously used to benchmark the original REM prototype, and forty new cases specifically constructed to stress advanced language features such as asynchronous functions, const evaluation, generics, trait objects, higher-ranked trait bounds, and non-local control flow. the new cases we target are selected specifically because the original prototype could not cover them. Hence we aim to demonstrate both the increased capabilities, along with demonstrating that the new toolchain remains at least as capable as its predecessor.
+
+The second experiment focusses on the \emph{verification toolchain}, using twenty test cases in total - ten trivial examples that isolate the basic correctness properties, and ten real world but (deliberately) simple functions drawn from open source repositories. These serve to validate the end-to-end equivalence checking between original and extracted functions, without running into the limitations posed by the still maturing \texttt{CHARON} and \texttt{AENEAS} tools. 
+
+\subsection{Evaluating against the original REM}
+\label{subsec:evaluating_against_original}
+% Very brief section, no more than 1 paragraph. 
+% Details that we got all of these cases from the original REM, processed them to extract their start / end tags, created a set of metadata for each repository. 
+To provide a baseline for comparison, we re-used the full suite of test cases from the original REM evaluation\footnote{The test repositories were copied directly from the provided artefact in VerseLab's github, \url{https://github.com/verse-lab/rem}}. Each case was reconstructed by parsing its annotated source files to locate the \icodeverb{// START SELECTION //} and \icodeverb{// END SELECTION //} or \icodeverb{/* START SELECTION */} and \icodeverb{/* END SELECTION */} markers, allowing us to automatically recover the intended extraction regions. From these, we generated a structured metadata file for every case, capturing file paths, the extraction span (as \icodeverb{u32} indexes into the file), and other relevant contextual information. Note that case \#16 has no selection markers inside any files, so we are unable to evaluate against that case. 
+
+\vspace*{-5mm}
+\subsection{Gathering new cases to test against}
+\label{subsec:new_test_cases}
+% This subsection focusses on how we got the new cases to test against, what we were looking for, and how we generated the new results
+% The data below was gathered from evanli's github rankings: https://evanli.github.io/Github-Ranking/Top100/Rust.html - it is just an outline of each repo (point being that they are big and in use, and as such if we can find examples directly from them, then our tool is relevant!)
+% Using these repositories as a base, we then perform a scan to look for any kind of extract / extract method etc, and then classify those extractions as best as we can. This methods does produce a lot of false positives (i.e. the commit was labelled extract, but the extract was unrelated to a method), but it was quick to write (with the help of GenAI) and gave us an excellent starting point
+% We then manually went through each detected case, and labelled suitable extraction sites with the relevant markers (// START SELECTION // // END SELECTION // or inline) and could build the extraction metadata using our existing scripts
+
+To properly evaluate the capabilities of the new toolchain, we aimed to gather a diverse range of real-world examples from actively maintained and highly starred Rust repositories. The end goal of this process is to verify that our toolchain can handle the same cases of refactorings and code patterns seen ``in the wild'', rather than relying solely on synthetic or curated test cases. This is similar to how the original REM project conducted its evaluation, however, we aim to reach a far greater breadth of Rust projects!
+
+We began by identifying a representative sample of the largest Rust projects using the GitHub rankings that are maintained by Evan Li~\cite{EvanLi_GithubRanking_Rust2025}. These repositories, listed in Table~\ref{tab:repo_summary}, include a mixture of developer tools, application frameworks, and infrastructure software — each widely used within the Rust ecosystem. This diversity ensured we could locate (and thus evaluate against) a very broad spectrum of language features including but not limited to \icodeverb{async}/\icodeverb{await}, generics, dynamic dispatch, and complex control flow.
+
+\begin{table}[h]
+\centering
+
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+\textbf{Ranking} & \textbf{Project Repo}        & \textbf{Stars} & \textbf{Forks} & \textbf{Language} & \textbf{Open Issues} \\ \hline
+2                & denoland/deno                & 105077         & 5768           & Rust              & 2384                 \\
+3                & rustdesk/rustdesk            & 102158         & 14993          & Rust              & 61                   \\
+4                & tauri-apps/tauri             & 98717          & 3155           & Rust              & 1161                 \\
+5                & unionlabs/union              & 74500          & 3835           & Rust              & 155                  \\
+6                & astral-sh/uv                 & 72353          & 2212           & Rust              & 2136                 \\
+7                & zed-industries/zed           & 69398          & 5885           & Rust              & 3054                 \\
+8                & FuelLabs/sway                & 62106          & 5428           & Rust              & 862                  \\
+9                & alacritty/alacritty          & 60977          & 3227           & Rust              & 323                  \\
+10               & rust-lang/rustlings          & 60569          & 10978          & Rust              & 46                   \\
+11               & FuelLabs/fuel-core           & 57463          & 2856           & Rust              & 149                  \\
+12               & BurntSushi/ripgrep           & 57159          & 2304           & Rust              & 85                   \\
+13               & topjohnwu/Magisk             & 56856          & 15853          & Rust              & 36                   \\
+14               & sharkdp/bat                  & 55755          & 1409           & Rust              & 318                  \\
+15               & meilisearch/meilisearch      & 54438          & 2254           & Rust              & 221                  \\
+16               & lencx/ChatGPT                & 54214          & 6192           & Rust              & 856                  \\
+17               & rust-unofficial/awesome-rust & 53670          & 3064           & Rust              & 10                   \\
+18               & starship/starship            & 52113          & 2284           & Rust              & 762                  \\
+19               & dani-garcia/vaultwarden      & 50694          & 2374           & Rust              & 17                   \\
+20               & openai/codex                 & 50131          & 6215           & Rust              & 1164                 \\
+21               & types/typst                  & 47876          & 1305           & Rust              & 1007                 \\ \hline
+\end{tabular}
+
+\captionsetup{justification=centering}
+\caption{Brief summary of the 20 Repositories that we searched to find real world examples from. \#1 is the Rust project itself.}
+\label{tab:repo_summary}
+\end{table}
+
+Once the repositories were selected, we performed an automated scan across their full Git history to locate commits likely related to method or function extraction. This scan searched commit messages for characteristic phrases such as \texttt{``extract''}, \texttt{``extract method''}, \texttt{``factor out''}, and \texttt{``refactor: extract''}. The script then leveraged a combination of regex patterns and repository-wide \texttt{git grep} queries to determine which commits may contain extractions. We limited the depth of this search to 100 commits across the 3 most committed branches. This heuristic based approach did lead to a lot of false positives (e.g. a commit containing \texttt{``extract''} but for an unrelated part of the codebase), however, it was an excellent starting point for our testing. For repositories where the automated tooling was unable to identify a suitable candidate, we manually identified candidates from the most recent commit of the repository (as of 01~November~2025). 
+
+For each confirmed case, we annotated the corresponding source region with the selection markers used by our metadata preprocessor (\icodeverb{// START SELECTION //} and \icodeverb{// END SELECTION //}, or inline equivalents). This enabled us to automatically generate extraction metadata and test descriptors using our existing dataset generation scripts.
+
+A lookup table with all identified commits can be found in Table~\ref{tab:appendix2_details_of_each_repository}, Appendix~\ref{sec:appendix2_details_of_each_repository}. 
+
+% TODO - should this be moved to the actual explanation in Chapter 2 or left here?
+\vspace*{-5mm}
+\subsection{The New Capabilities of REM}
+\label{subsec: new_capabilities_example}
+
+Here we provide concrete (although somewhat trivial) examples of the behaviour that we are searching for in the repositories listed in Section~\ref{subsec:new_test_cases}. In general, we are looking for examples that isolate a feature that the original version of REM would be completely unable to handle\footnote{This is also why the results table in Section~\ref{subsec:new_results_table} does not list a comparison to the original REM}. These features include asynchronous code execution, const evaluation, generics, (dynamic) trait objects and higher-ranked trait bounds. Additionally, we target a few instances of non-local control flow, as although the original toolchain was capable of such refactorings, our extraction engine implements a far more ``standard'' approach through the \icodeverb{std::ops::ControlFlow} variants and thus it should be separately evaluated. Together, these cases test whether the extractor correctly preserves \emph{semantics}, \emph{typing}, and \emph{compilation validity} across complex language mechanics. Each case includes a short description outlining the expected behaviour we are looking for in the refactored code. When searching for evaluation cases, we attempted to locate cases that involved more than one of the below features. 
+
+\subsubsection{Generics (GEN)}
+
+This case targets a generic function with multiple trait bounds, verifying that these are copied exactly to the extracted function. The extractor must not monomorphise or omit generic parameters, as doing so would restrict the function’s polymorphism and likely \xmark type checking. Additionally, if only a subset of the caller functions trait bounds apply to the callee (e.g. it only takes one of many generic arguments), then we would expect just the applicable trait bounds to be copied). 
+
+\begin{minipage}[t]{0.45\linewidth}
+    \vspace{0pt}% align tops
+    \captionsetup{type=listing} 
+    \inputminted[             fontsize=\scriptsize,             frame=lines,             linenos,             breaklines,         ]{rust}{4_Chapter4/code/generics/before.rs}
+    \captionof{listing}{Generics Example: Before}
+    \label{lst:generics-before}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.45\linewidth}
+    \vspace{0pt}
+    \captionsetup{type=listing}
+    \inputminted[             fontsize=\scriptsize,             frame=lines,             linenos,             breaklines,         ]{rust}{4_Chapter4/code/generics/after.rs}
+    \captionof{listing}{Generics Example: After}
+    \label{lst:generics-after}
+\end{minipage}
+
+\subsubsection{Async and Await (ASYNC)}
+
+This case targets extraction from within an \icodeverb{async fn}, where the inserted boundaries must remain within the compiler-generated state machine \footnote{\texttt{rustc} automatically generates a struct that acts as a state machine, with an internal state variable and a poll method. Each await point becomes a place where the state machine can pause, return \icodeverb{Poll::Pending}, and be resumed later by the runtime without losing its state.}.The extractor must correctly preserve the asynchronous context and the \icodeverb{Result} return type implied by \icodeverb{?}, while ensuring that lifetimes and borrows are not widened across the await suspension point. If the lifetimes produced by the extraction engine are incorrect, we expect REM-Repairer to correct them. 
+
+\begin{minipage}[t]{0.45\linewidth}
+    \vspace{0pt}% align tops
+    \captionsetup{type=listing} 
+    \inputminted[             fontsize=\scriptsize,             frame=lines,             linenos,             breaklines,         ]{rust}{4_Chapter4/code/async/before.rs}
+    \captionof{listing}{Async Example: Before}
+    \label{lst:async-before}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.45\linewidth}
+    \vspace{0pt}
+    \captionsetup{type=listing}
+    \label{lst:async-after}
+    \inputminted[             fontsize=\scriptsize,             frame=lines,             linenos,             breaklines,         ]{rust}{4_Chapter4/code/async/after.rs}
+    \captionof{listing}{Async Example: After}
+\end{minipage}
+
+\subsubsection{Constant declarations (CONST)}
+
+This case covers extraction within a \icodeverb{const fn}, which must remain evaluable at compile time under Rust's const-checking rules. Thus the extraction engine must identify const contexts, and where possible, propagate the \icodeverb{const} qualifier to the new function to maintain those guaruntees.
+
+\begin{minipage}[t]{0.45\linewidth}
+    \vspace{0pt}% align tops
+    \captionsetup{type=listing} 
+    \inputminted[             fontsize=\scriptsize,             frame=lines,             linenos,             breaklines,         ]{rust}{4_Chapter4/code/const/before.rs}
+    \captionof{listing}{CONST Example: Before}
+    \label{lst:const-before}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.45\linewidth}
+    \vspace{0pt}
+    \captionsetup{type=listing}
+    \inputminted[             fontsize=\scriptsize,             frame=lines,             linenos,             breaklines,         ]{rust}{4_Chapter4/code/const/after.rs}
+    \captionof{listing}{CONST Example: After}
+    \label{lst:const-after}
+\end{minipage}
+
+\subsubsection{Non Local Control Flow (NLCF)}
+
+This case covers all aspects of NLCF, being \icodeverb{return}, \icodeverb{break}, and \icodeverb{continue} in Rust. NLCF objects cannot cross function boundaries, and as such the extraction engine must reify control flow into a return value, using \icodeverb{std::ops::ControlFlow} variants to communicate termination or continuation back to the caller. As mentioned previously, this differs from REM's original insertion of custom enums to outline control flow handling, as we rely on the extraction engine to provide this information rather than REM-Controller. 
+
+\begin{minipage}[t]{0.45\linewidth}
+    \vspace{0pt}% align tops
+    \captionsetup{type=listing} 
+    \inputminted[             fontsize=\scriptsize,             frame=lines,             linenos,             breaklines,         ]{rust}{4_Chapter4/code/NLCF/before.rs}
+    \captionof{listing}{NLCF Example: Before}
+    \label{lst:nlcf-before}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.45\linewidth}
+    \vspace{0pt}
+    \captionsetup{type=listing}
+    \inputminted[             fontsize=\scriptsize,             frame=lines,             linenos,             breaklines,         ]{rust}{4_Chapter4/code/NLCF/after.rs}
+    \captionof{listing}{NLCF Example: After}
+    \label{lst:nlcf-after}
+\end{minipage}
+
+\subsubsection{Higher Ranked Trait Bounds (HRTB)}
+
+This case examines extraction from functions parameterised by higher-ranked trait bounds such as \icodeverb{for<'a> Fn(\&'a T) -> \&'a T}. These bounds are not inferred implicitly and must be explicitly copied to the new function signature to maintain lifetime correctness. Again, REM-Repairer is expected to be called here to either a) verify that the lifetimes are correct, and / or b) fix the incorrect lifetime bounds.
+
+\begin{minipage}[t]{0.45\linewidth}
+    \vspace{0pt}% align tops
+    \captionsetup{type=listing} 
+    \inputminted[             fontsize=\scriptsize,             frame=lines,             linenos,             breaklines,         ]{rust}{4_Chapter4/code/HRTB/before.rs}
+    \captionof{listing}{HRTB Example: Before}
+    \label{lst:hrtb-before}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.45\linewidth}
+    \vspace{0pt}
+    \captionsetup{type=listing}
+    \inputminted[             fontsize=\scriptsize,             frame=lines,             linenos,             breaklines,         ]{rust}{4_Chapter4/code/HRTB/after.rs}
+    \captionof{listing}{HRTB Example: After}
+    \label{lst:hrtb-after}
+\end{minipage}
+
+\subsubsection{Dynamic Trait Objects (DTO)}
+
+Here we isolate extraction involving a \icodeverb{\&dyn Trait} parameter to test the extraction engines preservation of dynamic dispatch and object safety. The extractor must retain the trait object type and avoid replacing it with a generic bound, which would alter runtime behaviour. The category also includes cases where a function's arguments implement a trait, e.g. \icodeverb{fn ident(s: impl Into<String> -> ...}. 
+
+\begin{minipage}[t]{0.45\linewidth}
+    \vspace{0pt}% align tops
+    \captionsetup{type=listing} 
+    \inputminted[             fontsize=\scriptsize,             frame=lines,             linenos,             breaklines,         ]{rust}{4_Chapter4/code/DTO/before.rs}
+    \captionof{listing}{DTO Example: Before}
+    \label{lst:dto-before}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.45\linewidth}
+    \vspace{0pt}
+    \captionsetup{type=listing}
+    \inputminted[             fontsize=\scriptsize,             frame=lines,             linenos,             breaklines,         ]{rust}{4_Chapter4/code/DTO/after.rs}
+    \captionof{listing}{DTO Example: After}
+    \label{lst:dto-after}
+\end{minipage}
+
+\vspace*{-5mm}
+\section{Evaluation Criteria}
+\label{sec:evaluation_criteria}
+% This section should be very brief, and just quickly explain how we are going to demonstrate \cmark
+% Against the original REM - at least as good (ideall 100%) coverage of all cases. Also a significant speedup overall
+
+This section defines the criteria used to assess each stage of the new REM toolchain. We evaluate (i) extraction correctness and speed against the original set of REM benchmarks, (ii) coverage of new language features (in both the extraction engine and attached verifier) and (iii) function equivalence generated by the automated proof pipeline. Table~\ref{tab:evaluation_criteria} summarises the main goals and Success conditions for each experiment .
+
+{\small
+\begin{longtable}{p{3cm}p{4.5cm}p{7.25cm}}
+% \setlength{\extrarowheight}{-1pt} \\
+% \setlength{\abovecaptionskip}{2pt} \\
+% \setlength{\belowcaptionskip}{2pt} \\
+\toprule
+\textbf{Experiment} & \textbf{Objective} & \textbf{Evaluation Criteria} \\
+\midrule
+\endfirsthead
+
+\multicolumn{3}{c}%
+{{\bfseries Table \thetable\ (continued)}} \\
+\toprule
+\textbf{Experiment} & \textbf{Objective} & \textbf{Evaluation Criteria} \\
+\midrule
+\endhead
+
+\midrule
+\multicolumn{3}{r}{{Continued on next page}} \\
+\bottomrule
+\endfoot
+
+\bottomrule
+\endlastfoot
+
+\raggedright\textbf{Original Cases} &
+Confirm (at minimum) parity with baseline REM &
+\begin{itemize}[nosep, leftmargin=*, itemsep=0pt, topsep=1pt, parsep=0pt]
+    \item Successful extraction of all original cases.
+    \item Identical (or improved) compilation outcomes.
+    \item Significantly reduced latency compared to the original pipeline.
+\end{itemize} \\
+\raggedright\textbf{New Feature Cases} &
+Demonstrate support for language features previously unsupported by REM &
+\begin{itemize}[nosep, leftmargin=*, itemsep=0pt, topsep=1pt, parsep=0pt]
+    \item Correct extraction without semantic or typing errors across \icodeverb{async}, \icodeverb{const}, generics, (dynamic) trait objects, higher ranked trait bounds, and non-local control-flow examples.
+    \item 100\% compilation of extracted code.
+\end{itemize} \\
+\raggedright\textbf{Verification Pipeline} &
+Validate correctness of extracted functions via formal equivalence checking &
+\begin{itemize}[nosep, leftmargin=*, itemsep=0pt, topsep=1pt, parsep=0pt]
+    \item Proof completion for all trivial and real-world cases.
+    \item Matching function semantics under the AENEAS/Coq transform.
+    \item failure only for provably non-equivalent transformations.
+    \item Presence of counter-examples or failure cases that could be transformed.
+\end{itemize} \\
+
+\captionsetup{justification=centering}
+\caption{Summary of experimental objectives and evaluation criteria.}
+\label{tab:evaluation_criteria}
+
+\end{longtable}
+}
+
+\vspace*{-5mm}
+\section{Extraction: Results and Analysis}
+\label{sec:results_analysis}
+
+This section presents and analyses the outcomes of the extraction experiments described in Section~\ref{sec:experimental_setup}. We first evaluate the new extraction engine (as described in Section~\ref{sec:architecture_overview} against the original REM benchmark suite to confirm our baseline compatibility and performance overmatch. We then examine its behaviour on the newly introduced feature-specific cases to assess its capabilities across much more complex language constructs that were previously out of reach. Quantitative metrics such as extraction \cmark rate and latency are combined with a qualitative analysis of select examples to highlight both improvements and remaining limitations. The subsequent section then focuses on the verification pipeline, examining the correctness guarantees with a minor focus on the overall latency.
+
+\newpage
+\subsection{Original REM Cases: Results Table}
+\label{subsec:original_results_table}
+\begin{table}[h!]
+    \centering
+\begin{tabular}{|c|c|cc|ccc|c|}
+\hline
+\multirow{2}{*}{\#} & \multirow{2}{*}{\begin{tabular}[c]{@{}c@{}}Project\\ (LOC)\end{tabular}} & \multicolumn{2}{c|}{Outcome} & \multicolumn{3}{c|}{Time (ms)} & \multirow{2}{*}{\begin{tabular}[c]{@{}c@{}}Repairer\\ Needed\end{tabular}} \\
+ &  & REM & New & REM & Raw & User &  \\ \hline
+1 & \multirow{7}{*}{\begin{tabular}[c]{@{}c@{}}petgraph\\ (20,157)\end{tabular}} & \cmark & \cmark & 370 & 3.511 & 184.32 & \xmark \\
+2 &  & \cmark & \cmark & 1020 & 3.753 & 217.91 & \xmark \\
+3 &  & \cmark & \cmark & 1470 & 2.166 & 231.08 & \cmark \\
+4 &  & \cmark & \cmark & 1700 & 3.337 & 196.77 & \xmark \\
+5 &  & \cmark & \cmark & 850 & 2.018 & 128.54 & \xmark \\
+6 &  & \cmark & \cmark & 980 & 2.148 & 142.66 & \xmark \\
+7 &  & \xmark & \cmark & 550 & 2.030 & 255.19 & \cmark \\ \hline
+8 & \multirow{18}{*}{\begin{tabular}[c]{@{}c@{}}gitoxide\\ (20,211)\end{tabular}} & \cmark & \cmark & 930 & 2.851 & 199.45 & \xmark \\
+9 &  & \cmark & \cmark & 1240 & 3.240 & 173.82 & \cmark \\
+10 &  & \cmark & \cmark & 640 & 2.823 & 208.37 & \xmark \\
+11 &  & \cmark & \cmark & 810 & 2.991 & 244.68 & \xmark \\
+12 &  & \cmark & \cmark & 810 & 3.282 & 188.05 & \xmark \\
+13 &  & \cmark & \cmark & 860 & 2.995 & 163.49 & \xmark \\
+14 &  & \cmark & \cmark & 690 & 5.345 & 226.91 & \xmark \\
+15 &  & \cmark & \cmark & 680 & 5.468 & 203.74 & \xmark \\
+16 &  & \cmark & No Data & 540 & N/A & N/A & \xmark \\
+17 &  & \cmark & \cmark & 1200 & 3.283 & 179.40 & \cmark \\
+18 &  & \cmark & \cmark & 920 & 5.241 & 210.62 & \cmark \\
+19 &  & \cmark & \cmark & 2320 & 3.283 & 226.46 & \cmark \\
+20 &  & \xmark & \cmark & 1150 & 5.430 & 192.92 & \cmark \\
+21 &  & \cmark & \cmark & 690 & 3.396 & 123.84 & \xmark \\
+22 &  & \cmark & \cmark & 640 & 2.984 & 264.15 & \xmark \\
+23 &  & \cmark & \cmark & 700 & 3.153 & 132.97 & \xmark \\
+24 &  & \cmark & \cmark & 640 & 3.230 & 147.53 & \xmark \\
+25 &  & \cmark & \cmark & 720 & 3.457 & 221.84 & \xmark \\ \hline
+26 & \multirow{5}{*}{\begin{tabular}[c]{@{}c@{}}kickoff\\ (1,502)\end{tabular}} & \cmark & \cmark & 1030 & 3.802 & 185.09 & \xmark \\
+27 &  & \cmark & \cmark & 1010 & 8.557 & 237.26 & \xmark \\
+28 &  & \cmark & \cmark & 910 & 7.365 & 168.44 & \xmark \\
+29 &  & \cmark & \cmark & 980 & 4.864 & 206.59 & \xmark \\
+30 &  & \cmark & \cmark & 790 & 4.191 & 257.31 & \xmark \\ \hline
+31 & \multirow{9}{*}{\begin{tabular}[c]{@{}c@{}}sniffnet\\ (7,304)\end{tabular}} & \cmark & \cmark & 1040 & 7.288 & 121.06 & \xmark \\
+32 &  & \xmark & \cmark & 760 & 5.674 & 195.22 & \cmark \\
+33 &  & \cmark & \cmark & 1010 & 4.439 & 172.80 & \xmark \\
+34 &  & \cmark & \cmark & 980 & 3.602 & 234.13 & \xmark \\
+35 &  & \cmark & \cmark & 1060 & 3.265 & 141.95 & \xmark \\
+36 &  & \cmark & \cmark & 1000 & 3.507 & 260.42 & \xmark \\
+37 &  & \cmark & \cmark & 1060 & 4.147 & 209.61 & \xmark \\
+38 &  & \cmark & \cmark & 1080 & 4.284 & 187.32 & \xmark \\
+39 &  & \cmark & \cmark & 1060 & 4.273 & 149.40 & \xmark \\ \hline
+40 & beerus (302) & \cmark & \cmark & 1070 & 5.158 & 224.75 & \xmark \\ \hline
+\end{tabular}
+
+    \captionsetup{justification=centering}
+    \caption{Comparison of the new toolchain to the \\original REM toolchain against the same cases.}
+    \label{tab:rem_original_results}
+\end{table}
+
+\newpage
+\subsection{New Capabilities: Results Table}
+\label{subsec:new_results_table}
+
+\begin{table}[h!]
+\hspace*{-1cm}
+\begin{minipage}{\dimexpr\textwidth+1cm\relax}
+\centering
+
+\begin{tabular}{|c|c|cccccc|l|c|}
+\hline
+\multirow{2}{*}{\textbf{\#}} & \multirow{2}{*}{\begin{tabular}[c]{@{}c@{}}Project \\ (LOC)\end{tabular}} & \multicolumn{6}{c|}{Code Features} & \multirow{2}{*}{Res} & \multirow{2}{*}{\begin{tabular}[c]{@{}c@{}}Time\\ (ms)\end{tabular}} \\
+ &  & \multicolumn{1}{c}{GEN} & \multicolumn{1}{c}{ASYNC} & \multicolumn{1}{c}{CONST} & \multicolumn{1}{c}{NLCF} & \multicolumn{1}{c}{HRTB} & \multicolumn{1}{c|}{DYN} &  &  \\ \hline
+1 & \multirow{5}{*}{\begin{tabular}[c]{@{}c@{}}deno \\ (359996)\end{tabular}} &  &  & \cmark &  &  &  & \cmark & 5.882 \\
+2 &  &  &  &  & \cmark &  &  & \xmark \hyperlink{fail-1}{(1)} & N/A \\
+3 &  &  &  &  & \cmark &  &  & \cmark & 4.346 \\
+4 &  & \cmark &  &  & \cmark &  &  & \cmark & 9.685 \\
+5 &  &  & \cmark &  &  &  &  & \cmark & 2.910 \\ \hline
+6 & \multirow{2}{*}{\begin{tabular}[c]{@{}c@{}}fuel-core \\ (78921)\end{tabular}} &  &  &  & \cmark &  &  & \cmark & 6.736 \\
+7 &  &  & \cmark &  &  &  &  & \cmark & 2.999 \\ \hline
+8 & \multirow{5}{*}{\begin{tabular}[c]{@{}c@{}}meilisearch\\ (186553)\end{tabular}} & \cmark &  &  &  &  &  & \cmark & 4.363 \\
+9 &  & \cmark &  &  &  & \cmark &  & \cmark & 12.071 \\
+10 &  & \cmark &  &  &  & \cmark &  & \xmark \hyperlink{fail-2}{(2)} & N/A \\
+11 &  &  &  & \cmark &  &  &  & \cmark & 3.071 \\
+12 &  &  &  & \cmark &  &  &  & \cmark & 3.852 \\ \hline
+13 & \multirow{2}{*}{\begin{tabular}[c]{@{}c@{}}ripgrep \\ (40453)\end{tabular}} & \cmark &  &  & \cmark &  &  & \cmark & 3.117 \\
+14 &  &  &  &  & \cmark &  &  & \cmark & 2.089 \\ \hline
+15 & \multirow{2}{*}{\begin{tabular}[c]{@{}c@{}}starship \\ (37225)\end{tabular}} &  &  &  & \cmark &  &  & \cmark & 1.955 \\
+16 &  & \cmark &  &  &  &  &  & \cmark & 1.866 \\ \hline
+17 & \multirow{3}{*}{\begin{tabular}[c]{@{}c@{}}sway\\ (108725)\end{tabular}} &  &  & \cmark &  &  &  & \cmark & 4.802 \\
+18 &  &  &  & \cmark &  &  &  & \cmark & 3.073 \\
+19 &  & \cmark &  &  &  & \cmark &  & \cmark & 2.365 \\ \hline
+20 & \multirow{4}{*}{\begin{tabular}[c]{@{}c@{}}tauri\\ (83582)\end{tabular}} & \cmark &  &  &  & \cmark &  & \cmark & 1.183 \\
+21 &  & \cmark &  &  & \cmark &  &  & \cmark & 8.565 \\
+22 &  &  &  &  & \cmark &  &  & \cmark & 3.054 \\
+23 &  &  &  &  & \cmark &  &  & \cmark & 5.346 \\ \hline
+24 & \multirow{4}{*}{\begin{tabular}[c]{@{}c@{}}union\\ (514914)\end{tabular}} &  & \cmark &  &  & \cmark &  & \cmark & 3.175\\
+25 &  &  &  & \cmark &  &  &  & \cmark & 2.864\\
+26 &  &  & \cmark &  & \cmark & \cmark &  & \xmark \hyperlink{fail-3}{(3)} & N/A \\
+27 &  &  &  &  &  &  & \cmark & \xmark \hyperlink{fail-4}{(4)} & N/A \\ \hline
+28 & \multirow{4}{*}{\begin{tabular}[c]{@{}c@{}}uv\\ (321584)\end{tabular}} &  &  & \cmark &  &  &  & \cmark & 16.703\\
+29 &  & \cmark &  &  & \cmark & \cmark &  & \cmark & 6.451 \\
+30 &  &  &  & \cmark &  &  &  & \cmark & 2.873 \\
+31 &  & \cmark &  &  &  &  &  & \xmark \hyperlink{fail-5}{(5)} & N/A \\ \hline
+32 & \multirow{3}{*}{\begin{tabular}[c]{@{}c@{}}vaultwarden\\ (29937)\end{tabular}} &  &  & \cmark & \cmark &  &  & \cmark & 5.134 \\
+33 &  &  & \cmark &  &  &  &  & \cmark & 3.057 \\
+34 &  & \cmark &  & \cmark &  &  &  & \xmark \hyperlink{fail-6}{(6)} & NA \\ \hline
+35 & \multirow{6}{*}{\begin{tabular}[c]{@{}c@{}}zed \\ (888269)\end{tabular}} &  &  &  &  &  & \cmark & \xmark \hyperlink{fail-7}{(7)} & N/A \\
+36 &  &  & \cmark &  &  &  & \cmark & \cmark & 7.383 \\
+37 &  &  &  & \cmark &  &  &  & \cmark & 2.062 \\
+38 &  & \cmark & \cmark &  &  & \cmark &  & \cmark & 3.667 \\
+39 &  & \cmark &  &  &  &  &  & \cmark & 1.959 \\
+40 &  &  & \cmark &  &  &  &  & \cmark & 1.853 \\ \hline
+\end{tabular}
+
+\caption{Results of extracting previously unavailable / incompatible language features. More detail on reasons for failure available in Table~\ref{tab:failure_reasons}}
+\label{tab:new_capabilities_results}
+\end{minipage}
+\end{table}
+
+\subsection{Analysis of the Extraction Results}
+\label{subsec:extraction_analysis}
+% go into detail about what the results in each table actually mean first (i.e. where the tables came from)
+% potentially explain combinations we found to never work (async + controlflow)
+
+
+\subsection{Failure Cases of the Extraction Engine}
+\label{subsec:extraction_failures}
+% Common theme when we have &dyn (not all the time but sometimes) is that the extracted signature ends up being _ -> _ - we are unable to determine the type signature
+% Refer to example 2_zed_dyn 
+
+% Would be worth picking two or three of the \xmarked cases and giving my best guess as to why they \xmarked?
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|l|}
+\hline
+\# & Reason \\ \hline
+\hypertarget{fail-1}{1} & Unable to infer function sig \\
+\hypertarget{fail-2}{2} & Unable to infer return type \\
+\hypertarget{fail-3}{3} & Unable to identify correct extraction bounds \\
+\hypertarget{fail-4}{4} & \icodeverb{AsRef<[u8]>} incorrectly mapped to \icodeverb{?Sized} \\
+\hypertarget{fail-5}{5} & Return signature of \icodeverb{_} instead of \icodeverb{Result<S::Ok, S::Error>} \\
+\hypertarget{fail-6}{6} & Failed to copy generic bounds to new sig \\
+\hypertarget{fail-7}{7} & Unable to infer function sig \\ \hline
+\end{tabular}
+\captionsetup{justification=centering}
+\caption{Reasons why the extraction was a \\``failure'' for failure cases from Table~\ref{tab:new_capabilities_results}}
+\label{tab:failure_reasons}
+\end{table}
+
+\vspace*{-5mm}
+\section{Verification: Results and Analysis}
+\label{sec:verification_results_analysis}
+% This section is going to focus more on the performance of the verifyer. We have shown that it works, and that the transformations it performs are non-trivial. Now we need to basically explain that it is available as an option to the developer and what the tradeoffs are for using it.
+
+\newpage
+\subsection{Verification: Results Table}
+\label{subsec:Verification}
+
+\begin{table}[h!]
+\hspace*{-1cm}
+\begin{minipage}{\dimexpr\textwidth+1cm\relax}
+\centering
+
+\begin{tabular}{|c|c|cc|cc|cccc|}
+\hline
+\multirow{2}{*}{\#} & \multirow{2}{*}{Type} & \multicolumn{2}{c|}{Size (LOC)} & \multicolumn{2}{c|}{Verification} & \multicolumn{4}{c|}{Time (ms)}                                                                                                                                                                             \\ \cline{3-10} 
+                    &                       & CLR               & CLE         & A               & S               & \begin{tabular}[c]{@{}c@{}}LLBC \\ Conversion\end{tabular} & \begin{tabular}[c]{@{}c@{}}CoQ \\ Conversion\end{tabular} & \begin{tabular}[c]{@{}c@{}}Proof Creation\\ and Verification\end{tabular} & Total \\ \hline
+1                   &                       & \textbf{}         &             &                 &                 &                                                            &                                                           &                                                                           &       \\
+2                   &                       &                   &             &                 &                 &                                                            &                                                           &                                                                           &       \\
+3                   &                       &                   &             &                 &                 &                                                            &                                                           &                                                                           &       \\
+4                   &                       &                   &             &                 &                 &                                                            &                                                           &                                                                           &       \\
+5                   &                       &                   &             &                 &                 &                                                            &                                                           &                                                                           &       \\
+6                   &                       &                   &             &                 &                 &                                                            &                                                           &                                                                           &       \\
+7                   &                       &                   &             &                 &                 &                                                            &                                                           &                                                                           &       \\
+8                   &                       &                   &             &                 &                 &                                                            &                                                           &                                                                           &       \\
+9                   &                       &                   &             &                 &                 &                                                            &                                                           &                                                                           &       \\
+10                  &                       &                   &             &                 &                 &                                                            &                                                           &                                                                           &       \\ \hline
+11                  &                       &                   &             &                 &                 &                                                            &                                                           &                                                                           &       \\
+12                  &                       &                   &             &                 &                 &                                                            &                                                           &                                                                           &       \\
+13                  &                       &                   &             &                 &                 &                                                            &                                                           &                                                                           &       \\
+14                  &                       &                   &             &                 &                 &                                                            &                                                           &                                                                           &       \\
+15                  &                       &                   &             &                 &                 &                                                            &                                                           &                                                                           &       \\
+16                  &                       &                   &             &                 &                 &                                                            &                                                           &                                                                           &       \\
+17                  &                       &                   &             &                 &                 &                                                            &                                                           &                                                                           &       \\
+18                  &                       &                   &             &                 &                 &                                                            &                                                           &                                                                           &       \\
+19                  &                       &                   &             &                 &                 &                                                            &                                                           &                                                                           &       \\
+20                  &                       &                   &             &                 &                 &                                                            &                                                           &                                                                           &       \\ \hline
+\end{tabular}
+
+\caption{Verification Results and Timings \\ Verification.A = Attempted, .S = \cmarkful}
+\label{tab:verification_results}
+\end{minipage}
+\end{table}
+
+\subsection{Analysis of the Results}
+\label{subsec:verification_analysis}
+
+\subsection{\xmarkure Modes of the Verifyer}
+\label{subsec:verification_failure_modes}
+% Never and _ types (which can be returned by the extraction tool!)

@@ -1,10 +1,26 @@
 \documentclass[oneside,onecolumn,12pt,a4paper,openany]{book}
 \usepackage{anuthesis}
+
+\setlength{\textwidth}{165mm}      % wider text block
+\setlength{\oddsidemargin}{4.6mm}  % gives 30 mm left margin
+\setlength{\evensidemargin}{4.6mm} 
+\setstretch{1.03}
+\setlength{\parskip}{0pt plus 0.5pt}
+
+\AtBeginDocument{%
+  \abovedisplayskip=10pt
+  \belowdisplayskip=10pt
+  \abovedisplayshortskip=6pt
+  \belowdisplayshortskip=6pt
+}
+
 \usepackage{fancyhdr}
 \usepackage{graphicx}
 \usepackage{multirow}
 \usepackage{amsmath}	% Advanced maths commands
 \usepackage{amssymb}	% Extra maths symbols
+\usepackage{amsfonts}
+\usepackage{stmaryrd}  %\llbracket, \rrbracket
 \usepackage{amscd}
 \usepackage{physics}
 \usepackage{rotating} % Rotating table
@@ -16,10 +32,7 @@
 %\usepackage{titlepic}
 \usepackage{setspace}
 \usepackage{changepage}
-\usepackage[colorlinks=true,
-linkcolor=black,
-urlcolor=black,
-citecolor=black, breaklinks=true]{hyperref}
+\usepackage[colorlinks=true, linkcolor=black, urlcolor=black, citecolor=black, breaklinks=true] {hyperref}
 \usepackage{rotating}
 \usepackage{longtable}
 \usepackage[numbers,sort&compress]{natbib}
@@ -29,15 +42,19 @@ citecolor=black, breaklinks=true]{hyperref}
 \usepackage{bbding}
 \usepackage{booktabs}
 \usepackage{tabularx}
+\usepackage{tcolorbox}
+\usepackage{paracol}
+\usepackage{adjustbox}
+\usepackage{siunitx}
 
 \usepackage{cleveref}
 \crefformat{footnote}{#2\footnotemark[#1]#3}
 \usepackage{sidecap}
  \renewcommand{\bottomfraction}{0.7}
 
-\newcommand{\thesistitle}{Refactoring and Verification in Rust}
-\newcommand{\thesistitletwo}{Expanding the REM toolchain }
-\newcommand{\thesistitlethree}{And providing a novel approach to verification}
+\newcommand{\thesistitle}{\textbf{Refactoring and Equivalence in Rust}}
+\newcommand{\thesistitletwo}{\textbf{Expanding the REM toolchain}}
+\newcommand{\thesistitlethree}{\textbf{And Providing a Novel Approach to Automated Equivalence Proofs}}
 \newcommand{\fullname}{Matthew Britton}
 \newcommand{\shortname}{M. Britton}
 \newcommand{\thesissubjects}{Rust, Refactoring, Verification}
@@ -53,15 +70,30 @@ citecolor=black, breaklinks=true]{hyperref}
 \usepackage{color}
 \usepackage[normalem]{ulem}
 \usepackage[dvipsnames]{xcolor}
+% \usepackage{xcolor}
 \usepackage[a4paper, left=1.2in, right=0.8in, top=1in, bottom=1in]{geometry}
 \usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta}
 \usepackage{wrapfig}
 \usepackage{subcaption}
 \usepackage[absolute,overlay]{textpos}
 \usepackage{enumitem}   
+
+\newlist{compactdesc}{description}{1}
+\setlist[compactdesc]{%
+  labelindent=0pt,
+  leftmargin=0pt,
+  labelsep=0.5em,
+  itemsep=0pt,
+  topsep=0pt,
+  partopsep=0pt,
+  parsep=0pt,
+  style=nextline
+}
+
 \usepackage{longtable} 
 
-
+\usepackage[newfloat]{minted}
 \usepackage{minted}
 \setminted{
 	fontsize=\small,
@@ -106,6 +138,8 @@ citecolor=black, breaklinks=true]{hyperref}
 \usepackage{caption}
 \usepackage{subcaption}
 \captionsetup{compatibility=false} %https://tex.stackexchange.com/questions/31906/subcaption-package-compatibility-issue
+\captionsetup[table]{justification=centering}
+
 \usepackage{multicol}        % Multi-column entries in tables
 \usepackage{bm}		% Bold maths symbols, including upright Greek
 \usepackage{booktabs} %to include pandas latex tables
@@ -119,11 +153,43 @@ citecolor=black, breaklinks=true]{hyperref}
 \newcommand{\cmark}{\ding{51}} % ✔
 \newcommand{\xmark}{\ding{55}} % ✘
 
+\makeatletter
+\newcommand{\currentsubfigletter}{\alph{subfigure}}
+\makeatother
+
+\newcommand{\sublistingcaption}[1]{%
+  \caption{#1}%
+  % Add to List of Listings using Figure.Subfigure format
+  \addcontentsline{lol}{listing}{\protect\numberline{\thefigure.\currentsubfigletter}#1}%
+}
 %%%%%%%%%%%%%%%%%%%% DEFINE PAPER ALIASES  HERE %%%%%%%%%%%%%%%%%%%
 
 \onehalfspacing
 
+
 \begin{document}
+
+% Create the table of listings and define a custom caption
+% \renewcommand{\listingscaption}{Code}
+\renewcommand{\listoflistingscaption}{List of Code Listings}
+\renewcommand{\arraystretch}{0.9}
+
+
+\newtcbox{\icodebox}{on line,
+  boxrule=0pt,
+  colback=gray!15,
+  arc=2pt,
+  boxsep=1pt,
+  left=1pt, right=1pt, top=1pt, bottom=1pt,
+}
+
+\newcommand{\icodeverb}[1]{%
+  \icodebox{%
+    \raisebox{-.2ex}{\Verb|#1|}%
+    \vphantom{Ay} % ensures consistent height/depth
+  }%
+}
+
 
 % epigraph settings, for quotes at the start of introduction and conclusions
 \setlength{\epigraphwidth}{12cm}
@@ -149,7 +215,7 @@ citecolor=black, breaklinks=true]{hyperref}
 		{ \fontsize{20}{10} \selectfont \thesistitlethree}
 
 		\vspace{1.5cm}
-		{\bf \huge \fullname}\\
+		{\bf \LARGE \fullname}\\
         \vspace{0.5cm}
         {\large Supervised by:}\\
         {\large Associate Professor Alex Potanin}\\
@@ -167,10 +233,7 @@ citecolor=black, breaklinks=true]{hyperref}
 		\includegraphics[width=0.4\textwidth]{anu-logo-colour.pdf}\\
 		\vspace{1.5cm}
 		{\large \thesisdate}
-
-		% {\bf Submitted:}\\
-		%{\bf Approved:}\\
-		\vspace{1.5cm}
+		\vspace{1cm}
 		{\large  \textcopyright\ Copyright by \fullname,  \thesisyear \\}
 		\vspace{0.5cm}
 		{\large All Rights Reserved}
@@ -241,6 +304,13 @@ citecolor=black, breaklinks=true]{hyperref}
 \phantomsection\addcontentsline{toc}{section}{List of Tables}
 \listoftables\cleardoublepage
 
+% Table of code listings
+\cleardoublepage
+\phantomsection
+\addcontentsline{toc}{section}{\listoflistingscaption} % include in ToC
+\listoflistings
+\cleardoublepage
+
 % Glossary Table
 \phantomsection\addcontentsline{toc}{section}{Glossary}
 \input{glossary.tex}
@@ -248,6 +318,7 @@ citecolor=black, breaklinks=true]{hyperref}
 %%% MAIN CONTENT:
 %
 % page numbering as numbers for content of thesis
+\cleardoublepage
 \pagenumbering{arabic}
 \pagestyle{fancy}
 \fancyhead[LO]{\nouppercase{\rightmark}}
@@ -260,13 +331,13 @@ citecolor=black, breaklinks=true]{hyperref}
 
 %%%%%%%%%%%%%%%%%% MAIN CONTENT %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\include{0_Introduction/introduction}
-\include{1_Chapter1/body}
-\include{2_Chapter2/body}
-\include{3_Chapter3/body}
-\include{4_Chapter4/body}
-\include{5_Conclusions/conclusions}
-
+\newpage
+\input{0_Introduction/introduction}
+\input{1_Chapter1/body}
+\input{2_Chapter2/body}
+\input{3_Chapter3/body}
+\input{4_Chapter4/body}
+\input{5_Conclusions/conclusions}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% BACK CONTENT:

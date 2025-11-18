@@ -1,0 +1,124 @@
+\section{Appendix 7: New Extraction Feature Categories in Detail}
+\label{app:new_extraction_features}
+
+In this appendix we give concrete (although somewhat small) examples for each of the feature categories introduced in Section~\ref{subsec:new_language_features}. The examples are drawn from the repositories listed in Section~\ref{subsec:new_feature_cases}, or are lightly simplified variants of patterns we observed there, and are designed to isolate the behaviour of the extractor in the presence of a particular construct. In addition to asynchronous functions, const evaluation, generics, dynamic trait objects, and higher-ranked trait bounds, we include several instances of non-local control flow. Although the original REM toolchain could already handle some non-local control-flow refactorings, the new extraction engine implements them via the (now) standard \icodeverb{std::ops::ControlFlow} variants rather than custom enums, and we therefore evaluate them separately. Together, these examples characterise the kinds of advanced language mechanics that the original REM could not support and that the new toolchain is explicitly designed to handle, allowing us to check that it preserves semantics, typing, and compilation validity in each case.
+
+\subsubsection{Generics (GEN)}
+
+This case targets a generic function with multiple trait bounds, verifying that these are copied exactly to the extracted function. The extractor must not monomorphise or omit generic parameters, as doing so would restrict the function’s polymorphism and likely fail type checking. Additionally, if only a subset of the caller functions trait bounds apply to the callee (e.g. it only takes one of many generic arguments), then we would expect just the applicable trait bounds to be copied). 
+
+\begin{minipage}[t]{0.43\linewidth}
+    \vspace{0pt}% align tops
+    \captionsetup{type=listing} 
+    \inputminted[             fontsize=\scriptsize,             frame=lines,             linenos,             breaklines,         ]{rust}{6_appendices/app7_code/generics/before.rs}
+    \captionof{listing}{Generics Example: Before}
+    \label{lst:generics-before}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.43\linewidth}
+    \vspace{0pt}
+    \captionsetup{type=listing}
+    \inputminted[             fontsize=\scriptsize,             frame=lines,             linenos,             breaklines,         ]{rust}{6_appendices/app7_code/generics/after.rs}
+    \captionof{listing}{Generics Example: After}
+    \label{lst:generics-after}
+\end{minipage}
+
+\subsubsection{Async and Await (ASYNC)}
+
+This case targets extraction from within an \icodeverb{async fn}, where the inserted boundaries must remain within the compiler-generated state machine \footnote{\texttt{rustc} automatically generates a struct that acts as a state machine, with an internal state variable and a poll method. Each await point becomes a place where the state machine can pause, return \icodeverb{Poll::Pending}, and be resumed later by the runtime without losing its state.}.The extractor must correctly preserve the asynchronous context and the \icodeverb{Result} return type implied by \icodeverb{?}, while ensuring that lifetimes and borrows are not widened across the await suspension point. If the lifetimes produced by the extraction engine are incorrect, we expect REM-Repairer to correct them. 
+
+\begin{minipage}[t]{0.43\linewidth}
+    \vspace{0pt}% align tops
+    \captionsetup{type=listing} 
+    \inputminted[             fontsize=\scriptsize,             frame=lines,             linenos,             breaklines,         ]{rust}{6_appendices/app7_code/async/before.rs}
+    \captionof{listing}{Async Example: Before}
+    \label{lst:async-before}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.43\linewidth}
+    \vspace{0pt}
+    \captionsetup{type=listing}
+    \label{lst:async-after}
+    \inputminted[             fontsize=\scriptsize,             frame=lines,             linenos,             breaklines,         ]{rust}{6_appendices/app7_code/async/after.rs}
+    \captionof{listing}{Async Example: After}
+\end{minipage}
+
+\subsubsection{Constant declarations (CONST)}
+
+This case covers extraction within a \icodeverb{const fn}, which must remain evaluable at compile time under Rust's const-checking rules. Thus the extraction engine must identify const contexts, and where possible, propagate the \icodeverb{const} qualifier to the new function to maintain those guaruntees.
+
+\begin{minipage}[t]{0.43\linewidth}
+    \vspace{0pt}% align tops
+    \captionsetup{type=listing} 
+    \inputminted[             fontsize=\scriptsize,             frame=lines,             linenos,             breaklines,         ]{rust}{6_appendices/app7_code/const/before.rs}
+    \captionof{listing}{CONST Example: Before}
+    \label{lst:const-before}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.43\linewidth}
+    \vspace{0pt}
+    \captionsetup{type=listing}
+    \inputminted[             fontsize=\scriptsize,             frame=lines,             linenos,             breaklines,         ]{rust}{6_appendices/app7_code/const/after.rs}
+    \captionof{listing}{CONST Example: After}
+    \label{lst:const-after}
+\end{minipage}
+
+\subsubsection{Non Local Control Flow (NLCF)}
+
+This case covers all aspects of NLCF, being \icodeverb{return}, \icodeverb{break}, and \icodeverb{continue} in Rust. NLCF objects cannot cross function boundaries, and as such the extraction engine must reify control flow into a return value, using \icodeverb{std::ops::ControlFlow} variants to communicate termination or continuation back to the caller. As mentioned previously, this differs from REM's original insertion of custom enums to outline control flow handling, as we rely on the extraction engine to provide this information rather than REM-Controller. 
+
+\begin{minipage}[t]{0.43\linewidth}
+    \vspace{0pt}% align tops
+    \captionsetup{type=listing} 
+    \inputminted[             fontsize=\scriptsize,             frame=lines,             linenos,             breaklines,         ]{rust}{6_appendices/app7_code/NLCF/before.rs}
+    \captionof{listing}{NLCF Example: Before}
+    \label{lst:nlcf-before}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.43\linewidth}
+    \vspace{0pt}
+    \captionsetup{type=listing}
+    \inputminted[             fontsize=\scriptsize,             frame=lines,             linenos,             breaklines,         ]{rust}{6_appendices/app7_code/NLCF/after.rs}
+    \captionof{listing}{NLCF Example: After}
+    \label{lst:nlcf-after}
+\end{minipage}
+
+\subsubsection{Higher Ranked Trait Bounds (HRTB)}
+
+This case examines extraction from functions parameterised by higher-ranked trait bounds such as \icodeverb{for<'a> Fn(&'a T) -> &'a T}. These bounds are not inferred implicitly and must be explicitly copied to the new function signature to maintain lifetime correctness. Again, REM-Repairer is expected to be called here to either a) verify that the lifetimes are correct, and / or b) fix the incorrect lifetime bounds.
+
+\begin{minipage}[t]{0.43\linewidth}
+    \vspace{0pt}% align tops
+    \captionsetup{type=listing} 
+    \inputminted[             fontsize=\scriptsize,             frame=lines,             linenos,             breaklines,         ]{rust}{6_appendices/app7_code/HRTB/before.rs}
+    \captionof{listing}{HRTB Example: Before}
+    \label{lst:hrtb-before}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.43\linewidth}
+    \vspace{0pt}
+    \captionsetup{type=listing}
+    \inputminted[             fontsize=\scriptsize,             frame=lines,             linenos,             breaklines,         ]{rust}{6_appendices/app7_code/HRTB/after.rs}
+    \captionof{listing}{HRTB Example: After}
+    \label{lst:hrtb-after}
+\end{minipage}
+
+\subsubsection{Dynamic Trait Objects (DTO)}
+
+Here we isolate extraction involving a \icodeverb{&dyn Trait} parameter to test the extraction engines preservation of dynamic dispatch and object safety. The extractor must retain the trait object type and avoid replacing it with a generic bound, which would alter runtime behaviour. The category also includes cases where a function's arguments implement a trait, e.g. \icodeverb{fn ident(s: impl Into<String> -> ...}. 
+
+\begin{minipage}[t]{0.43\linewidth}
+    \vspace{0pt}% align tops
+    \captionsetup{type=listing} 
+    \inputminted[             fontsize=\scriptsize,             frame=lines,             linenos,             breaklines,         ]{rust}{6_appendices/app7_code/DTO/before.rs}
+    \captionof{listing}{DTO Example: Before}
+    \label{lst:dto-before}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.43\linewidth}
+    \vspace{0pt}
+    \captionsetup{type=listing}
+    \inputminted[             fontsize=\scriptsize,             frame=lines,             linenos,             breaklines,         ]{rust}{6_appendices/app7_code/DTO/after.rs}
+    \captionof{listing}{DTO Example: After}
+    \label{lst:dto-after}
+\end{minipage}

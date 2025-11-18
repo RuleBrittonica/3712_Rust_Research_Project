@@ -1,0 +1,24 @@
+\section{Appendix 6: (Almost) Complete Coq Translations}
+\label{app:coq_translations}
+Some of the Coq boilerplate has been removed to make these inclusions sensible. Still it is clear how massive the translation can get for even a small example. 
+
+\captionsetup{justification=centering,type=listing}
+\inputminted[
+    fontsize=\scriptsize,
+    linenos,
+    frame=lines,
+    breaklines
+]{coq}{3_Chapter3/complex_example/Orig2.v}
+\captionof{listing}{Original Coq translation, less some boilerplate}
+\label{lst:orig-coq}
+
+\newpage
+\captionsetup{justification=centering,type=listing}
+\inputminted[
+    fontsize=\scriptsize,
+    linenos,
+    frame=lines,
+    breaklines
+]{coq}{3_Chapter3/complex_example/Wrong2.v}
+\captionof{listing}{Coq translation of the Incorrect Extraction, less some boilerplate}
+\label{lst:wrong-coq}

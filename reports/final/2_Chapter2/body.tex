@@ -1,5 +1,6 @@
 \chapter{Expanding the Capabilities of REM}
 \label{chap:expanding_rem}
+\vspace*{-20mm}
 
 Automated refactoring in Rust has long been constrained by the languages strict
 ownership, borrowing and lifetime rules. Early prototypes of the Rusty Extraction
@@ -10,29 +11,236 @@ entire toolchain was reliant on a fragile integration with IntelliJ, which
 quickly became outdated. As a result, REM remained an academic proof-of-concept
 rather than a tool developers could realistically adopt.
 
-This chapter details how REM has evolved from a fragile prototype into a robust, modular, and extensible system. At its core, REM now operates through a streamlined, multi-component pipeline designed for speed, flexibility, and integration with modern Rust workflows.
+This chapter details how REM has evolved from a fragile prototype into a robust, modular, and extensible system. At its core, REM2.0 now operates through a streamlined, multi-component pipeline designed for speed, flexibility, and integration with modern Rust workflows.
 
-The REM server orchestrates the entire process through a JSON-RPC interface, coordinating extraction, repair, and verification processes (the latter discussed in Chapter 3). The extraction tool, built directly on top of Rust Analyzer’s incremental analysis engine, performs lightning-fast semantic extraction while integrating the capabilities of REM’s original controller and borrower modules. The repairer tool, adapted from the original REM toolchain, continues to play a key role in resolving lifetimes and other semantic inconsistencies that may arise during refactoring.
+The REM server orchestrates the entire process through a JSON-RPC interface, coordinating extraction, repair, and equivalence checking processes (the latter discussed in Chapter \ref{chap:verification}). The extraction tool, built directly on top of Rust Analyzer's incremental analysis engine, performs lightning-fast semantic extraction while integrating the capabilities of REM's original controller and borrower modules. The repairer tool, adapted from the original REM toolchain, continues to play a key role in resolving lifetimes and other semantic inconsistencies that may arise during refactoring.
 
-Finally, a prototype Visual Studio Code (VSCode) extension connects with the REM server to deliver near-instant feedback—typically around 200 ms end-to-end (see Chapter 4). Together, these components transform REM into a practical refactoring system capable of integrating into everyday Rust development while preserving its foundation as a platform for continued research.
+Finally, a prototype Visual Studio Code (VSCode) extension connects with the REM server to deliver near-instant feedback—typically around 200 ms end-to-end (see Chapter \ref{chap:evaluation_experimental_results}). Together, these components transform REM into a practical refactoring system capable of integrating into everyday Rust development while preserving its foundation as a platform for continued research.
 
-\section{Motivation}
+\vspace{-5mm}
+\section{Motivation: Why REM needed to change}
 \label{sec:expanding_motivation}
 
-\section{Architecture Overview}
+The original REM prototype demonstrated that automated extract-method refactoring for Rust was possible, but its design also exposed several fundamental limitations. At its core, REM relied on repeated invocations of \texttt{cargo check} and a set of highly unstable \texttt{rustc} internals, as well as the IntelliJ IDEA Rust plugin, which has since been superseded by RustRover and was never particularly stable during the lifetime of this project. As a consequence, the toolchain was slow, fragile, and extremely sensitive to minor changes in both the Rust ecosystem and the underlying editor integration. Its viability as anything beyond a research prototype was effectively non-existent: before any new work could begin, it took over a month of effort just to restore the original implementation to a usable state.
+
+These architectural choices also severely constrained the kinds of Rust programs that REM could handle. Even small, modern Rust fragments routinely use language features that REM was simply unable to process. For example, REM could not extract from even minimal asynchronous functions:
+\begin{minted}[fontsize=\footnotesize]{rust}
+async fn fetch() {
+    let v = client.get("/").await; // REM failed to recognise the `await`
+}
+\end{minted}
+nor could it handle functions involving generic parameters or bounds:
+\begin{minted}[fontsize=\footnotesize]{rust}
+fn min<T: Ord>(a: T, b: T) -> T { /* ... */ }
+\end{minted}
+and it struggled with non-local control flow such as \texttt{break} or \texttt{return} inside loops:
+\begin{minted}[fontsize=\footnotesize]{rust}
+for x in xs {
+    if x < 0 { break; } // difficult for REM to lift cleanly into a new function
+}
+\end{minted}
+
+Language features that are now commonplace in production codebases---such as \texttt{async}/\texttt{await}, const evaluation, generics with non-trivial bounds, trait objects, higher-ranked trait bounds, and non-local control flow\footnote{Non-local control flow \emph{is} supported by REM, but its implementation relies on one-off custom generics rather than the modern \icodeverb{std::ops::ControlFlow} abstraction.}---lay entirely outside REM's reliably supported fragment. Although the original codebase contained many scattered TODOs mentioning future support for generics or async, there was no coherent plan for how to integrate such features into the pipeline. In practice, this meant that REM could sometimes operate successfully on specific large projects such as \texttt{gitoxide}, but in our testing, it would frequently fail or time out when faced with more complex codebases like Deno, Tokio, or Vaultwarden, where these advanced features are pervasive.
+
+Perhaps most importantly, REM provided no formal safety net. Its extraction decisions were driven largely by syntactic AST rewriting rather than a deep semantic understanding of the program, and there was no verification pipeline to check that transformations preserved behaviour. A refactoring could silently change program semantics while still compiling, and the tool had no mechanism to detect or prevent such regressions. Together, these limitations motivated a complete redesign of the system: if extraction was to be useful for everyday Rust development, REM had to become faster, more robust, feature-complete, and semantically trustworthy.
+
+% \vspace{-5mm}
+\section{High Level Vision: What REM2.0 Needed to Achieve}
+\label{sec:high_level_vision}
+
+REM2.0 was designed in response to these shortcomings with a clear set of high-level goals. The first was performance: the roughly one-second turnaround time of the original REM \emph{after} IntelliJ performed the initial extraction was unacceptable for an interactive refactoring workflow. To feel natural inside an IDE, extraction had to complete in well under a second, ideally within the sub-500\,ms range. Achieving this required abandoning the ``re-run the compiler'' model in favour of a persistent semantic engine. At the same time, REM2.0 needed to move beyond the restricted language subset of its predecessor and support essentially any piece of real Rust code. This meant handling async functions, const evaluation, generics (including complex bounds), trait objects, higher-ranked trait bounds, and non-local control flow as real language features rather than TODOs in the source tree.
+
+A second, equally important, goal was accessibility. The original REM existed primarily as a research artefact and demanded significant effort to build, configure, and operate; very few everyday developers could realistically benefit from it. REM2.0, by contrast, is intended as a tool that can be adopted with minimal friction: it should integrate cleanly with common development workflows, expose its functionality through a familiar VSCode interface, and have no interaction with unstable compiler internals\footnote{The version of these internals available to the installed program is entirely dependent on the compiler being used by the developer, and thus the original REM could be completely incompatible with a codebase.}. Behind the straightforward interface, the system must still uphold strong correctness guarantees. Refactorings are deterministic and built on a stable representation designed for reliable transformation and verification. With help from a correctness backend, the tool ensures not only safety but behavioural equivalence. In short, REM 2.0 aims to be fast, compatible with modern Rust, and never silently break code.
+
+\vspace{-5mm}
+\section{REM2.0 At a Glance: Core Contributions}
+\label{sec:at_a_glance}
+Before delving into architecture and implementation details, it is useful to summarise the key contributions of REM2.0 at a high level. Collectively, the below changes / upgrades transform REM from a fragile research prototype into a practical, extensible refactoring toolchain for modern Rust.
+
+\begin{itemize}[noitemsep, topsep=2pt,leftmargin=1em]
+
+  \item \textbf{Rust-Analyzer-backed extraction engine.} REM~2.0 replaces direct dependence on \texttt{rustc} internals and editor-specific plugins with a new extraction engine that uses Rust-Analyzer as its backend. A custom ``single-file workspace'' abstraction allows us to run extract-method relative to the current file while still benefiting from Rust-Analyzer's full semantic analysis capabilities.
+
+  \item \textbf{Full language-feature coverage for extraction.} Building on Rust-Analyzer's capabilities, REM2.0 supports extraction in the presence of async functions, const evaluation, generics (including complex bounds), trait objects, higher-ranked trait bounds, and non-local control flow, rather than restricting itself to a narrow, hand-picked fragment of Rust.
+  
+  \item \textbf{Preservation and extension of REM's lifetime repair.} The new system maintains all core capabilities of the original REM, in particular its ability to repair lifetime annotations and placements after extraction, while integrating these repairs into a far more useful and usable pipeline. REM2.0 gives the developer the ability to pick and choose between maximum correctness, maximum responsiveness, or a combination of the two.
+
+  \item \textbf{Verification backend for behavioural equivalence.} REM2.0 introduces an end-to-end verification pipeline that translates extracted code through Charon and LLBC to Aeneas and Coq, where equivalence between the original and refactored functions can be proved (or refuted) automatically. See Section~\ref{sec:ref_to_verification} and Chapter~\ref{chap:verification} for a full explanation.
+
+  \item \textbf{VSCode integration for interactive refactoring.} A new VSCode extension exposes REM~2.0 as an interactive refactoring tool, providing extract-method commands, preview and undo functionality, and surfacing verifier results directly to the developer.
+
+\end{itemize}
+
+Together, these contributions establish REM~2.0 as a fast, feature-complete, and semantically aware extract-method toolchain that is suitable both for research and for everyday Rust development.
+
+\vspace{-5mm}
+\section{Overview of the REM2.0 Architecture}
 \label{sec:architecture_overview}
 
-\section{Single-File Analysis}
-\label{sec:single_file_analysis}
+\begin{figure}[ht]
+  \centering
+  \large
+  \resizebox{\textwidth}{!}{%
+  \begin{tikzpicture}[node distance=2.2cm and 2.6cm, >=Stealth, thick, font=\Large]
+    % Styles
+    \tikzstyle{block}=[draw, rounded corners, fill=blue!10,
+      minimum width=6cm, minimum height=2.5cm, align=center]
 
-\section{Extraction Workflow}
-\label{sec:extraction_workflow}
+    % Top: VS Code
+    \node[block] (vscode) {VS Code Extension\\(Interactive Frontend)};
 
-\section{Handling Advanced Language Features}
-\label{sec:handling_advanced_language_features}
+    % Middle: REM Server
+    \node[block, below=of vscode] (server) {REM Server\\(JSON-RPC Orchestrator)};
 
-\section{Editor Integration}
-\label{sec:editor_integration}
+    % Bottom row: three components
+    \node[block, below left=1.8cm and 5.0cm of server] (extractor)
+      {Extraction Engine\\(Rust Analyzer–backed, single-file)};
+    \node[block, below=1.8cm of server] (repairer)
+      {REM Repairer\\(Lifetimes)};
+    \node[block, below right=1.8cm and 5.0cm of server] (verify)
+      {Verification Pipeline\\(CHARON + AENEAS + Coq) \\ (Chapter \ref{chap:verification})};
 
-\section{Future Directions}
-\label{sec:expanding_future_directions}
+    % Edges
+    \draw[<->] (vscode) -- (server);
+    \draw[->]  (server) -- (extractor);
+    \draw[->]  (server) -- (repairer);
+    \draw[->]  (server) -- (verify);
+  \end{tikzpicture}%
+  }
+  \captionsetup{justification=centering}
+  \caption{High-level overview of the expanded REM architecture: VS Code communicates bidirectionally with the REM Server, which dispatches to the Extraction Engine, the REM Repairer, and the REM Verification pipeline.}
+  \label{fig:rem_architecture_overview}
+\end{figure}
+
+The expanded REM architecture is organised around a modular, service-oriented design that is able to decouple the interactive editing from semantic analysis and its surrounding logic. Figure \ref{fig:rem_architecture_overview} illustrates the system's structure at the highest level.
+
+At the centre of the system is the REM server, a lightweight orchestrator that exposes a JSON-RPC (Remote Procedure Call) interface to the VSCode extension. The server can also be rexported as a CLI to be integrated into local programs \footnote{https://crates.io/crates/rem-command-line}. The server is responsible for coordinating all major operations - \emph{extraction}, \emph{repair}, and \emph{verification}, for handling errors and for providing immediate feedback as to whether an operation is possible. Crucially, the interface is completely generic, and has been designed to be very easily adaptable to any other IDE. 
+
+The extraction engine (REM Extract) forms the analytical core of the new toolchain. Built directly atop of Rust Analyzer, its key innovation is being able to perform semantic extraction over a \textit{single source file} rather than an entire crate. This adaptation is key to REM's speed: whereas Rust Analyzer typically analyses entire projects to populate its HIR (High-Level Intermediate Representation), our engine is able to leverage internal features and interfaces to perform analysis on a single file without needing to consider the wider module / crate context. Given an extraction request (\verb|file path, selection range, function name|), the engine constructs a minimal semantic model of the file, determines the precise boundaries of the selection, and synthesises the extracted function and corresponding call-site edits. The engine is also capable of returning extract semantic information up the chain depending on the mode in which it is called and the requirements of the downstream elements. 
+
+Once extraction is complete`, the resulting transformation is then (optionally) passed into REM Repairer. The repairer is a direct descendant of the original REM prototype but re-engineered for performance and modularity. Its task is to reify and correct any missing lifetimes (as guided by \verb|cargo check|), before applying a series of lifetime elision rules to attempt to bring the resultant mess into a form that is (mostly) human readable. The main algorithm is still the same as was discussed in Adventure of a Lifetime \cite{AdventureOfALifetime}, so we have omitted a large discussion of it from this report. 
+
+Finally, the VSCode extension provides the user-facing layer of the system. Acting as a thin client, it serialises extraction requests to the REM server and applies the returned edits to the open buffer. Bidirectional communication over JSON-RPC enables sub-200 ms round-trip times from user action to visual feedback. From the user's perspective, REM behaves like a native IDE feature rather than an external tool. 
+
+\section{Single-File Workspaces over Rust-Analyzer}
+\label{sec:single_file_workspace}
+
+\vspace*{-2.5mm}
+A central constraint for REM2.0's speed is the ability to run extract-method on demand, without re-analysing an entire project, or even really having access to the entire project. Rust-Analyzer (RA), however, is designed around crate-level workspaces: it expects a \texttt{Cargo.toml}, a dependency graph, and a complete module tree before it will perform semantic analysis. To bridge this mismatch, REM2.0 constructs a lightweight, synthetic ``single-file workspace'' in which the file currently being refactored is treated as an isolated crate. This workspace contains only the minimum metadata necessary for RA to parse, index, and type-check the file.
+
+This abstraction gives us fast, incremental semantics while avoiding the cost of repeatedly analysing a full repository. However, as we discovered, a single-file workspace lacks any knowledge of the standard library: types available by default such as \icodeverb{Vec<T>}, \icodeverb{Option<T>}, \icodeverb{String}, or even \icodeverb{Result<T,E>} are not available unless for some reason they have been explicitly imported by the user. Rust-Analyser therefore assigns placeholder types (internally represented as ``\_'' or incomplete inference variables) whenever an extracted function must reference a std-provided type. 
+
+Figure~\ref{fig:std_extraction} highlights just how significant this limitation is. Extracting Listing~\ref{lst:std-original} should produce the fully inferred function in Listing~\ref{lst:std-fix}, but in a single-file workspace (without \icodeverb{std}/\icodeverb{core} loaded), RA instead generates the incomplete signature shown in Listing~\ref{lst:std-fail}. Because this placeholder type propagates into the call site and return position, the resulting code no longer compiles.
+
+\begin{figure}[H]
+\centering
+
+\begin{subfigure}[t]{0.32\textwidth}
+    \centering
+    \inputminted[
+        fontsize=\scriptsize,
+        linenos,
+        frame=lines
+    ]{rust}{2_Chapter2/code/orig.rs}
+    \captionsetup{justification=centering}
+    \sublistingcaption{Original Code}
+    \label{lst:std-original}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.32\textwidth}
+    \centering
+    \inputminted[
+        fontsize=\scriptsize,
+        linenos,
+        frame=lines
+    ]{rust}{2_Chapter2/code/fail.rs}
+    \captionsetup{justification=centering}
+    \sublistingcaption{Failed Extraction \\ As \texttt{std} is out of scope}
+    \label{lst:std-fail}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.32\textwidth}
+    \centering
+    \inputminted[
+        fontsize=\scriptsize,
+        linenos,
+        frame=lines
+    ]{rust}{2_Chapter2/code/fix.rs}
+    \captionsetup{justification=centering}
+    \sublistingcaption{Correct Extraction \\ Now that \texttt{std} is in scope}
+    \label{lst:std-fix}
+\end{subfigure}
+
+\captionsetup{justification=centering}
+\caption{Comparison of an extraction prior to the \texttt{std} and \texttt{core} fixes and after. Before we return a `\_' as a placeholder, as Rust-Analyzer is unable to infer the type without the semantic information provided by \texttt{std}.}
+\label{fig:std_extraction}
+\end{figure}
+
+\vspace*{-5mm}
+To address this problem, REM~2.0 constructs a second, persistent workspace containing the complete set of standard crates and their dependency graph. This workspace is initialised once when the VSCode extension starts (a one-time expensive step) and is assumed to remain stable across refactorings. During extraction, REM merges the semantic graphs of the \icodeverb{std} workspace and the single-file workspace, producing an ``effective'' workspace with full knowledge of both user code and the standard library. With this view, RA regains the ability to infer types such as \texttt{Vec<T>} correctly, restoring the fully inferred extraction shown in Listing~\ref{lst:std-fix}. The complete set of standard crates imported into this persistent workspace is shown alongside.
+
+\vspace{-2.5mm}
+\begin{figure}[H]
+\centering
+\begin{minipage}[t]{0.5\textwidth}
+To address this problem, REM2.0 constructs a second, persistent workspace containing the complete set of standard crates and their dependency graph. This workspace is initialised once when the VSCode extension starts (a one-time expensive step) and is assumed to remain stable across refactorings. During extraction, REM merges the semantic graphs of the \icodeverb{std} workspace and the single-file workspace, producing an ``effective'' workspace with full knowledge of both user code and the standard library. With this view, RA regains the ability to infer types such as \icodeverb{Vec<T>} correctly, restoring the fully inferred extraction shown in Listing~\ref{lst:std-fix}. The complete set of standard crates imported into this persistent workspace is shown alongside.
+\end{minipage}\hfill%
+\begin{minipage}[t]{0.48\textwidth}
+\small
+\footnotesize
+\begin{verbatim}
+crate Idx::<CData>(0) -> core
+crate Idx::<CData>(1) -> compiler_builtins
+crate Idx::<CData>(2) -> alloc
+crate Idx::<CData>(3) -> panic_abort
+crate Idx::<CData>(4) -> libc
+crate Idx::<CData>(5) -> unwind
+crate Idx::<CData>(6) -> panic_unwind
+crate Idx::<CData>(7) -> std_detect
+crate Idx::<CData>(8) -> cfg_if
+crate Idx::<CData>(9) -> hashbrown
+crate Idx::<CData>(10) -> rand_core
+crate Idx::<CData>(11) -> rand
+crate Idx::<CData>(12) -> rand_xorshift
+crate Idx::<CData>(13) -> rustc_demangle
+crate Idx::<CData>(14) -> std
+crate Idx::<CData>(15) -> rustc_literal_escaper
+crate Idx::<CData>(16) -> proc_macro
+crate Idx::<CData>(17) -> getopts
+crate Idx::<CData>(18) -> test
+\end{verbatim}
+\captionsetup{justification=centering}
+\captionof{listing}{Crates in the std workspace}
+\label{fig:std_crate_list_fallback}
+\end{minipage}
+\end{figure}
+
+\vspace{-5mm}
+\subsection{Leveraging Rust-Analyzer's Extract Method}
+\label{sec:ra_extract_integration}
+
+With the effective workspace in place, REM2.0 relies directly on RA's built-in \emph{Extract Function} assist. Instead of re-implementing extraction logic, REM2.0 issues the same internal request that a client editor would send to RA: the file contents, the selected range, and a desired function name. RA then returns a structured edit describing (1) a new function with fully inferred types, generics, lifetimes, and where-clauses, and (2) a rewritten call site at the extraction point.
+
+This delegation is critical. RA already contains sophisticated logic for name resolution, trait and impl lookup, async/await de-sugaring, const evaluation, higher-ranked trait bounds, and non-local control flow analysis. By using its extract-method implementation as the semantic source of truth, REM2.0 inherits support for the full Rust language surface—including features that would be prohibitively difficult or brittle to handle manually. It also allows REM2.0 to fully benefit from years of active development in this space, allowing us to focus on expanding the capability of the whole REM2.0 toolchain rather than attempting to rewrite something that already exists. We are also able to query the semantic analysis returned by RA to improve the repair and verification stages that come next. 
+
+REM~2.0 treats the edits returned by RA as a semantic blueprint, adapting them only as needed for lifetime repair, call-site updates, and optional verification. Rather than maintaining its own parallel program state, REM is able to query RA directly for any additional type or lifetime information, allowing it to build on RA's mature transformations while adding its own layers of structure and correctness checking.
+
+\vspace{-5mm}
+\section{VSCode Integration and the REM Daemon}
+\label{sec:vscode_and_daemon}
+\vspace*{-2.5mm}
+To make extraction accessible to everyday Rust developers, REM2.0 is exposed through a dedicated VSCode extension backed by a persistent ``REM daemon.'' The daemon runs as a long-lived process and communicates with the extension over a lightweight JSON-RPC protocol via \texttt{stdin}/\texttt{stdout}, enabling the lightning fast refactorings without the overhead of repeated process launches. On startup, the extension performs an environment check to ensure that the Daemon, CHARON, AENEAS and Coqc are available; if not, it presents targeted installation instructions directly in the editor. From the user's perspective, extraction appears as a standard VSCode code action: selecting a region triggers a panel, options for naming the new function, and (when equivalence checking is enabled) clear feedback on whether the refactoring preserves semantics. This architecture provides a seamless and familiar developer experience while hiding the complexity of the underlying pipeline. Figure~\ref{fig:vscode_options} below is the list of options presented to the developer, and they can also be given keyboard shortcuts for ease of use. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{2_Chapter2/extract_method_screenshot.jpg}
+    \captionsetup{justification=centering}
+    \caption{Options presented to the user when they have selected a region to extract.}
+    \label{fig:vscode_options}
+\end{figure}
+
+\vspace{-7.5mm}
+\subsection{Preparing Refactorings for Verification}
+\label{sec:ref_to_verification}
+
+Although the verification pipeline is described in detail in Chapter~\ref{chap:verification}, with specific implementation details in Section~\ref{sec:implementation_verification}, REM2.0 performs a small amount of preparation at extraction time to ensure that refactorings can be checked efficiently. For each extraction, REM2.0 captures both the original function body and the newly generated function in isolated ``virtual crates'', preserving the exact syntax and inferred types returned by RA. These crates form the minimal input required by CHARON and allow the verifier to compare only the code relevant to the transformation, rather than the surrounding project.
